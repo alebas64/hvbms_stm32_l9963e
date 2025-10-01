@@ -1,0 +1,983 @@
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"can_utils.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/can_utils.c"
+  20              		.section	.text.can_routines_init,"ax",%progbits
+  21              		.align	1
+  22              		.global	can_routines_init
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	can_routines_init:
+  28              	.LVL0:
+  29              	.LFB134:
+   1:Core/Src/can_utils.c **** #include "can_utils.h"
+   2:Core/Src/can_utils.c **** 
+   3:Core/Src/can_utils.c **** uint8_t send_buffer[8];
+   4:Core/Src/can_utils.c **** pack_information_t *pack_information_pointer = NULL;
+   5:Core/Src/can_utils.c **** void can_routines_init(pack_information_t *ptr){
+  30              		.loc 1 5 48 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+   6:Core/Src/can_utils.c ****     pack_information_pointer = ptr;
+  35              		.loc 1 6 5 view .LVU1
+  36              		.loc 1 6 30 is_stmt 0 view .LVU2
+  37 0000 014B     		ldr	r3, .L2
+  38 0002 1860     		str	r0, [r3]
+   7:Core/Src/can_utils.c **** }
+  39              		.loc 1 7 1 view .LVU3
+  40 0004 7047     		bx	lr
+  41              	.L3:
+  42 0006 00BF     		.align	2
+  43              	.L2:
+  44 0008 00000000 		.word	pack_information_pointer
+  45              		.cfi_endproc
+  46              	.LFE134:
+  48              		.section	.text.can_receive_routine,"ax",%progbits
+  49              		.align	1
+  50              		.global	can_receive_routine
+  51              		.syntax unified
+  52              		.thumb
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 2
+
+
+  53              		.thumb_func
+  55              	can_receive_routine:
+  56              	.LFB136:
+   8:Core/Src/can_utils.c **** 
+   9:Core/Src/can_utils.c **** void can_send_routine(){
+  10:Core/Src/can_utils.c ****     //uint16_t const *cells = L9963E_utils_get_cells();
+  11:Core/Src/can_utils.c ****     uint16_t cells[L9963Es_TOTAL_CELLS_N];
+  12:Core/Src/can_utils.c ****     //L9963E_utils_get_cells(cells);
+  13:Core/Src/can_utils.c ****     uint8_t buffer[8];
+  14:Core/Src/can_utils.c **** 
+  15:Core/Src/can_utils.c ****     buffer[0]=(cells[0]&0xFF00)>8;
+  16:Core/Src/can_utils.c ****     buffer[1]=cells[0]&0xFF;
+  17:Core/Src/can_utils.c ****     buffer[2]=(cells[1]&0xFF00)>8;
+  18:Core/Src/can_utils.c ****     buffer[3]=cells[1]&0xFF;
+  19:Core/Src/can_utils.c ****     buffer[4]=(cells[2]&0xFF00)>8;
+  20:Core/Src/can_utils.c ****     buffer[5]=cells[2]&0xFF;
+  21:Core/Src/can_utils.c ****     buffer[6]=(cells[3]&0xFF00)>8;
+  22:Core/Src/can_utils.c ****     buffer[7]=cells[3]&0xFF;
+  23:Core/Src/can_utils.c ****     can_send_msg(0x100,buffer);
+  24:Core/Src/can_utils.c **** 
+  25:Core/Src/can_utils.c ****     buffer[0]=(cells[4]&0xFF00)>8;
+  26:Core/Src/can_utils.c ****     buffer[1]=cells[4]&0xFF;
+  27:Core/Src/can_utils.c ****     buffer[2]=(cells[5]&0xFF00)>8;
+  28:Core/Src/can_utils.c ****     buffer[3]=cells[5]&0xFF;
+  29:Core/Src/can_utils.c ****     buffer[4]=(cells[6]&0xFF00)>8;
+  30:Core/Src/can_utils.c ****     buffer[5]=cells[6]&0xFF;
+  31:Core/Src/can_utils.c ****     buffer[6]=(cells[7]&0xFF00)>8;
+  32:Core/Src/can_utils.c ****     buffer[7]=cells[7]&0xFF;
+  33:Core/Src/can_utils.c ****     can_send_msg(0x101,buffer);
+  34:Core/Src/can_utils.c **** 
+  35:Core/Src/can_utils.c ****     buffer[0]=(cells[8]&0xFF00)>8;
+  36:Core/Src/can_utils.c ****     buffer[1]=cells[8]&0xFF;
+  37:Core/Src/can_utils.c ****     buffer[2]=(cells[9]&0xFF00)>8;
+  38:Core/Src/can_utils.c ****     buffer[3]=cells[9]&0xFF;
+  39:Core/Src/can_utils.c ****     buffer[4]=(cells[10]&0xFF00)>8;
+  40:Core/Src/can_utils.c ****     buffer[5]=cells[10]&0xFF;
+  41:Core/Src/can_utils.c ****     buffer[6]=(cells[11]&0xFF00)>8;
+  42:Core/Src/can_utils.c ****     buffer[7]=cells[11]&0xFF;
+  43:Core/Src/can_utils.c ****     can_send_msg(0x102,buffer);
+  44:Core/Src/can_utils.c **** 
+  45:Core/Src/can_utils.c ****     buffer[0]=(cells[12]&0xFF00)>8;
+  46:Core/Src/can_utils.c ****     buffer[1]=cells[12]&0xFF;
+  47:Core/Src/can_utils.c ****     buffer[2]=(cells[13]&0xFF00)>8;
+  48:Core/Src/can_utils.c ****     buffer[3]=cells[13]&0xFF;
+  49:Core/Src/can_utils.c ****     buffer[4]=(cells[14]&0xFF00)>8;
+  50:Core/Src/can_utils.c ****     buffer[5]=cells[14]&0xFF;
+  51:Core/Src/can_utils.c ****     buffer[6]=(cells[15]&0xFF00)>8;
+  52:Core/Src/can_utils.c ****     buffer[7]=cells[15]&0xFF;
+  53:Core/Src/can_utils.c ****     can_send_msg(0x103,buffer);
+  54:Core/Src/can_utils.c **** 
+  55:Core/Src/can_utils.c ****     buffer[0]=(cells[16]&0xFF00)>8;
+  56:Core/Src/can_utils.c ****     buffer[1]=cells[16]&0xFF;
+  57:Core/Src/can_utils.c ****     buffer[2]=(cells[17]&0xFF00)>8;
+  58:Core/Src/can_utils.c ****     buffer[3]=cells[17]&0xFF;
+  59:Core/Src/can_utils.c ****     buffer[4]=(cells[18]&0xFF00)>8;
+  60:Core/Src/can_utils.c ****     buffer[5]=cells[18]&0xFF;
+  61:Core/Src/can_utils.c ****     buffer[6]=(cells[19]&0xFF00)>8;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 3
+
+
+  62:Core/Src/can_utils.c ****     buffer[7]=cells[19]&0xFF;
+  63:Core/Src/can_utils.c ****     can_send_msg(0x104,buffer);
+  64:Core/Src/can_utils.c **** 
+  65:Core/Src/can_utils.c ****     buffer[0]=(cells[20]&0xFF00)>8;
+  66:Core/Src/can_utils.c ****     buffer[1]=cells[20]&0xFF;
+  67:Core/Src/can_utils.c ****     buffer[2]=(cells[21]&0xFF00)>8;
+  68:Core/Src/can_utils.c ****     buffer[3]=cells[21]&0xFF;
+  69:Core/Src/can_utils.c ****     buffer[4]=(cells[22]&0xFF00)>8;
+  70:Core/Src/can_utils.c ****     buffer[5]=cells[22]&0xFF;
+  71:Core/Src/can_utils.c ****     buffer[6]=(cells[23]&0xFF00)>8;
+  72:Core/Src/can_utils.c ****     buffer[7]=cells[23]&0xFF;
+  73:Core/Src/can_utils.c ****     can_send_msg(0x105,buffer);
+  74:Core/Src/can_utils.c **** 
+  75:Core/Src/can_utils.c ****     buffer[0]=(cells[24]&0xFF00)>8;
+  76:Core/Src/can_utils.c ****     buffer[1]=cells[24]&0xFF;
+  77:Core/Src/can_utils.c ****     buffer[2]=(cells[25]&0xFF00)>8;
+  78:Core/Src/can_utils.c ****     buffer[3]=cells[25]&0xFF;
+  79:Core/Src/can_utils.c ****     buffer[4]=(cells[26]&0xFF00)>8;
+  80:Core/Src/can_utils.c ****     buffer[5]=cells[26]&0xFF;
+  81:Core/Src/can_utils.c ****     buffer[6]=(cells[27]&0xFF00)>8;
+  82:Core/Src/can_utils.c ****     buffer[7]=cells[27]&0xFF;
+  83:Core/Src/can_utils.c ****     can_send_msg(0x106,buffer);
+  84:Core/Src/can_utils.c **** }
+  85:Core/Src/can_utils.c **** 
+  86:Core/Src/can_utils.c **** void can_receive_routine(){
+  57              		.loc 1 86 27 is_stmt 1 view -0
+  58              		.cfi_startproc
+  59              		@ args = 0, pretend = 0, frame = 0
+  60              		@ frame_needed = 0, uses_anonymous_args = 0
+  61              		@ link register save eliminated.
+  87:Core/Src/can_utils.c ****     
+  88:Core/Src/can_utils.c **** }
+  62              		.loc 1 88 1 view .LVU5
+  63 0000 7047     		bx	lr
+  64              		.cfi_endproc
+  65              	.LFE136:
+  67              		.section	.text.can_send_msg,"ax",%progbits
+  68              		.align	1
+  69              		.global	can_send_msg
+  70              		.syntax unified
+  71              		.thumb
+  72              		.thumb_func
+  74              	can_send_msg:
+  75              	.LVL1:
+  76              	.LFB137:
+  89:Core/Src/can_utils.c **** 
+  90:Core/Src/can_utils.c **** void can_send_msg(uint32_t id, uint8_t * buffer){
+  77              		.loc 1 90 49 view -0
+  78              		.cfi_startproc
+  79              		@ args = 0, pretend = 0, frame = 24
+  80              		@ frame_needed = 0, uses_anonymous_args = 0
+  81              		.loc 1 90 49 is_stmt 0 view .LVU7
+  82 0000 00B5     		push	{lr}
+  83              		.cfi_def_cfa_offset 4
+  84              		.cfi_offset 14, -4
+  85 0002 87B0     		sub	sp, sp, #28
+  86              		.cfi_def_cfa_offset 32
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 4
+
+
+  91:Core/Src/can_utils.c ****     CAN_TxHeaderTypeDef tx_header;
+  87              		.loc 1 91 5 is_stmt 1 view .LVU8
+  92:Core/Src/can_utils.c ****     //uint8_t buffer[8] = {0};
+  93:Core/Src/can_utils.c ****     tx_header.ExtId = 0;
+  88              		.loc 1 93 5 view .LVU9
+  89              		.loc 1 93 21 is_stmt 0 view .LVU10
+  90 0004 0023     		movs	r3, #0
+  91 0006 0193     		str	r3, [sp, #4]
+  94:Core/Src/can_utils.c ****     tx_header.IDE   = CAN_ID_STD;
+  92              		.loc 1 94 5 is_stmt 1 view .LVU11
+  93              		.loc 1 94 21 is_stmt 0 view .LVU12
+  94 0008 0293     		str	r3, [sp, #8]
+  95:Core/Src/can_utils.c ****     tx_header.RTR   = CAN_RTR_DATA;
+  95              		.loc 1 95 5 is_stmt 1 view .LVU13
+  96              		.loc 1 95 21 is_stmt 0 view .LVU14
+  97 000a 0393     		str	r3, [sp, #12]
+  96:Core/Src/can_utils.c ****     tx_header.StdId = id;
+  98              		.loc 1 96 5 is_stmt 1 view .LVU15
+  99              		.loc 1 96 21 is_stmt 0 view .LVU16
+ 100 000c 0090     		str	r0, [sp]
+  97:Core/Src/can_utils.c ****     CAN_send(&hcan1, buffer, &tx_header);
+ 101              		.loc 1 97 5 is_stmt 1 view .LVU17
+ 102 000e 6A46     		mov	r2, sp
+ 103 0010 0248     		ldr	r0, .L7
+ 104              	.LVL2:
+ 105              		.loc 1 97 5 is_stmt 0 view .LVU18
+ 106 0012 FFF7FEFF 		bl	CAN_send
+ 107              	.LVL3:
+  98:Core/Src/can_utils.c **** }
+ 108              		.loc 1 98 1 view .LVU19
+ 109 0016 07B0     		add	sp, sp, #28
+ 110              		.cfi_def_cfa_offset 4
+ 111              		@ sp needed
+ 112 0018 5DF804FB 		ldr	pc, [sp], #4
+ 113              	.L8:
+ 114              		.align	2
+ 115              	.L7:
+ 116 001c 00000000 		.word	hcan1
+ 117              		.cfi_endproc
+ 118              	.LFE137:
+ 120              		.section	.text.can_send_routine,"ax",%progbits
+ 121              		.align	1
+ 122              		.global	can_send_routine
+ 123              		.syntax unified
+ 124              		.thumb
+ 125              		.thumb_func
+ 127              	can_send_routine:
+ 128              	.LFB135:
+   9:Core/Src/can_utils.c ****     //uint16_t const *cells = L9963E_utils_get_cells();
+ 129              		.loc 1 9 24 is_stmt 1 view -0
+ 130              		.cfi_startproc
+ 131              		@ args = 0, pretend = 0, frame = 64
+ 132              		@ frame_needed = 0, uses_anonymous_args = 0
+ 133 0000 10B5     		push	{r4, lr}
+ 134              		.cfi_def_cfa_offset 8
+ 135              		.cfi_offset 4, -8
+ 136              		.cfi_offset 14, -4
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 5
+
+
+ 137 0002 90B0     		sub	sp, sp, #64
+ 138              		.cfi_def_cfa_offset 72
+  11:Core/Src/can_utils.c ****     //L9963E_utils_get_cells(cells);
+ 139              		.loc 1 11 5 view .LVU21
+  13:Core/Src/can_utils.c **** 
+ 140              		.loc 1 13 5 view .LVU22
+  15:Core/Src/can_utils.c ****     buffer[1]=cells[0]&0xFF;
+ 141              		.loc 1 15 5 view .LVU23
+  15:Core/Src/can_utils.c ****     buffer[1]=cells[0]&0xFF;
+ 142              		.loc 1 15 21 is_stmt 0 view .LVU24
+ 143 0004 BDF80820 		ldrh	r2, [sp, #8]
+  15:Core/Src/can_utils.c ****     buffer[1]=cells[0]&0xFF;
+ 144              		.loc 1 15 32 view .LVU25
+ 145 0008 02F47F43 		and	r3, r2, #65280
+ 146 000c 082B     		cmp	r3, #8
+ 147 000e 94BF     		ite	ls
+ 148 0010 0023     		movls	r3, #0
+ 149 0012 0123     		movhi	r3, #1
+  15:Core/Src/can_utils.c ****     buffer[1]=cells[0]&0xFF;
+ 150              		.loc 1 15 14 view .LVU26
+ 151 0014 8DF80030 		strb	r3, [sp]
+  16:Core/Src/can_utils.c ****     buffer[2]=(cells[1]&0xFF00)>8;
+ 152              		.loc 1 16 5 is_stmt 1 view .LVU27
+  16:Core/Src/can_utils.c ****     buffer[2]=(cells[1]&0xFF00)>8;
+ 153              		.loc 1 16 14 is_stmt 0 view .LVU28
+ 154 0018 8DF80120 		strb	r2, [sp, #1]
+  17:Core/Src/can_utils.c ****     buffer[3]=cells[1]&0xFF;
+ 155              		.loc 1 17 5 is_stmt 1 view .LVU29
+  17:Core/Src/can_utils.c ****     buffer[3]=cells[1]&0xFF;
+ 156              		.loc 1 17 21 is_stmt 0 view .LVU30
+ 157 001c BDF80A20 		ldrh	r2, [sp, #10]
+  17:Core/Src/can_utils.c ****     buffer[3]=cells[1]&0xFF;
+ 158              		.loc 1 17 32 view .LVU31
+ 159 0020 02F47F43 		and	r3, r2, #65280
+ 160 0024 082B     		cmp	r3, #8
+ 161 0026 94BF     		ite	ls
+ 162 0028 0023     		movls	r3, #0
+ 163 002a 0123     		movhi	r3, #1
+  17:Core/Src/can_utils.c ****     buffer[3]=cells[1]&0xFF;
+ 164              		.loc 1 17 14 view .LVU32
+ 165 002c 8DF80230 		strb	r3, [sp, #2]
+  18:Core/Src/can_utils.c ****     buffer[4]=(cells[2]&0xFF00)>8;
+ 166              		.loc 1 18 5 is_stmt 1 view .LVU33
+  18:Core/Src/can_utils.c ****     buffer[4]=(cells[2]&0xFF00)>8;
+ 167              		.loc 1 18 14 is_stmt 0 view .LVU34
+ 168 0030 8DF80320 		strb	r2, [sp, #3]
+  19:Core/Src/can_utils.c ****     buffer[5]=cells[2]&0xFF;
+ 169              		.loc 1 19 5 is_stmt 1 view .LVU35
+  19:Core/Src/can_utils.c ****     buffer[5]=cells[2]&0xFF;
+ 170              		.loc 1 19 21 is_stmt 0 view .LVU36
+ 171 0034 BDF80C20 		ldrh	r2, [sp, #12]
+  19:Core/Src/can_utils.c ****     buffer[5]=cells[2]&0xFF;
+ 172              		.loc 1 19 32 view .LVU37
+ 173 0038 02F47F43 		and	r3, r2, #65280
+ 174 003c 082B     		cmp	r3, #8
+ 175 003e 94BF     		ite	ls
+ 176 0040 0023     		movls	r3, #0
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 6
+
+
+ 177 0042 0123     		movhi	r3, #1
+  19:Core/Src/can_utils.c ****     buffer[5]=cells[2]&0xFF;
+ 178              		.loc 1 19 14 view .LVU38
+ 179 0044 8DF80430 		strb	r3, [sp, #4]
+  20:Core/Src/can_utils.c ****     buffer[6]=(cells[3]&0xFF00)>8;
+ 180              		.loc 1 20 5 is_stmt 1 view .LVU39
+  20:Core/Src/can_utils.c ****     buffer[6]=(cells[3]&0xFF00)>8;
+ 181              		.loc 1 20 14 is_stmt 0 view .LVU40
+ 182 0048 8DF80520 		strb	r2, [sp, #5]
+  21:Core/Src/can_utils.c ****     buffer[7]=cells[3]&0xFF;
+ 183              		.loc 1 21 5 is_stmt 1 view .LVU41
+  21:Core/Src/can_utils.c ****     buffer[7]=cells[3]&0xFF;
+ 184              		.loc 1 21 21 is_stmt 0 view .LVU42
+ 185 004c BDF80E20 		ldrh	r2, [sp, #14]
+  21:Core/Src/can_utils.c ****     buffer[7]=cells[3]&0xFF;
+ 186              		.loc 1 21 32 view .LVU43
+ 187 0050 02F47F43 		and	r3, r2, #65280
+ 188 0054 082B     		cmp	r3, #8
+ 189 0056 94BF     		ite	ls
+ 190 0058 0023     		movls	r3, #0
+ 191 005a 0123     		movhi	r3, #1
+  21:Core/Src/can_utils.c ****     buffer[7]=cells[3]&0xFF;
+ 192              		.loc 1 21 14 view .LVU44
+ 193 005c 8DF80630 		strb	r3, [sp, #6]
+  22:Core/Src/can_utils.c ****     can_send_msg(0x100,buffer);
+ 194              		.loc 1 22 5 is_stmt 1 view .LVU45
+  22:Core/Src/can_utils.c ****     can_send_msg(0x100,buffer);
+ 195              		.loc 1 22 14 is_stmt 0 view .LVU46
+ 196 0060 8DF80720 		strb	r2, [sp, #7]
+  23:Core/Src/can_utils.c **** 
+ 197              		.loc 1 23 5 is_stmt 1 view .LVU47
+ 198 0064 6946     		mov	r1, sp
+ 199 0066 4FF48070 		mov	r0, #256
+ 200 006a FFF7FEFF 		bl	can_send_msg
+ 201              	.LVL4:
+  25:Core/Src/can_utils.c ****     buffer[1]=cells[4]&0xFF;
+ 202              		.loc 1 25 5 view .LVU48
+  25:Core/Src/can_utils.c ****     buffer[1]=cells[4]&0xFF;
+ 203              		.loc 1 25 21 is_stmt 0 view .LVU49
+ 204 006e BDF81020 		ldrh	r2, [sp, #16]
+  25:Core/Src/can_utils.c ****     buffer[1]=cells[4]&0xFF;
+ 205              		.loc 1 25 32 view .LVU50
+ 206 0072 02F47F43 		and	r3, r2, #65280
+ 207 0076 082B     		cmp	r3, #8
+ 208 0078 94BF     		ite	ls
+ 209 007a 0023     		movls	r3, #0
+ 210 007c 0123     		movhi	r3, #1
+  25:Core/Src/can_utils.c ****     buffer[1]=cells[4]&0xFF;
+ 211              		.loc 1 25 14 view .LVU51
+ 212 007e 8DF80030 		strb	r3, [sp]
+  26:Core/Src/can_utils.c ****     buffer[2]=(cells[5]&0xFF00)>8;
+ 213              		.loc 1 26 5 is_stmt 1 view .LVU52
+  26:Core/Src/can_utils.c ****     buffer[2]=(cells[5]&0xFF00)>8;
+ 214              		.loc 1 26 14 is_stmt 0 view .LVU53
+ 215 0082 8DF80120 		strb	r2, [sp, #1]
+  27:Core/Src/can_utils.c ****     buffer[3]=cells[5]&0xFF;
+ 216              		.loc 1 27 5 is_stmt 1 view .LVU54
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 7
+
+
+  27:Core/Src/can_utils.c ****     buffer[3]=cells[5]&0xFF;
+ 217              		.loc 1 27 21 is_stmt 0 view .LVU55
+ 218 0086 BDF81220 		ldrh	r2, [sp, #18]
+  27:Core/Src/can_utils.c ****     buffer[3]=cells[5]&0xFF;
+ 219              		.loc 1 27 32 view .LVU56
+ 220 008a 02F47F43 		and	r3, r2, #65280
+ 221 008e 082B     		cmp	r3, #8
+ 222 0090 94BF     		ite	ls
+ 223 0092 0023     		movls	r3, #0
+ 224 0094 0123     		movhi	r3, #1
+  27:Core/Src/can_utils.c ****     buffer[3]=cells[5]&0xFF;
+ 225              		.loc 1 27 14 view .LVU57
+ 226 0096 8DF80230 		strb	r3, [sp, #2]
+  28:Core/Src/can_utils.c ****     buffer[4]=(cells[6]&0xFF00)>8;
+ 227              		.loc 1 28 5 is_stmt 1 view .LVU58
+  28:Core/Src/can_utils.c ****     buffer[4]=(cells[6]&0xFF00)>8;
+ 228              		.loc 1 28 14 is_stmt 0 view .LVU59
+ 229 009a 8DF80320 		strb	r2, [sp, #3]
+  29:Core/Src/can_utils.c ****     buffer[5]=cells[6]&0xFF;
+ 230              		.loc 1 29 5 is_stmt 1 view .LVU60
+  29:Core/Src/can_utils.c ****     buffer[5]=cells[6]&0xFF;
+ 231              		.loc 1 29 21 is_stmt 0 view .LVU61
+ 232 009e BDF81420 		ldrh	r2, [sp, #20]
+  29:Core/Src/can_utils.c ****     buffer[5]=cells[6]&0xFF;
+ 233              		.loc 1 29 32 view .LVU62
+ 234 00a2 02F47F43 		and	r3, r2, #65280
+ 235 00a6 082B     		cmp	r3, #8
+ 236 00a8 94BF     		ite	ls
+ 237 00aa 0023     		movls	r3, #0
+ 238 00ac 0123     		movhi	r3, #1
+  29:Core/Src/can_utils.c ****     buffer[5]=cells[6]&0xFF;
+ 239              		.loc 1 29 14 view .LVU63
+ 240 00ae 8DF80430 		strb	r3, [sp, #4]
+  30:Core/Src/can_utils.c ****     buffer[6]=(cells[7]&0xFF00)>8;
+ 241              		.loc 1 30 5 is_stmt 1 view .LVU64
+  30:Core/Src/can_utils.c ****     buffer[6]=(cells[7]&0xFF00)>8;
+ 242              		.loc 1 30 14 is_stmt 0 view .LVU65
+ 243 00b2 8DF80520 		strb	r2, [sp, #5]
+  31:Core/Src/can_utils.c ****     buffer[7]=cells[7]&0xFF;
+ 244              		.loc 1 31 5 is_stmt 1 view .LVU66
+  31:Core/Src/can_utils.c ****     buffer[7]=cells[7]&0xFF;
+ 245              		.loc 1 31 21 is_stmt 0 view .LVU67
+ 246 00b6 BDF81620 		ldrh	r2, [sp, #22]
+  31:Core/Src/can_utils.c ****     buffer[7]=cells[7]&0xFF;
+ 247              		.loc 1 31 32 view .LVU68
+ 248 00ba 02F47F43 		and	r3, r2, #65280
+ 249 00be 082B     		cmp	r3, #8
+ 250 00c0 94BF     		ite	ls
+ 251 00c2 0023     		movls	r3, #0
+ 252 00c4 0123     		movhi	r3, #1
+  31:Core/Src/can_utils.c ****     buffer[7]=cells[7]&0xFF;
+ 253              		.loc 1 31 14 view .LVU69
+ 254 00c6 8DF80630 		strb	r3, [sp, #6]
+  32:Core/Src/can_utils.c ****     can_send_msg(0x101,buffer);
+ 255              		.loc 1 32 5 is_stmt 1 view .LVU70
+  32:Core/Src/can_utils.c ****     can_send_msg(0x101,buffer);
+ 256              		.loc 1 32 14 is_stmt 0 view .LVU71
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 8
+
+
+ 257 00ca 8DF80720 		strb	r2, [sp, #7]
+  33:Core/Src/can_utils.c **** 
+ 258              		.loc 1 33 5 is_stmt 1 view .LVU72
+ 259 00ce 6946     		mov	r1, sp
+ 260 00d0 40F20110 		movw	r0, #257
+ 261 00d4 FFF7FEFF 		bl	can_send_msg
+ 262              	.LVL5:
+  35:Core/Src/can_utils.c ****     buffer[1]=cells[8]&0xFF;
+ 263              		.loc 1 35 5 view .LVU73
+  35:Core/Src/can_utils.c ****     buffer[1]=cells[8]&0xFF;
+ 264              		.loc 1 35 21 is_stmt 0 view .LVU74
+ 265 00d8 BDF81820 		ldrh	r2, [sp, #24]
+  35:Core/Src/can_utils.c ****     buffer[1]=cells[8]&0xFF;
+ 266              		.loc 1 35 32 view .LVU75
+ 267 00dc 02F47F43 		and	r3, r2, #65280
+ 268 00e0 082B     		cmp	r3, #8
+ 269 00e2 94BF     		ite	ls
+ 270 00e4 0023     		movls	r3, #0
+ 271 00e6 0123     		movhi	r3, #1
+  35:Core/Src/can_utils.c ****     buffer[1]=cells[8]&0xFF;
+ 272              		.loc 1 35 14 view .LVU76
+ 273 00e8 8DF80030 		strb	r3, [sp]
+  36:Core/Src/can_utils.c ****     buffer[2]=(cells[9]&0xFF00)>8;
+ 274              		.loc 1 36 5 is_stmt 1 view .LVU77
+  36:Core/Src/can_utils.c ****     buffer[2]=(cells[9]&0xFF00)>8;
+ 275              		.loc 1 36 14 is_stmt 0 view .LVU78
+ 276 00ec 8DF80120 		strb	r2, [sp, #1]
+  37:Core/Src/can_utils.c ****     buffer[3]=cells[9]&0xFF;
+ 277              		.loc 1 37 5 is_stmt 1 view .LVU79
+  37:Core/Src/can_utils.c ****     buffer[3]=cells[9]&0xFF;
+ 278              		.loc 1 37 21 is_stmt 0 view .LVU80
+ 279 00f0 BDF81A20 		ldrh	r2, [sp, #26]
+  37:Core/Src/can_utils.c ****     buffer[3]=cells[9]&0xFF;
+ 280              		.loc 1 37 32 view .LVU81
+ 281 00f4 02F47F43 		and	r3, r2, #65280
+ 282 00f8 082B     		cmp	r3, #8
+ 283 00fa 94BF     		ite	ls
+ 284 00fc 0023     		movls	r3, #0
+ 285 00fe 0123     		movhi	r3, #1
+  37:Core/Src/can_utils.c ****     buffer[3]=cells[9]&0xFF;
+ 286              		.loc 1 37 14 view .LVU82
+ 287 0100 8DF80230 		strb	r3, [sp, #2]
+  38:Core/Src/can_utils.c ****     buffer[4]=(cells[10]&0xFF00)>8;
+ 288              		.loc 1 38 5 is_stmt 1 view .LVU83
+  38:Core/Src/can_utils.c ****     buffer[4]=(cells[10]&0xFF00)>8;
+ 289              		.loc 1 38 14 is_stmt 0 view .LVU84
+ 290 0104 8DF80320 		strb	r2, [sp, #3]
+  39:Core/Src/can_utils.c ****     buffer[5]=cells[10]&0xFF;
+ 291              		.loc 1 39 5 is_stmt 1 view .LVU85
+  39:Core/Src/can_utils.c ****     buffer[5]=cells[10]&0xFF;
+ 292              		.loc 1 39 21 is_stmt 0 view .LVU86
+ 293 0108 BDF81C20 		ldrh	r2, [sp, #28]
+  39:Core/Src/can_utils.c ****     buffer[5]=cells[10]&0xFF;
+ 294              		.loc 1 39 33 view .LVU87
+ 295 010c 02F47F43 		and	r3, r2, #65280
+ 296 0110 082B     		cmp	r3, #8
+ 297 0112 94BF     		ite	ls
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 9
+
+
+ 298 0114 0023     		movls	r3, #0
+ 299 0116 0123     		movhi	r3, #1
+  39:Core/Src/can_utils.c ****     buffer[5]=cells[10]&0xFF;
+ 300              		.loc 1 39 14 view .LVU88
+ 301 0118 8DF80430 		strb	r3, [sp, #4]
+  40:Core/Src/can_utils.c ****     buffer[6]=(cells[11]&0xFF00)>8;
+ 302              		.loc 1 40 5 is_stmt 1 view .LVU89
+  40:Core/Src/can_utils.c ****     buffer[6]=(cells[11]&0xFF00)>8;
+ 303              		.loc 1 40 14 is_stmt 0 view .LVU90
+ 304 011c 8DF80520 		strb	r2, [sp, #5]
+  41:Core/Src/can_utils.c ****     buffer[7]=cells[11]&0xFF;
+ 305              		.loc 1 41 5 is_stmt 1 view .LVU91
+  41:Core/Src/can_utils.c ****     buffer[7]=cells[11]&0xFF;
+ 306              		.loc 1 41 21 is_stmt 0 view .LVU92
+ 307 0120 BDF81E20 		ldrh	r2, [sp, #30]
+  41:Core/Src/can_utils.c ****     buffer[7]=cells[11]&0xFF;
+ 308              		.loc 1 41 33 view .LVU93
+ 309 0124 02F47F43 		and	r3, r2, #65280
+ 310 0128 082B     		cmp	r3, #8
+ 311 012a 94BF     		ite	ls
+ 312 012c 0023     		movls	r3, #0
+ 313 012e 0123     		movhi	r3, #1
+  41:Core/Src/can_utils.c ****     buffer[7]=cells[11]&0xFF;
+ 314              		.loc 1 41 14 view .LVU94
+ 315 0130 8DF80630 		strb	r3, [sp, #6]
+  42:Core/Src/can_utils.c ****     can_send_msg(0x102,buffer);
+ 316              		.loc 1 42 5 is_stmt 1 view .LVU95
+  42:Core/Src/can_utils.c ****     can_send_msg(0x102,buffer);
+ 317              		.loc 1 42 14 is_stmt 0 view .LVU96
+ 318 0134 8DF80720 		strb	r2, [sp, #7]
+  43:Core/Src/can_utils.c **** 
+ 319              		.loc 1 43 5 is_stmt 1 view .LVU97
+ 320 0138 6946     		mov	r1, sp
+ 321 013a 4FF48170 		mov	r0, #258
+ 322 013e FFF7FEFF 		bl	can_send_msg
+ 323              	.LVL6:
+  45:Core/Src/can_utils.c ****     buffer[1]=cells[12]&0xFF;
+ 324              		.loc 1 45 5 view .LVU98
+  45:Core/Src/can_utils.c ****     buffer[1]=cells[12]&0xFF;
+ 325              		.loc 1 45 21 is_stmt 0 view .LVU99
+ 326 0142 BDF82020 		ldrh	r2, [sp, #32]
+  45:Core/Src/can_utils.c ****     buffer[1]=cells[12]&0xFF;
+ 327              		.loc 1 45 33 view .LVU100
+ 328 0146 02F47F43 		and	r3, r2, #65280
+ 329 014a 082B     		cmp	r3, #8
+ 330 014c 94BF     		ite	ls
+ 331 014e 0023     		movls	r3, #0
+ 332 0150 0123     		movhi	r3, #1
+  45:Core/Src/can_utils.c ****     buffer[1]=cells[12]&0xFF;
+ 333              		.loc 1 45 14 view .LVU101
+ 334 0152 8DF80030 		strb	r3, [sp]
+  46:Core/Src/can_utils.c ****     buffer[2]=(cells[13]&0xFF00)>8;
+ 335              		.loc 1 46 5 is_stmt 1 view .LVU102
+  46:Core/Src/can_utils.c ****     buffer[2]=(cells[13]&0xFF00)>8;
+ 336              		.loc 1 46 14 is_stmt 0 view .LVU103
+ 337 0156 8DF80120 		strb	r2, [sp, #1]
+  47:Core/Src/can_utils.c ****     buffer[3]=cells[13]&0xFF;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 10
+
+
+ 338              		.loc 1 47 5 is_stmt 1 view .LVU104
+  47:Core/Src/can_utils.c ****     buffer[3]=cells[13]&0xFF;
+ 339              		.loc 1 47 21 is_stmt 0 view .LVU105
+ 340 015a BDF82220 		ldrh	r2, [sp, #34]
+  47:Core/Src/can_utils.c ****     buffer[3]=cells[13]&0xFF;
+ 341              		.loc 1 47 33 view .LVU106
+ 342 015e 02F47F43 		and	r3, r2, #65280
+ 343 0162 082B     		cmp	r3, #8
+ 344 0164 94BF     		ite	ls
+ 345 0166 0023     		movls	r3, #0
+ 346 0168 0123     		movhi	r3, #1
+  47:Core/Src/can_utils.c ****     buffer[3]=cells[13]&0xFF;
+ 347              		.loc 1 47 14 view .LVU107
+ 348 016a 8DF80230 		strb	r3, [sp, #2]
+  48:Core/Src/can_utils.c ****     buffer[4]=(cells[14]&0xFF00)>8;
+ 349              		.loc 1 48 5 is_stmt 1 view .LVU108
+  48:Core/Src/can_utils.c ****     buffer[4]=(cells[14]&0xFF00)>8;
+ 350              		.loc 1 48 14 is_stmt 0 view .LVU109
+ 351 016e 8DF80320 		strb	r2, [sp, #3]
+  49:Core/Src/can_utils.c ****     buffer[5]=cells[14]&0xFF;
+ 352              		.loc 1 49 5 is_stmt 1 view .LVU110
+  49:Core/Src/can_utils.c ****     buffer[5]=cells[14]&0xFF;
+ 353              		.loc 1 49 21 is_stmt 0 view .LVU111
+ 354 0172 BDF82420 		ldrh	r2, [sp, #36]
+  49:Core/Src/can_utils.c ****     buffer[5]=cells[14]&0xFF;
+ 355              		.loc 1 49 33 view .LVU112
+ 356 0176 02F47F43 		and	r3, r2, #65280
+ 357 017a 082B     		cmp	r3, #8
+ 358 017c 94BF     		ite	ls
+ 359 017e 0023     		movls	r3, #0
+ 360 0180 0123     		movhi	r3, #1
+  49:Core/Src/can_utils.c ****     buffer[5]=cells[14]&0xFF;
+ 361              		.loc 1 49 14 view .LVU113
+ 362 0182 8DF80430 		strb	r3, [sp, #4]
+  50:Core/Src/can_utils.c ****     buffer[6]=(cells[15]&0xFF00)>8;
+ 363              		.loc 1 50 5 is_stmt 1 view .LVU114
+  50:Core/Src/can_utils.c ****     buffer[6]=(cells[15]&0xFF00)>8;
+ 364              		.loc 1 50 14 is_stmt 0 view .LVU115
+ 365 0186 8DF80520 		strb	r2, [sp, #5]
+  51:Core/Src/can_utils.c ****     buffer[7]=cells[15]&0xFF;
+ 366              		.loc 1 51 5 is_stmt 1 view .LVU116
+  51:Core/Src/can_utils.c ****     buffer[7]=cells[15]&0xFF;
+ 367              		.loc 1 51 21 is_stmt 0 view .LVU117
+ 368 018a BDF82620 		ldrh	r2, [sp, #38]
+  51:Core/Src/can_utils.c ****     buffer[7]=cells[15]&0xFF;
+ 369              		.loc 1 51 33 view .LVU118
+ 370 018e 02F47F43 		and	r3, r2, #65280
+ 371 0192 082B     		cmp	r3, #8
+ 372 0194 94BF     		ite	ls
+ 373 0196 0023     		movls	r3, #0
+ 374 0198 0123     		movhi	r3, #1
+  51:Core/Src/can_utils.c ****     buffer[7]=cells[15]&0xFF;
+ 375              		.loc 1 51 14 view .LVU119
+ 376 019a 8DF80630 		strb	r3, [sp, #6]
+  52:Core/Src/can_utils.c ****     can_send_msg(0x103,buffer);
+ 377              		.loc 1 52 5 is_stmt 1 view .LVU120
+  52:Core/Src/can_utils.c ****     can_send_msg(0x103,buffer);
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 11
+
+
+ 378              		.loc 1 52 14 is_stmt 0 view .LVU121
+ 379 019e 8DF80720 		strb	r2, [sp, #7]
+  53:Core/Src/can_utils.c **** 
+ 380              		.loc 1 53 5 is_stmt 1 view .LVU122
+ 381 01a2 6946     		mov	r1, sp
+ 382 01a4 40F20310 		movw	r0, #259
+ 383 01a8 FFF7FEFF 		bl	can_send_msg
+ 384              	.LVL7:
+  55:Core/Src/can_utils.c ****     buffer[1]=cells[16]&0xFF;
+ 385              		.loc 1 55 5 view .LVU123
+  55:Core/Src/can_utils.c ****     buffer[1]=cells[16]&0xFF;
+ 386              		.loc 1 55 21 is_stmt 0 view .LVU124
+ 387 01ac BDF82820 		ldrh	r2, [sp, #40]
+  55:Core/Src/can_utils.c ****     buffer[1]=cells[16]&0xFF;
+ 388              		.loc 1 55 33 view .LVU125
+ 389 01b0 02F47F43 		and	r3, r2, #65280
+ 390 01b4 082B     		cmp	r3, #8
+ 391 01b6 94BF     		ite	ls
+ 392 01b8 0023     		movls	r3, #0
+ 393 01ba 0123     		movhi	r3, #1
+  55:Core/Src/can_utils.c ****     buffer[1]=cells[16]&0xFF;
+ 394              		.loc 1 55 14 view .LVU126
+ 395 01bc 8DF80030 		strb	r3, [sp]
+  56:Core/Src/can_utils.c ****     buffer[2]=(cells[17]&0xFF00)>8;
+ 396              		.loc 1 56 5 is_stmt 1 view .LVU127
+  56:Core/Src/can_utils.c ****     buffer[2]=(cells[17]&0xFF00)>8;
+ 397              		.loc 1 56 14 is_stmt 0 view .LVU128
+ 398 01c0 8DF80120 		strb	r2, [sp, #1]
+  57:Core/Src/can_utils.c ****     buffer[3]=cells[17]&0xFF;
+ 399              		.loc 1 57 5 is_stmt 1 view .LVU129
+  57:Core/Src/can_utils.c ****     buffer[3]=cells[17]&0xFF;
+ 400              		.loc 1 57 21 is_stmt 0 view .LVU130
+ 401 01c4 BDF82A20 		ldrh	r2, [sp, #42]
+  57:Core/Src/can_utils.c ****     buffer[3]=cells[17]&0xFF;
+ 402              		.loc 1 57 33 view .LVU131
+ 403 01c8 02F47F43 		and	r3, r2, #65280
+ 404 01cc 082B     		cmp	r3, #8
+ 405 01ce 94BF     		ite	ls
+ 406 01d0 0023     		movls	r3, #0
+ 407 01d2 0123     		movhi	r3, #1
+  57:Core/Src/can_utils.c ****     buffer[3]=cells[17]&0xFF;
+ 408              		.loc 1 57 14 view .LVU132
+ 409 01d4 8DF80230 		strb	r3, [sp, #2]
+  58:Core/Src/can_utils.c ****     buffer[4]=(cells[18]&0xFF00)>8;
+ 410              		.loc 1 58 5 is_stmt 1 view .LVU133
+  58:Core/Src/can_utils.c ****     buffer[4]=(cells[18]&0xFF00)>8;
+ 411              		.loc 1 58 14 is_stmt 0 view .LVU134
+ 412 01d8 8DF80320 		strb	r2, [sp, #3]
+  59:Core/Src/can_utils.c ****     buffer[5]=cells[18]&0xFF;
+ 413              		.loc 1 59 5 is_stmt 1 view .LVU135
+  59:Core/Src/can_utils.c ****     buffer[5]=cells[18]&0xFF;
+ 414              		.loc 1 59 21 is_stmt 0 view .LVU136
+ 415 01dc BDF82C20 		ldrh	r2, [sp, #44]
+  59:Core/Src/can_utils.c ****     buffer[5]=cells[18]&0xFF;
+ 416              		.loc 1 59 33 view .LVU137
+ 417 01e0 02F47F43 		and	r3, r2, #65280
+ 418 01e4 082B     		cmp	r3, #8
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 12
+
+
+ 419 01e6 94BF     		ite	ls
+ 420 01e8 0023     		movls	r3, #0
+ 421 01ea 0123     		movhi	r3, #1
+  59:Core/Src/can_utils.c ****     buffer[5]=cells[18]&0xFF;
+ 422              		.loc 1 59 14 view .LVU138
+ 423 01ec 8DF80430 		strb	r3, [sp, #4]
+  60:Core/Src/can_utils.c ****     buffer[6]=(cells[19]&0xFF00)>8;
+ 424              		.loc 1 60 5 is_stmt 1 view .LVU139
+  60:Core/Src/can_utils.c ****     buffer[6]=(cells[19]&0xFF00)>8;
+ 425              		.loc 1 60 14 is_stmt 0 view .LVU140
+ 426 01f0 8DF80520 		strb	r2, [sp, #5]
+  61:Core/Src/can_utils.c ****     buffer[7]=cells[19]&0xFF;
+ 427              		.loc 1 61 5 is_stmt 1 view .LVU141
+  61:Core/Src/can_utils.c ****     buffer[7]=cells[19]&0xFF;
+ 428              		.loc 1 61 21 is_stmt 0 view .LVU142
+ 429 01f4 BDF82E20 		ldrh	r2, [sp, #46]
+  61:Core/Src/can_utils.c ****     buffer[7]=cells[19]&0xFF;
+ 430              		.loc 1 61 33 view .LVU143
+ 431 01f8 02F47F43 		and	r3, r2, #65280
+ 432 01fc 082B     		cmp	r3, #8
+ 433 01fe 94BF     		ite	ls
+ 434 0200 0023     		movls	r3, #0
+ 435 0202 0123     		movhi	r3, #1
+  61:Core/Src/can_utils.c ****     buffer[7]=cells[19]&0xFF;
+ 436              		.loc 1 61 14 view .LVU144
+ 437 0204 8DF80630 		strb	r3, [sp, #6]
+  62:Core/Src/can_utils.c ****     can_send_msg(0x104,buffer);
+ 438              		.loc 1 62 5 is_stmt 1 view .LVU145
+  62:Core/Src/can_utils.c ****     can_send_msg(0x104,buffer);
+ 439              		.loc 1 62 14 is_stmt 0 view .LVU146
+ 440 0208 8DF80720 		strb	r2, [sp, #7]
+  63:Core/Src/can_utils.c **** 
+ 441              		.loc 1 63 5 is_stmt 1 view .LVU147
+ 442 020c 6946     		mov	r1, sp
+ 443 020e 4FF48270 		mov	r0, #260
+ 444 0212 FFF7FEFF 		bl	can_send_msg
+ 445              	.LVL8:
+  65:Core/Src/can_utils.c ****     buffer[1]=cells[20]&0xFF;
+ 446              		.loc 1 65 5 view .LVU148
+  65:Core/Src/can_utils.c ****     buffer[1]=cells[20]&0xFF;
+ 447              		.loc 1 65 21 is_stmt 0 view .LVU149
+ 448 0216 BDF83020 		ldrh	r2, [sp, #48]
+  65:Core/Src/can_utils.c ****     buffer[1]=cells[20]&0xFF;
+ 449              		.loc 1 65 33 view .LVU150
+ 450 021a 02F47F43 		and	r3, r2, #65280
+ 451 021e 082B     		cmp	r3, #8
+ 452 0220 94BF     		ite	ls
+ 453 0222 0023     		movls	r3, #0
+ 454 0224 0123     		movhi	r3, #1
+  65:Core/Src/can_utils.c ****     buffer[1]=cells[20]&0xFF;
+ 455              		.loc 1 65 14 view .LVU151
+ 456 0226 8DF80030 		strb	r3, [sp]
+  66:Core/Src/can_utils.c ****     buffer[2]=(cells[21]&0xFF00)>8;
+ 457              		.loc 1 66 5 is_stmt 1 view .LVU152
+  66:Core/Src/can_utils.c ****     buffer[2]=(cells[21]&0xFF00)>8;
+ 458              		.loc 1 66 14 is_stmt 0 view .LVU153
+ 459 022a 8DF80120 		strb	r2, [sp, #1]
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 13
+
+
+  67:Core/Src/can_utils.c ****     buffer[3]=cells[21]&0xFF;
+ 460              		.loc 1 67 5 is_stmt 1 view .LVU154
+  67:Core/Src/can_utils.c ****     buffer[3]=cells[21]&0xFF;
+ 461              		.loc 1 67 21 is_stmt 0 view .LVU155
+ 462 022e BDF83220 		ldrh	r2, [sp, #50]
+  67:Core/Src/can_utils.c ****     buffer[3]=cells[21]&0xFF;
+ 463              		.loc 1 67 33 view .LVU156
+ 464 0232 02F47F43 		and	r3, r2, #65280
+ 465 0236 082B     		cmp	r3, #8
+ 466 0238 94BF     		ite	ls
+ 467 023a 0023     		movls	r3, #0
+ 468 023c 0123     		movhi	r3, #1
+  67:Core/Src/can_utils.c ****     buffer[3]=cells[21]&0xFF;
+ 469              		.loc 1 67 14 view .LVU157
+ 470 023e 8DF80230 		strb	r3, [sp, #2]
+  68:Core/Src/can_utils.c ****     buffer[4]=(cells[22]&0xFF00)>8;
+ 471              		.loc 1 68 5 is_stmt 1 view .LVU158
+  68:Core/Src/can_utils.c ****     buffer[4]=(cells[22]&0xFF00)>8;
+ 472              		.loc 1 68 14 is_stmt 0 view .LVU159
+ 473 0242 8DF80320 		strb	r2, [sp, #3]
+  69:Core/Src/can_utils.c ****     buffer[5]=cells[22]&0xFF;
+ 474              		.loc 1 69 5 is_stmt 1 view .LVU160
+  69:Core/Src/can_utils.c ****     buffer[5]=cells[22]&0xFF;
+ 475              		.loc 1 69 21 is_stmt 0 view .LVU161
+ 476 0246 BDF83420 		ldrh	r2, [sp, #52]
+  69:Core/Src/can_utils.c ****     buffer[5]=cells[22]&0xFF;
+ 477              		.loc 1 69 33 view .LVU162
+ 478 024a 02F47F43 		and	r3, r2, #65280
+ 479 024e 082B     		cmp	r3, #8
+ 480 0250 94BF     		ite	ls
+ 481 0252 0023     		movls	r3, #0
+ 482 0254 0123     		movhi	r3, #1
+  69:Core/Src/can_utils.c ****     buffer[5]=cells[22]&0xFF;
+ 483              		.loc 1 69 14 view .LVU163
+ 484 0256 8DF80430 		strb	r3, [sp, #4]
+  70:Core/Src/can_utils.c ****     buffer[6]=(cells[23]&0xFF00)>8;
+ 485              		.loc 1 70 5 is_stmt 1 view .LVU164
+  70:Core/Src/can_utils.c ****     buffer[6]=(cells[23]&0xFF00)>8;
+ 486              		.loc 1 70 14 is_stmt 0 view .LVU165
+ 487 025a 8DF80520 		strb	r2, [sp, #5]
+  71:Core/Src/can_utils.c ****     buffer[7]=cells[23]&0xFF;
+ 488              		.loc 1 71 5 is_stmt 1 view .LVU166
+  71:Core/Src/can_utils.c ****     buffer[7]=cells[23]&0xFF;
+ 489              		.loc 1 71 21 is_stmt 0 view .LVU167
+ 490 025e BDF83620 		ldrh	r2, [sp, #54]
+  71:Core/Src/can_utils.c ****     buffer[7]=cells[23]&0xFF;
+ 491              		.loc 1 71 33 view .LVU168
+ 492 0262 02F47F43 		and	r3, r2, #65280
+ 493 0266 082B     		cmp	r3, #8
+ 494 0268 94BF     		ite	ls
+ 495 026a 0023     		movls	r3, #0
+ 496 026c 0123     		movhi	r3, #1
+  71:Core/Src/can_utils.c ****     buffer[7]=cells[23]&0xFF;
+ 497              		.loc 1 71 14 view .LVU169
+ 498 026e 8DF80630 		strb	r3, [sp, #6]
+  72:Core/Src/can_utils.c ****     can_send_msg(0x105,buffer);
+ 499              		.loc 1 72 5 is_stmt 1 view .LVU170
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 14
+
+
+  72:Core/Src/can_utils.c ****     can_send_msg(0x105,buffer);
+ 500              		.loc 1 72 14 is_stmt 0 view .LVU171
+ 501 0272 8DF80720 		strb	r2, [sp, #7]
+  73:Core/Src/can_utils.c **** 
+ 502              		.loc 1 73 5 is_stmt 1 view .LVU172
+ 503 0276 6946     		mov	r1, sp
+ 504 0278 40F20510 		movw	r0, #261
+ 505 027c FFF7FEFF 		bl	can_send_msg
+ 506              	.LVL9:
+  75:Core/Src/can_utils.c ****     buffer[1]=cells[24]&0xFF;
+ 507              		.loc 1 75 5 view .LVU173
+  75:Core/Src/can_utils.c ****     buffer[1]=cells[24]&0xFF;
+ 508              		.loc 1 75 21 is_stmt 0 view .LVU174
+ 509 0280 BDF83820 		ldrh	r2, [sp, #56]
+  75:Core/Src/can_utils.c ****     buffer[1]=cells[24]&0xFF;
+ 510              		.loc 1 75 33 view .LVU175
+ 511 0284 02F47F43 		and	r3, r2, #65280
+ 512 0288 082B     		cmp	r3, #8
+ 513 028a 94BF     		ite	ls
+ 514 028c 0023     		movls	r3, #0
+ 515 028e 0123     		movhi	r3, #1
+  75:Core/Src/can_utils.c ****     buffer[1]=cells[24]&0xFF;
+ 516              		.loc 1 75 14 view .LVU176
+ 517 0290 8DF80030 		strb	r3, [sp]
+  76:Core/Src/can_utils.c ****     buffer[2]=(cells[25]&0xFF00)>8;
+ 518              		.loc 1 76 5 is_stmt 1 view .LVU177
+  76:Core/Src/can_utils.c ****     buffer[2]=(cells[25]&0xFF00)>8;
+ 519              		.loc 1 76 14 is_stmt 0 view .LVU178
+ 520 0294 8DF80120 		strb	r2, [sp, #1]
+  77:Core/Src/can_utils.c ****     buffer[3]=cells[25]&0xFF;
+ 521              		.loc 1 77 5 is_stmt 1 view .LVU179
+  77:Core/Src/can_utils.c ****     buffer[3]=cells[25]&0xFF;
+ 522              		.loc 1 77 21 is_stmt 0 view .LVU180
+ 523 0298 BDF83A20 		ldrh	r2, [sp, #58]
+  77:Core/Src/can_utils.c ****     buffer[3]=cells[25]&0xFF;
+ 524              		.loc 1 77 33 view .LVU181
+ 525 029c 02F47F43 		and	r3, r2, #65280
+ 526 02a0 082B     		cmp	r3, #8
+ 527 02a2 94BF     		ite	ls
+ 528 02a4 0023     		movls	r3, #0
+ 529 02a6 0123     		movhi	r3, #1
+  77:Core/Src/can_utils.c ****     buffer[3]=cells[25]&0xFF;
+ 530              		.loc 1 77 14 view .LVU182
+ 531 02a8 8DF80230 		strb	r3, [sp, #2]
+  78:Core/Src/can_utils.c ****     buffer[4]=(cells[26]&0xFF00)>8;
+ 532              		.loc 1 78 5 is_stmt 1 view .LVU183
+  78:Core/Src/can_utils.c ****     buffer[4]=(cells[26]&0xFF00)>8;
+ 533              		.loc 1 78 14 is_stmt 0 view .LVU184
+ 534 02ac 8DF80320 		strb	r2, [sp, #3]
+  79:Core/Src/can_utils.c ****     buffer[5]=cells[26]&0xFF;
+ 535              		.loc 1 79 5 is_stmt 1 view .LVU185
+  79:Core/Src/can_utils.c ****     buffer[5]=cells[26]&0xFF;
+ 536              		.loc 1 79 21 is_stmt 0 view .LVU186
+ 537 02b0 BDF83C20 		ldrh	r2, [sp, #60]
+  79:Core/Src/can_utils.c ****     buffer[5]=cells[26]&0xFF;
+ 538              		.loc 1 79 33 view .LVU187
+ 539 02b4 02F47F43 		and	r3, r2, #65280
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 15
+
+
+ 540 02b8 082B     		cmp	r3, #8
+ 541 02ba 94BF     		ite	ls
+ 542 02bc 0023     		movls	r3, #0
+ 543 02be 0123     		movhi	r3, #1
+  79:Core/Src/can_utils.c ****     buffer[5]=cells[26]&0xFF;
+ 544              		.loc 1 79 14 view .LVU188
+ 545 02c0 8DF80430 		strb	r3, [sp, #4]
+  80:Core/Src/can_utils.c ****     buffer[6]=(cells[27]&0xFF00)>8;
+ 546              		.loc 1 80 5 is_stmt 1 view .LVU189
+  80:Core/Src/can_utils.c ****     buffer[6]=(cells[27]&0xFF00)>8;
+ 547              		.loc 1 80 14 is_stmt 0 view .LVU190
+ 548 02c4 8DF80520 		strb	r2, [sp, #5]
+  81:Core/Src/can_utils.c ****     buffer[7]=cells[27]&0xFF;
+ 549              		.loc 1 81 5 is_stmt 1 view .LVU191
+  81:Core/Src/can_utils.c ****     buffer[7]=cells[27]&0xFF;
+ 550              		.loc 1 81 21 is_stmt 0 view .LVU192
+ 551 02c8 BDF83E20 		ldrh	r2, [sp, #62]
+  81:Core/Src/can_utils.c ****     buffer[7]=cells[27]&0xFF;
+ 552              		.loc 1 81 33 view .LVU193
+ 553 02cc 02F47F43 		and	r3, r2, #65280
+ 554 02d0 082B     		cmp	r3, #8
+ 555 02d2 94BF     		ite	ls
+ 556 02d4 0023     		movls	r3, #0
+ 557 02d6 0123     		movhi	r3, #1
+  81:Core/Src/can_utils.c ****     buffer[7]=cells[27]&0xFF;
+ 558              		.loc 1 81 14 view .LVU194
+ 559 02d8 8DF80630 		strb	r3, [sp, #6]
+  82:Core/Src/can_utils.c ****     can_send_msg(0x106,buffer);
+ 560              		.loc 1 82 5 is_stmt 1 view .LVU195
+  82:Core/Src/can_utils.c ****     can_send_msg(0x106,buffer);
+ 561              		.loc 1 82 14 is_stmt 0 view .LVU196
+ 562 02dc 8DF80720 		strb	r2, [sp, #7]
+  83:Core/Src/can_utils.c **** }
+ 563              		.loc 1 83 5 is_stmt 1 view .LVU197
+ 564 02e0 6946     		mov	r1, sp
+ 565 02e2 4FF48370 		mov	r0, #262
+ 566 02e6 FFF7FEFF 		bl	can_send_msg
+ 567              	.LVL10:
+  84:Core/Src/can_utils.c **** 
+ 568              		.loc 1 84 1 is_stmt 0 view .LVU198
+ 569 02ea 10B0     		add	sp, sp, #64
+ 570              		.cfi_def_cfa_offset 8
+ 571              		@ sp needed
+ 572 02ec 10BD     		pop	{r4, pc}
+ 573              		.cfi_endproc
+ 574              	.LFE135:
+ 576              		.section	.text.can_receive_msg,"ax",%progbits
+ 577              		.align	1
+ 578              		.global	can_receive_msg
+ 579              		.syntax unified
+ 580              		.thumb
+ 581              		.thumb_func
+ 583              	can_receive_msg:
+ 584              	.LFB138:
+  99:Core/Src/can_utils.c **** 
+ 100:Core/Src/can_utils.c **** void can_receive_msg(){
+ 585              		.loc 1 100 23 is_stmt 1 view -0
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 16
+
+
+ 586              		.cfi_startproc
+ 587              		@ args = 0, pretend = 0, frame = 0
+ 588              		@ frame_needed = 0, uses_anonymous_args = 0
+ 589              		@ link register save eliminated.
+ 101:Core/Src/can_utils.c **** 
+ 102:Core/Src/can_utils.c **** }
+ 590              		.loc 1 102 1 view .LVU200
+ 591 0000 7047     		bx	lr
+ 592              		.cfi_endproc
+ 593              	.LFE138:
+ 595              		.section	.text.libBuffer_append_uint32,"ax",%progbits
+ 596              		.align	1
+ 597              		.global	libBuffer_append_uint32
+ 598              		.syntax unified
+ 599              		.thumb
+ 600              		.thumb_func
+ 602              	libBuffer_append_uint32:
+ 603              	.LVL11:
+ 604              	.LFB139:
+ 103:Core/Src/can_utils.c **** 
+ 104:Core/Src/can_utils.c **** void libBuffer_append_uint32(uint8_t* buffer,uint32_t data,uint8_t* index){
+ 605              		.loc 1 104 75 view -0
+ 606              		.cfi_startproc
+ 607              		@ args = 0, pretend = 0, frame = 0
+ 608              		@ frame_needed = 0, uses_anonymous_args = 0
+ 609              		@ link register save eliminated.
+ 105:Core/Src/can_utils.c **** 
+ 106:Core/Src/can_utils.c **** }
+ 610              		.loc 1 106 1 view .LVU202
+ 611 0000 7047     		bx	lr
+ 612              		.cfi_endproc
+ 613              	.LFE139:
+ 615              		.global	pack_information_pointer
+ 616              		.section	.bss.pack_information_pointer,"aw",%nobits
+ 617              		.align	2
+ 620              	pack_information_pointer:
+ 621 0000 00000000 		.space	4
+ 622              		.global	send_buffer
+ 623              		.section	.bss.send_buffer,"aw",%nobits
+ 624              		.align	2
+ 627              	send_buffer:
+ 628 0000 00000000 		.space	8
+ 628      00000000 
+ 629              		.text
+ 630              	.Letext0:
+ 631              		.file 2 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 632              		.file 3 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 633              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h"
+ 634              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 635              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 636              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 637              		.file 8 "Core/Inc/bms_datatypes.h"
+ 638              		.file 9 "Core/Inc/can.h"
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s 			page 17
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 can_utils.c
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:21     .text.can_routines_init:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:27     .text.can_routines_init:00000000 can_routines_init
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:44     .text.can_routines_init:00000008 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:620    .bss.pack_information_pointer:00000000 pack_information_pointer
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:49     .text.can_receive_routine:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:55     .text.can_receive_routine:00000000 can_receive_routine
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:68     .text.can_send_msg:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:74     .text.can_send_msg:00000000 can_send_msg
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:116    .text.can_send_msg:0000001c $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:121    .text.can_send_routine:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:127    .text.can_send_routine:00000000 can_send_routine
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:577    .text.can_receive_msg:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:583    .text.can_receive_msg:00000000 can_receive_msg
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:596    .text.libBuffer_append_uint32:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:602    .text.libBuffer_append_uint32:00000000 libBuffer_append_uint32
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:617    .bss.pack_information_pointer:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:627    .bss.send_buffer:00000000 send_buffer
+C:\Users\ALESSA~1\AppData\Local\Temp\ccyNWunm.s:624    .bss.send_buffer:00000000 $d
+
+UNDEFINED SYMBOLS
+CAN_send
+hcan1

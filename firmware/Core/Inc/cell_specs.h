@@ -1,0 +1,23 @@
+#ifndef CELL_SPEC_H
+#define CELL_SPEC_H
+#include "stdint.h"
+
+#define SOFT_UNDERVOLT (3000)
+
+#define HARD_UNDERVOLT (2800)
+
+#define SOFT_OVERVOLT (4180)
+#define HARD_OVERVOLT (4200)
+
+#define SOFT_UNDERTEMP (5 * 100)
+#define HARD_UNDERTEMP (-1 * 100)
+
+#define SOFT_OVERTEMP (40 * 100)
+#define HARD_OVERTEMP (55 * 100)
+
+#define CHARGE_CAPACITY_mAh (5300)
+#define CHARGING_CURRENT_END_mA (250)
+#define MAX_DISCHARGE_CURRENT (2 * CHARGE_CAPACITY_mAh)
+#define MAX_CHARGE_CURRENT (1 * CHARGE_CAPACITY_mAh)
+
+#endif

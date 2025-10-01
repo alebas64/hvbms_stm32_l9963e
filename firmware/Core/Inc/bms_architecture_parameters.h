@@ -1,0 +1,11 @@
+//information on how the l9963e devkit are setted and how many there are
+#ifndef BMS_ARCHITECTURE_PARAMETERS_H
+#define BMS_ARCHITECTURE_PARAMETERS_H
+
+#define L9963E_CELLS_N 14
+#define L9963E_GPIOS_N 5
+#define L9963E_SLAVES_N 2
+#define L9963Es_TOTAL_CELLS_N (L9963E_SLAVES_N*L9963E_CELLS_N)
+#define L9963Es_TOTAL_GPIOS_N (L9963E_SLAVES_N*L9963E_GPIOS_N)
+
+#endif
