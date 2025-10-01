@@ -1,0 +1,636 @@
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"utils.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/utils.c"
+  20              		.section	.text.max_search,"ax",%progbits
+  21              		.align	1
+  22              		.global	max_search
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	max_search:
+  28              	.LVL0:
+  29              	.LFB137:
+   1:Core/Src/utils.c **** #include "utils.h"
+   2:Core/Src/utils.c **** 
+   3:Core/Src/utils.c **** uint16_t max_search(uint16_t* array, uint8_t size){
+  30              		.loc 1 3 51 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+   4:Core/Src/utils.c ****     if(size==0)
+  34              		.loc 1 4 5 view .LVU1
+  35              		.loc 1 4 7 is_stmt 0 view .LVU2
+  36 0000 79B1     		cbz	r1, .L6
+   3:Core/Src/utils.c ****     if(size==0)
+  37              		.loc 1 3 51 view .LVU3
+  38 0002 00B5     		push	{lr}
+  39              		.cfi_def_cfa_offset 4
+  40              		.cfi_offset 14, -4
+  41 0004 8446     		mov	ip, r0
+  42 0006 8E46     		mov	lr, r1
+   5:Core/Src/utils.c ****         return 0;
+   6:Core/Src/utils.c ****     uint16_t max = array[0];
+  43              		.loc 1 6 5 is_stmt 1 view .LVU4
+  44              		.loc 1 6 14 is_stmt 0 view .LVU5
+  45 0008 0088     		ldrh	r0, [r0]
+  46              	.LVL1:
+   7:Core/Src/utils.c ****     for(uint8_t i=1;i<size;i++){
+  47              		.loc 1 7 5 is_stmt 1 view .LVU6
+  48              	.LBB2:
+  49              		.loc 1 7 9 view .LVU7
+  50              		.loc 1 7 17 is_stmt 0 view .LVU8
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 2
+
+
+  51 000a 0123     		movs	r3, #1
+  52              		.loc 1 7 5 view .LVU9
+  53 000c 01E0     		b	.L3
+  54              	.LVL2:
+  55              	.L4:
+  56              		.loc 1 7 29 is_stmt 1 discriminator 2 view .LVU10
+  57 000e 0133     		adds	r3, r3, #1
+  58              	.LVL3:
+  59              		.loc 1 7 29 is_stmt 0 discriminator 2 view .LVU11
+  60 0010 DBB2     		uxtb	r3, r3
+  61              	.LVL4:
+  62              	.L3:
+  63              		.loc 1 7 22 is_stmt 1 discriminator 1 view .LVU12
+  64 0012 7345     		cmp	r3, lr
+  65 0014 07D2     		bcs	.L12
+   8:Core/Src/utils.c ****         if(array[i]>max)
+  66              		.loc 1 8 9 view .LVU13
+  67              		.loc 1 8 17 is_stmt 0 view .LVU14
+  68 0016 3CF81320 		ldrh	r2, [ip, r3, lsl #1]
+  69              		.loc 1 8 11 view .LVU15
+  70 001a 8242     		cmp	r2, r0
+  71 001c F7D9     		bls	.L4
+   9:Core/Src/utils.c ****             max = array[i];
+  72              		.loc 1 9 17 view .LVU16
+  73 001e 1046     		mov	r0, r2
+  74              	.LVL5:
+  75              		.loc 1 9 17 view .LVU17
+  76 0020 F5E7     		b	.L4
+  77              	.LVL6:
+  78              	.L6:
+  79              		.cfi_def_cfa_offset 0
+  80              		.cfi_restore 14
+  81              		.loc 1 9 17 view .LVU18
+  82              	.LBE2:
+   5:Core/Src/utils.c ****     uint16_t max = array[0];
+  83              		.loc 1 5 16 view .LVU19
+  84 0022 0020     		movs	r0, #0
+  85              	.LVL7:
+  10:Core/Src/utils.c ****     }
+  11:Core/Src/utils.c ****     return max;
+  12:Core/Src/utils.c **** }
+  86              		.loc 1 12 1 view .LVU20
+  87 0024 7047     		bx	lr
+  88              	.LVL8:
+  89              	.L12:
+  90              		.cfi_def_cfa_offset 4
+  91              		.cfi_offset 14, -4
+  92              		.loc 1 12 1 view .LVU21
+  93 0026 5DF804FB 		ldr	pc, [sp], #4
+  94              		.cfi_endproc
+  95              	.LFE137:
+  97              		.section	.text.min_search,"ax",%progbits
+  98              		.align	1
+  99              		.global	min_search
+ 100              		.syntax unified
+ 101              		.thumb
+ 102              		.thumb_func
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 3
+
+
+ 104              	min_search:
+ 105              	.LVL9:
+ 106              	.LFB138:
+  13:Core/Src/utils.c **** 
+  14:Core/Src/utils.c **** uint16_t min_search(uint16_t* array, uint8_t size){
+ 107              		.loc 1 14 51 is_stmt 1 view -0
+ 108              		.cfi_startproc
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+  15:Core/Src/utils.c ****     if(size==0)
+ 111              		.loc 1 15 5 view .LVU23
+ 112              		.loc 1 15 7 is_stmt 0 view .LVU24
+ 113 0000 79B1     		cbz	r1, .L18
+  14:Core/Src/utils.c ****     if(size==0)
+ 114              		.loc 1 14 51 view .LVU25
+ 115 0002 00B5     		push	{lr}
+ 116              		.cfi_def_cfa_offset 4
+ 117              		.cfi_offset 14, -4
+ 118 0004 8446     		mov	ip, r0
+ 119 0006 8E46     		mov	lr, r1
+  16:Core/Src/utils.c ****         return 0;
+  17:Core/Src/utils.c ****     uint16_t min = array[0];
+ 120              		.loc 1 17 5 is_stmt 1 view .LVU26
+ 121              		.loc 1 17 14 is_stmt 0 view .LVU27
+ 122 0008 0088     		ldrh	r0, [r0]
+ 123              	.LVL10:
+  18:Core/Src/utils.c ****     for(uint8_t i=1;i<size;i++){
+ 124              		.loc 1 18 5 is_stmt 1 view .LVU28
+ 125              	.LBB3:
+ 126              		.loc 1 18 9 view .LVU29
+ 127              		.loc 1 18 17 is_stmt 0 view .LVU30
+ 128 000a 0123     		movs	r3, #1
+ 129              		.loc 1 18 5 view .LVU31
+ 130 000c 01E0     		b	.L15
+ 131              	.LVL11:
+ 132              	.L16:
+ 133              		.loc 1 18 29 is_stmt 1 discriminator 2 view .LVU32
+ 134 000e 0133     		adds	r3, r3, #1
+ 135              	.LVL12:
+ 136              		.loc 1 18 29 is_stmt 0 discriminator 2 view .LVU33
+ 137 0010 DBB2     		uxtb	r3, r3
+ 138              	.LVL13:
+ 139              	.L15:
+ 140              		.loc 1 18 22 is_stmt 1 discriminator 1 view .LVU34
+ 141 0012 7345     		cmp	r3, lr
+ 142 0014 07D2     		bcs	.L24
+  19:Core/Src/utils.c ****         if(array[i]<min)
+ 143              		.loc 1 19 9 view .LVU35
+ 144              		.loc 1 19 17 is_stmt 0 view .LVU36
+ 145 0016 3CF81320 		ldrh	r2, [ip, r3, lsl #1]
+ 146              		.loc 1 19 11 view .LVU37
+ 147 001a 8242     		cmp	r2, r0
+ 148 001c F7D2     		bcs	.L16
+  20:Core/Src/utils.c ****             min = array[i];
+ 149              		.loc 1 20 17 view .LVU38
+ 150 001e 1046     		mov	r0, r2
+ 151              	.LVL14:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 4
+
+
+ 152              		.loc 1 20 17 view .LVU39
+ 153 0020 F5E7     		b	.L16
+ 154              	.LVL15:
+ 155              	.L18:
+ 156              		.cfi_def_cfa_offset 0
+ 157              		.cfi_restore 14
+ 158              		.loc 1 20 17 view .LVU40
+ 159              	.LBE3:
+  16:Core/Src/utils.c ****     uint16_t min = array[0];
+ 160              		.loc 1 16 16 view .LVU41
+ 161 0022 0020     		movs	r0, #0
+ 162              	.LVL16:
+  21:Core/Src/utils.c ****     }
+  22:Core/Src/utils.c ****     return min;
+  23:Core/Src/utils.c **** }
+ 163              		.loc 1 23 1 view .LVU42
+ 164 0024 7047     		bx	lr
+ 165              	.LVL17:
+ 166              	.L24:
+ 167              		.cfi_def_cfa_offset 4
+ 168              		.cfi_offset 14, -4
+ 169              		.loc 1 23 1 view .LVU43
+ 170 0026 5DF804FB 		ldr	pc, [sp], #4
+ 171              		.cfi_endproc
+ 172              	.LFE138:
+ 174              		.section	.text.get_avg,"ax",%progbits
+ 175              		.align	1
+ 176              		.global	get_avg
+ 177              		.syntax unified
+ 178              		.thumb
+ 179              		.thumb_func
+ 181              	get_avg:
+ 182              	.LVL18:
+ 183              	.LFB139:
+  24:Core/Src/utils.c **** 
+  25:Core/Src/utils.c **** uint16_t get_avg(uint16_t* array, uint8_t size){
+ 184              		.loc 1 25 48 is_stmt 1 view -0
+ 185              		.cfi_startproc
+ 186              		@ args = 0, pretend = 0, frame = 0
+ 187              		@ frame_needed = 0, uses_anonymous_args = 0
+ 188              		@ link register save eliminated.
+  26:Core/Src/utils.c ****     if(size==0)
+ 189              		.loc 1 26 5 view .LVU45
+ 190              		.loc 1 26 7 is_stmt 0 view .LVU46
+ 191 0000 8C46     		mov	ip, r1
+ 192 0002 69B1     		cbz	r1, .L29
+ 193              	.LBB4:
+  27:Core/Src/utils.c ****         return 0;
+  28:Core/Src/utils.c ****     uint32_t sum = 0;
+  29:Core/Src/utils.c ****     for(uint8_t i=0;i<size;i++){
+ 194              		.loc 1 29 17 view .LVU47
+ 195 0004 0023     		movs	r3, #0
+ 196              	.LBE4:
+  28:Core/Src/utils.c ****     for(uint8_t i=0;i<size;i++){
+ 197              		.loc 1 28 14 view .LVU48
+ 198 0006 1A46     		mov	r2, r3
+ 199 0008 04E0     		b	.L27
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 5
+
+
+ 200              	.LVL19:
+ 201              	.L28:
+ 202              	.LBB5:
+  30:Core/Src/utils.c ****         sum += array[i];
+ 203              		.loc 1 30 9 is_stmt 1 view .LVU49
+ 204              		.loc 1 30 21 is_stmt 0 view .LVU50
+ 205 000a 30F81310 		ldrh	r1, [r0, r3, lsl #1]
+ 206              		.loc 1 30 13 view .LVU51
+ 207 000e 0A44     		add	r2, r2, r1
+ 208              	.LVL20:
+  29:Core/Src/utils.c ****         sum += array[i];
+ 209              		.loc 1 29 29 is_stmt 1 discriminator 3 view .LVU52
+ 210 0010 0133     		adds	r3, r3, #1
+ 211              	.LVL21:
+  29:Core/Src/utils.c ****         sum += array[i];
+ 212              		.loc 1 29 29 is_stmt 0 discriminator 3 view .LVU53
+ 213 0012 DBB2     		uxtb	r3, r3
+ 214              	.LVL22:
+ 215              	.L27:
+  29:Core/Src/utils.c ****         sum += array[i];
+ 216              		.loc 1 29 22 is_stmt 1 discriminator 1 view .LVU54
+ 217 0014 6345     		cmp	r3, ip
+ 218 0016 F8D3     		bcc	.L28
+ 219              	.LBE5:
+  31:Core/Src/utils.c ****     }
+  32:Core/Src/utils.c ****     return sum/size;
+ 220              		.loc 1 32 5 view .LVU55
+ 221              		.loc 1 32 15 is_stmt 0 view .LVU56
+ 222 0018 B2FBFCF0 		udiv	r0, r2, ip
+ 223              	.LVL23:
+ 224              		.loc 1 32 15 view .LVU57
+ 225 001c 80B2     		uxth	r0, r0
+ 226 001e 7047     		bx	lr
+ 227              	.LVL24:
+ 228              	.L29:
+  27:Core/Src/utils.c ****     uint32_t sum = 0;
+ 229              		.loc 1 27 16 view .LVU58
+ 230 0020 0020     		movs	r0, #0
+ 231              	.LVL25:
+  33:Core/Src/utils.c **** }
+ 232              		.loc 1 33 1 view .LVU59
+ 233 0022 7047     		bx	lr
+ 234              		.cfi_endproc
+ 235              	.LFE139:
+ 237              		.section	.text.max_search_signed,"ax",%progbits
+ 238              		.align	1
+ 239              		.global	max_search_signed
+ 240              		.syntax unified
+ 241              		.thumb
+ 242              		.thumb_func
+ 244              	max_search_signed:
+ 245              	.LVL26:
+ 246              	.LFB140:
+  34:Core/Src/utils.c **** 
+  35:Core/Src/utils.c **** int16_t max_search_signed(int16_t* array, uint8_t size){
+ 247              		.loc 1 35 56 is_stmt 1 view -0
+ 248              		.cfi_startproc
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 6
+
+
+ 249              		@ args = 0, pretend = 0, frame = 0
+ 250              		@ frame_needed = 0, uses_anonymous_args = 0
+  36:Core/Src/utils.c ****     if(size==0)
+ 251              		.loc 1 36 5 view .LVU61
+ 252              		.loc 1 36 7 is_stmt 0 view .LVU62
+ 253 0000 81B1     		cbz	r1, .L35
+  35:Core/Src/utils.c ****     if(size==0)
+ 254              		.loc 1 35 56 view .LVU63
+ 255 0002 00B5     		push	{lr}
+ 256              		.cfi_def_cfa_offset 4
+ 257              		.cfi_offset 14, -4
+ 258 0004 8446     		mov	ip, r0
+ 259 0006 8E46     		mov	lr, r1
+  37:Core/Src/utils.c ****         return 0;
+  38:Core/Src/utils.c ****     int16_t max = array[0];
+ 260              		.loc 1 38 5 is_stmt 1 view .LVU64
+ 261              		.loc 1 38 13 is_stmt 0 view .LVU65
+ 262 0008 B0F90000 		ldrsh	r0, [r0]
+ 263              	.LVL27:
+  39:Core/Src/utils.c ****     for(uint8_t i=1;i<size;i++){
+ 264              		.loc 1 39 5 is_stmt 1 view .LVU66
+ 265              	.LBB6:
+ 266              		.loc 1 39 9 view .LVU67
+ 267              		.loc 1 39 17 is_stmt 0 view .LVU68
+ 268 000c 0123     		movs	r3, #1
+ 269              		.loc 1 39 5 view .LVU69
+ 270 000e 01E0     		b	.L32
+ 271              	.LVL28:
+ 272              	.L33:
+ 273              		.loc 1 39 29 is_stmt 1 discriminator 2 view .LVU70
+ 274 0010 0133     		adds	r3, r3, #1
+ 275              	.LVL29:
+ 276              		.loc 1 39 29 is_stmt 0 discriminator 2 view .LVU71
+ 277 0012 DBB2     		uxtb	r3, r3
+ 278              	.LVL30:
+ 279              	.L32:
+ 280              		.loc 1 39 22 is_stmt 1 discriminator 1 view .LVU72
+ 281 0014 7345     		cmp	r3, lr
+ 282 0016 07D2     		bcs	.L41
+  40:Core/Src/utils.c ****         if(array[i]>max)
+ 283              		.loc 1 40 9 view .LVU73
+ 284              		.loc 1 40 17 is_stmt 0 view .LVU74
+ 285 0018 3CF91320 		ldrsh	r2, [ip, r3, lsl #1]
+ 286              		.loc 1 40 11 view .LVU75
+ 287 001c 8242     		cmp	r2, r0
+ 288 001e F7DD     		ble	.L33
+  41:Core/Src/utils.c ****             max = array[i];
+ 289              		.loc 1 41 17 view .LVU76
+ 290 0020 1046     		mov	r0, r2
+ 291              	.LVL31:
+ 292              		.loc 1 41 17 view .LVU77
+ 293 0022 F5E7     		b	.L33
+ 294              	.LVL32:
+ 295              	.L35:
+ 296              		.cfi_def_cfa_offset 0
+ 297              		.cfi_restore 14
+ 298              		.loc 1 41 17 view .LVU78
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 7
+
+
+ 299              	.LBE6:
+  37:Core/Src/utils.c ****     int16_t max = array[0];
+ 300              		.loc 1 37 16 view .LVU79
+ 301 0024 0020     		movs	r0, #0
+ 302              	.LVL33:
+  42:Core/Src/utils.c ****     }
+  43:Core/Src/utils.c ****     return max;
+  44:Core/Src/utils.c **** }
+ 303              		.loc 1 44 1 view .LVU80
+ 304 0026 7047     		bx	lr
+ 305              	.LVL34:
+ 306              	.L41:
+ 307              		.cfi_def_cfa_offset 4
+ 308              		.cfi_offset 14, -4
+ 309              		.loc 1 44 1 view .LVU81
+ 310 0028 5DF804FB 		ldr	pc, [sp], #4
+ 311              		.cfi_endproc
+ 312              	.LFE140:
+ 314              		.section	.text.min_search_signed,"ax",%progbits
+ 315              		.align	1
+ 316              		.global	min_search_signed
+ 317              		.syntax unified
+ 318              		.thumb
+ 319              		.thumb_func
+ 321              	min_search_signed:
+ 322              	.LVL35:
+ 323              	.LFB141:
+  45:Core/Src/utils.c **** 
+  46:Core/Src/utils.c **** int16_t min_search_signed(int16_t* array, uint8_t size){
+ 324              		.loc 1 46 56 is_stmt 1 view -0
+ 325              		.cfi_startproc
+ 326              		@ args = 0, pretend = 0, frame = 0
+ 327              		@ frame_needed = 0, uses_anonymous_args = 0
+  47:Core/Src/utils.c ****     if(size==0)
+ 328              		.loc 1 47 5 view .LVU83
+ 329              		.loc 1 47 7 is_stmt 0 view .LVU84
+ 330 0000 81B1     		cbz	r1, .L47
+  46:Core/Src/utils.c ****     if(size==0)
+ 331              		.loc 1 46 56 view .LVU85
+ 332 0002 00B5     		push	{lr}
+ 333              		.cfi_def_cfa_offset 4
+ 334              		.cfi_offset 14, -4
+ 335 0004 8446     		mov	ip, r0
+ 336 0006 8E46     		mov	lr, r1
+  48:Core/Src/utils.c ****         return 0;
+  49:Core/Src/utils.c ****     int16_t min = array[0];
+ 337              		.loc 1 49 5 is_stmt 1 view .LVU86
+ 338              		.loc 1 49 13 is_stmt 0 view .LVU87
+ 339 0008 B0F90000 		ldrsh	r0, [r0]
+ 340              	.LVL36:
+  50:Core/Src/utils.c ****     for(uint8_t i=1;i<size;i++){
+ 341              		.loc 1 50 5 is_stmt 1 view .LVU88
+ 342              	.LBB7:
+ 343              		.loc 1 50 9 view .LVU89
+ 344              		.loc 1 50 17 is_stmt 0 view .LVU90
+ 345 000c 0123     		movs	r3, #1
+ 346              		.loc 1 50 5 view .LVU91
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 8
+
+
+ 347 000e 01E0     		b	.L44
+ 348              	.LVL37:
+ 349              	.L45:
+ 350              		.loc 1 50 29 is_stmt 1 discriminator 2 view .LVU92
+ 351 0010 0133     		adds	r3, r3, #1
+ 352              	.LVL38:
+ 353              		.loc 1 50 29 is_stmt 0 discriminator 2 view .LVU93
+ 354 0012 DBB2     		uxtb	r3, r3
+ 355              	.LVL39:
+ 356              	.L44:
+ 357              		.loc 1 50 22 is_stmt 1 discriminator 1 view .LVU94
+ 358 0014 7345     		cmp	r3, lr
+ 359 0016 07D2     		bcs	.L53
+  51:Core/Src/utils.c ****         if(array[i]<min)
+ 360              		.loc 1 51 9 view .LVU95
+ 361              		.loc 1 51 17 is_stmt 0 view .LVU96
+ 362 0018 3CF91320 		ldrsh	r2, [ip, r3, lsl #1]
+ 363              		.loc 1 51 11 view .LVU97
+ 364 001c 8242     		cmp	r2, r0
+ 365 001e F7DA     		bge	.L45
+  52:Core/Src/utils.c ****             min = array[i];
+ 366              		.loc 1 52 17 view .LVU98
+ 367 0020 1046     		mov	r0, r2
+ 368              	.LVL40:
+ 369              		.loc 1 52 17 view .LVU99
+ 370 0022 F5E7     		b	.L45
+ 371              	.LVL41:
+ 372              	.L47:
+ 373              		.cfi_def_cfa_offset 0
+ 374              		.cfi_restore 14
+ 375              		.loc 1 52 17 view .LVU100
+ 376              	.LBE7:
+  48:Core/Src/utils.c ****     int16_t min = array[0];
+ 377              		.loc 1 48 16 view .LVU101
+ 378 0024 0020     		movs	r0, #0
+ 379              	.LVL42:
+  53:Core/Src/utils.c ****     }
+  54:Core/Src/utils.c ****     return min;
+  55:Core/Src/utils.c **** }
+ 380              		.loc 1 55 1 view .LVU102
+ 381 0026 7047     		bx	lr
+ 382              	.LVL43:
+ 383              	.L53:
+ 384              		.cfi_def_cfa_offset 4
+ 385              		.cfi_offset 14, -4
+ 386              		.loc 1 55 1 view .LVU103
+ 387 0028 5DF804FB 		ldr	pc, [sp], #4
+ 388              		.cfi_endproc
+ 389              	.LFE141:
+ 391              		.section	.text.get_avg_signed,"ax",%progbits
+ 392              		.align	1
+ 393              		.global	get_avg_signed
+ 394              		.syntax unified
+ 395              		.thumb
+ 396              		.thumb_func
+ 398              	get_avg_signed:
+ 399              	.LVL44:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 9
+
+
+ 400              	.LFB142:
+  56:Core/Src/utils.c **** 
+  57:Core/Src/utils.c **** int16_t get_avg_signed(int16_t* array, uint8_t size){
+ 401              		.loc 1 57 53 is_stmt 1 view -0
+ 402              		.cfi_startproc
+ 403              		@ args = 0, pretend = 0, frame = 0
+ 404              		@ frame_needed = 0, uses_anonymous_args = 0
+ 405              		@ link register save eliminated.
+  58:Core/Src/utils.c ****     if(size==0)
+ 406              		.loc 1 58 5 view .LVU105
+ 407              		.loc 1 58 7 is_stmt 0 view .LVU106
+ 408 0000 8C46     		mov	ip, r1
+ 409 0002 69B1     		cbz	r1, .L58
+ 410              	.LBB8:
+  59:Core/Src/utils.c ****         return 0;
+  60:Core/Src/utils.c ****     int32_t sum = 0;
+  61:Core/Src/utils.c ****     for(uint8_t i=0;i<size;i++){
+ 411              		.loc 1 61 17 view .LVU107
+ 412 0004 0023     		movs	r3, #0
+ 413              	.LBE8:
+  60:Core/Src/utils.c ****     for(uint8_t i=0;i<size;i++){
+ 414              		.loc 1 60 13 view .LVU108
+ 415 0006 1A46     		mov	r2, r3
+ 416 0008 04E0     		b	.L56
+ 417              	.LVL45:
+ 418              	.L57:
+ 419              	.LBB9:
+  62:Core/Src/utils.c ****         sum += array[i];
+ 420              		.loc 1 62 9 is_stmt 1 view .LVU109
+ 421              		.loc 1 62 21 is_stmt 0 view .LVU110
+ 422 000a 30F91310 		ldrsh	r1, [r0, r3, lsl #1]
+ 423              		.loc 1 62 13 view .LVU111
+ 424 000e 0A44     		add	r2, r2, r1
+ 425              	.LVL46:
+  61:Core/Src/utils.c ****         sum += array[i];
+ 426              		.loc 1 61 29 is_stmt 1 discriminator 3 view .LVU112
+ 427 0010 0133     		adds	r3, r3, #1
+ 428              	.LVL47:
+  61:Core/Src/utils.c ****         sum += array[i];
+ 429              		.loc 1 61 29 is_stmt 0 discriminator 3 view .LVU113
+ 430 0012 DBB2     		uxtb	r3, r3
+ 431              	.LVL48:
+ 432              	.L56:
+  61:Core/Src/utils.c ****         sum += array[i];
+ 433              		.loc 1 61 22 is_stmt 1 discriminator 1 view .LVU114
+ 434 0014 6345     		cmp	r3, ip
+ 435 0016 F8D3     		bcc	.L57
+ 436              	.LBE9:
+  63:Core/Src/utils.c ****     }
+  64:Core/Src/utils.c ****     return sum/size;
+ 437              		.loc 1 64 5 view .LVU115
+ 438              		.loc 1 64 15 is_stmt 0 view .LVU116
+ 439 0018 92FBFCF0 		sdiv	r0, r2, ip
+ 440              	.LVL49:
+ 441              		.loc 1 64 15 view .LVU117
+ 442 001c 00B2     		sxth	r0, r0
+ 443 001e 7047     		bx	lr
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 10
+
+
+ 444              	.LVL50:
+ 445              	.L58:
+  59:Core/Src/utils.c ****     int32_t sum = 0;
+ 446              		.loc 1 59 16 view .LVU118
+ 447 0020 0020     		movs	r0, #0
+ 448              	.LVL51:
+  65:Core/Src/utils.c **** }
+ 449              		.loc 1 65 1 view .LVU119
+ 450 0022 7047     		bx	lr
+ 451              		.cfi_endproc
+ 452              	.LFE142:
+ 454              		.section	.text.timer_check,"ax",%progbits
+ 455              		.align	1
+ 456              		.global	timer_check
+ 457              		.syntax unified
+ 458              		.thumb
+ 459              		.thumb_func
+ 461              	timer_check:
+ 462              	.LVL52:
+ 463              	.LFB143:
+  66:Core/Src/utils.c **** 
+  67:Core/Src/utils.c **** uint8_t timer_check(uint32_t interval, uint32_t millis_elapsed){
+ 464              		.loc 1 67 64 is_stmt 1 view -0
+ 465              		.cfi_startproc
+ 466              		@ args = 0, pretend = 0, frame = 0
+ 467              		@ frame_needed = 0, uses_anonymous_args = 0
+ 468              		.loc 1 67 64 is_stmt 0 view .LVU121
+ 469 0000 38B5     		push	{r3, r4, r5, lr}
+ 470              		.cfi_def_cfa_offset 16
+ 471              		.cfi_offset 3, -16
+ 472              		.cfi_offset 4, -12
+ 473              		.cfi_offset 5, -8
+ 474              		.cfi_offset 14, -4
+ 475 0002 0446     		mov	r4, r0
+ 476 0004 0D46     		mov	r5, r1
+  68:Core/Src/utils.c ****   if(HAL_GetTick()-(millis_elapsed)>interval){
+ 477              		.loc 1 68 3 is_stmt 1 view .LVU122
+ 478              		.loc 1 68 6 is_stmt 0 view .LVU123
+ 479 0006 FFF7FEFF 		bl	HAL_GetTick
+ 480              	.LVL53:
+ 481              		.loc 1 68 19 discriminator 1 view .LVU124
+ 482 000a 411B     		subs	r1, r0, r5
+ 483              		.loc 1 68 5 discriminator 1 view .LVU125
+ 484 000c A142     		cmp	r1, r4
+ 485 000e 01D9     		bls	.L61
+  69:Core/Src/utils.c ****     return 1;
+ 486              		.loc 1 69 12 view .LVU126
+ 487 0010 0120     		movs	r0, #1
+ 488              	.L60:
+  70:Core/Src/utils.c ****   }else{
+  71:Core/Src/utils.c ****     return 0;
+  72:Core/Src/utils.c ****   }
+  73:Core/Src/utils.c **** }...
+ 489              		.loc 1 73 1 view .LVU127
+ 490 0012 38BD     		pop	{r3, r4, r5, pc}
+ 491              	.LVL54:
+ 492              	.L61:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 11
+
+
+  71:Core/Src/utils.c ****     return 0;
+ 493              		.loc 1 71 12 view .LVU128
+ 494 0014 0020     		movs	r0, #0
+ 495 0016 FCE7     		b	.L60
+ 496              		.cfi_endproc
+ 497              	.LFE143:
+ 499              		.text
+ 500              	.Letext0:
+ 501              		.file 2 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 502              		.file 3 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 503              		.file 4 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal.h"
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 utils.c
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:21     .text.max_search:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:27     .text.max_search:00000000 max_search
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:98     .text.min_search:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:104    .text.min_search:00000000 min_search
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:175    .text.get_avg:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:181    .text.get_avg:00000000 get_avg
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:238    .text.max_search_signed:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:244    .text.max_search_signed:00000000 max_search_signed
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:315    .text.min_search_signed:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:321    .text.min_search_signed:00000000 min_search_signed
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:392    .text.get_avg_signed:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:398    .text.get_avg_signed:00000000 get_avg_signed
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:455    .text.timer_check:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccKWc4RR.s:461    .text.timer_check:00000000 timer_check
+
+UNDEFINED SYMBOLS
+HAL_GetTick

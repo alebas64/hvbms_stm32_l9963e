@@ -1,0 +1,2417 @@
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"bms.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Core/Src/bms.c"
+  20              		.section	.text.bms_routines_init,"ax",%progbits
+  21              		.align	1
+  22              		.global	bms_routines_init
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	bms_routines_init:
+  28              	.LVL0:
+  29              	.LFB137:
+   1:Core/Src/bms.c **** #include "bms.h"
+   2:Core/Src/bms.c **** uint8_t currentstate = HV_OFF;
+   3:Core/Src/bms.c **** 
+   4:Core/Src/bms.c **** uint8_t battery_is_safe = 0;
+   5:Core/Src/bms.c **** 
+   6:Core/Src/bms.c **** pack_information_t *pack_information;
+   7:Core/Src/bms.c **** battery_errors_t   *battery_errors;
+   8:Core/Src/bms.c **** hv_devices_states_requests_t *hv_devices_states_requests;
+   9:Core/Src/bms.c **** 
+  10:Core/Src/bms.c **** //* setup function for the bms routine
+  11:Core/Src/bms.c **** void bms_routines_init(pack_information_t *ptr1, battery_errors_t *ptr2, hv_devices_states_requests
+  30              		.loc 1 11 109 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 11 109 is_stmt 0 view .LVU1
+  35 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+  36              		.cfi_def_cfa_offset 24
+  37              		.cfi_offset 3, -24
+  38              		.cfi_offset 4, -20
+  39              		.cfi_offset 5, -16
+  40              		.cfi_offset 6, -12
+  41              		.cfi_offset 7, -8
+  42              		.cfi_offset 14, -4
+  43 0002 0746     		mov	r7, r0
+  44 0004 0E46     		mov	r6, r1
+  45 0006 1546     		mov	r5, r2
+  12:Core/Src/bms.c ****     //avvio pwm per ventole
+  13:Core/Src/bms.c ****     TIMER_FAN_PWM->CCR1 = 0;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 2
+
+
+  46              		.loc 1 13 5 is_stmt 1 view .LVU2
+  47              		.loc 1 13 25 is_stmt 0 view .LVU3
+  48 0008 0024     		movs	r4, #0
+  49 000a 164B     		ldr	r3, .L7
+  50 000c 5C63     		str	r4, [r3, #52]
+  14:Core/Src/bms.c ****     HAL_TIM_PWM_Start_IT(&htim12,TIM_CHANNEL_1);
+  51              		.loc 1 14 5 is_stmt 1 view .LVU4
+  52 000e 2146     		mov	r1, r4
+  53              	.LVL1:
+  54              		.loc 1 14 5 is_stmt 0 view .LVU5
+  55 0010 1548     		ldr	r0, .L7+4
+  56              	.LVL2:
+  57              		.loc 1 14 5 view .LVU6
+  58 0012 FFF7FEFF 		bl	HAL_TIM_PWM_Start_IT
+  59              	.LVL3:
+  15:Core/Src/bms.c **** 
+  16:Core/Src/bms.c ****     for(uint8_t i=0;i<L9963Es_TOTAL_CELLS_N;i++){
+  60              		.loc 1 16 5 is_stmt 1 view .LVU7
+  61              	.LBB2:
+  62              		.loc 1 16 9 view .LVU8
+  63              		.loc 1 16 17 is_stmt 0 view .LVU9
+  64 0016 2346     		mov	r3, r4
+  65              		.loc 1 16 5 view .LVU10
+  66 0018 0DE0     		b	.L2
+  67              	.LVL4:
+  68              	.L3:
+  17:Core/Src/bms.c ****         pack_information->cell_voltages_mV[i] = CELL_VOLTAGE_READ_ERROR;
+  69              		.loc 1 17 9 is_stmt 1 view .LVU11
+  70              		.loc 1 17 25 is_stmt 0 view .LVU12
+  71 001a 144A     		ldr	r2, .L7+8
+  72 001c 1468     		ldr	r4, [r2]
+  73              		.loc 1 17 47 view .LVU13
+  74 001e 1A1D     		adds	r2, r3, #4
+  75 0020 04EB4202 		add	r2, r4, r2, lsl #1
+  76 0024 41F65831 		movw	r1, #7000
+  77 0028 9180     		strh	r1, [r2, #4]	@ movhi
+  18:Core/Src/bms.c ****         pack_information->cell_balancing[i] = CELL_BALANCING_OFF;
+  78              		.loc 1 18 9 is_stmt 1 view .LVU14
+  79              		.loc 1 18 45 is_stmt 0 view .LVU15
+  80 002a 1C44     		add	r4, r4, r3
+  81 002c 0022     		movs	r2, #0
+  82 002e 84F84C20 		strb	r2, [r4, #76]
+  16:Core/Src/bms.c ****         pack_information->cell_voltages_mV[i] = CELL_VOLTAGE_READ_ERROR;
+  83              		.loc 1 16 46 is_stmt 1 discriminator 3 view .LVU16
+  84 0032 0133     		adds	r3, r3, #1
+  85              	.LVL5:
+  16:Core/Src/bms.c ****         pack_information->cell_voltages_mV[i] = CELL_VOLTAGE_READ_ERROR;
+  86              		.loc 1 16 46 is_stmt 0 discriminator 3 view .LVU17
+  87 0034 DBB2     		uxtb	r3, r3
+  88              	.LVL6:
+  89              	.L2:
+  16:Core/Src/bms.c ****         pack_information->cell_voltages_mV[i] = CELL_VOLTAGE_READ_ERROR;
+  90              		.loc 1 16 22 is_stmt 1 discriminator 1 view .LVU18
+  91 0036 1B2B     		cmp	r3, #27
+  92 0038 EFD9     		bls	.L3
+  93              	.LBE2:
+  94              	.LBB3:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 3
+
+
+  19:Core/Src/bms.c ****     }
+  20:Core/Src/bms.c **** 
+  21:Core/Src/bms.c ****     for(uint8_t i=0;i<L9963Es_TOTAL_GPIOS_N;i++){
+  95              		.loc 1 21 17 is_stmt 0 view .LVU19
+  96 003a 0023     		movs	r3, #0
+  97              	.LVL7:
+  98              		.loc 1 21 17 view .LVU20
+  99 003c 09E0     		b	.L4
+ 100              	.LVL8:
+ 101              	.L5:
+  22:Core/Src/bms.c ****         pack_information->cell_temperatures_centideg[i] = CELL_TEMPERATURE_READ_ERROR;
+ 102              		.loc 1 22 9 is_stmt 1 view .LVU21
+ 103              		.loc 1 22 25 is_stmt 0 view .LVU22
+ 104 003e 0B4A     		ldr	r2, .L7+8
+ 105 0040 1268     		ldr	r2, [r2]
+ 106              		.loc 1 22 57 view .LVU23
+ 107 0042 03F13401 		add	r1, r3, #52
+ 108 0046 4FF66070 		movw	r0, #65376
+ 109 004a 22F81100 		strh	r0, [r2, r1, lsl #1]	@ movhi
+  21:Core/Src/bms.c ****         pack_information->cell_temperatures_centideg[i] = CELL_TEMPERATURE_READ_ERROR;
+ 110              		.loc 1 21 46 is_stmt 1 discriminator 3 view .LVU24
+ 111 004e 0133     		adds	r3, r3, #1
+ 112              	.LVL9:
+  21:Core/Src/bms.c ****         pack_information->cell_temperatures_centideg[i] = CELL_TEMPERATURE_READ_ERROR;
+ 113              		.loc 1 21 46 is_stmt 0 discriminator 3 view .LVU25
+ 114 0050 DBB2     		uxtb	r3, r3
+ 115              	.LVL10:
+ 116              	.L4:
+  21:Core/Src/bms.c ****         pack_information->cell_temperatures_centideg[i] = CELL_TEMPERATURE_READ_ERROR;
+ 117              		.loc 1 21 22 is_stmt 1 discriminator 1 view .LVU26
+ 118 0052 092B     		cmp	r3, #9
+ 119 0054 F3D9     		bls	.L5
+ 120              	.LBE3:
+  23:Core/Src/bms.c ****     }
+  24:Core/Src/bms.c **** 
+  25:Core/Src/bms.c ****     pack_information = ptr1;
+ 121              		.loc 1 25 5 view .LVU27
+ 122              		.loc 1 25 22 is_stmt 0 view .LVU28
+ 123 0056 054B     		ldr	r3, .L7+8
+ 124              	.LVL11:
+ 125              		.loc 1 25 22 view .LVU29
+ 126 0058 1F60     		str	r7, [r3]
+  26:Core/Src/bms.c ****     battery_errors = ptr2;
+ 127              		.loc 1 26 5 is_stmt 1 view .LVU30
+ 128              		.loc 1 26 20 is_stmt 0 view .LVU31
+ 129 005a 054B     		ldr	r3, .L7+12
+ 130 005c 1E60     		str	r6, [r3]
+  27:Core/Src/bms.c ****     hv_devices_states_requests = ptr3;
+ 131              		.loc 1 27 5 is_stmt 1 view .LVU32
+ 132              		.loc 1 27 32 is_stmt 0 view .LVU33
+ 133 005e 054B     		ldr	r3, .L7+16
+ 134 0060 1D60     		str	r5, [r3]
+  28:Core/Src/bms.c **** }
+ 135              		.loc 1 28 1 view .LVU34
+ 136 0062 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 137              	.LVL12:
+ 138              	.L8:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 4
+
+
+ 139              		.loc 1 28 1 view .LVU35
+ 140              		.align	2
+ 141              	.L7:
+ 142 0064 00180040 		.word	1073747968
+ 143 0068 00000000 		.word	htim12
+ 144 006c 00000000 		.word	pack_information
+ 145 0070 00000000 		.word	battery_errors
+ 146 0074 00000000 		.word	hv_devices_states_requests
+ 147              		.cfi_endproc
+ 148              	.LFE137:
+ 150              		.section	.text.balancing_procedure,"ax",%progbits
+ 151              		.align	1
+ 152              		.global	balancing_procedure
+ 153              		.syntax unified
+ 154              		.thumb
+ 155              		.thumb_func
+ 157              	balancing_procedure:
+ 158              	.LFB140:
+  29:Core/Src/bms.c **** 
+  30:Core/Src/bms.c **** void bms_routine(){
+  31:Core/Src/bms.c ****     #ifdef SERIAL_DEBUG
+  32:Core/Src/bms.c ****     uint8_t buf[50];
+  33:Core/Src/bms.c ****     strcpy((char*)buf,"sono dentro la bmsroutine\r\n");
+  34:Core/Src/bms.c ****     HAL_UART_Transmit(&huart2,buf,strlen((char*)buf),HAL_MAX_DELAY);
+  35:Core/Src/bms.c ****     #endif
+  36:Core/Src/bms.c **** 
+  37:Core/Src/bms.c ****     for(uint8_t n_modules=1;n_modules<=L9963E_SLAVES_N;n_modules++)
+  38:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+  39:Core/Src/bms.c ****     
+  40:Core/Src/bms.c ****     #ifdef SERIAL_DEBUG
+  41:Core/Src/bms.c ****     strcpy((char*)buf,"finita lettura\r\n");
+  42:Core/Src/bms.c ****     HAL_UART_Transmit(&huart2,buf,strlen((char*)buf),HAL_MAX_DELAY);
+  43:Core/Src/bms.c ****     #endif
+  44:Core/Src/bms.c **** 
+  45:Core/Src/bms.c ****     pack_information->pack_voltage_mV = L9963E_utils_get_batt_mv();
+  46:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+  47:Core/Src/bms.c ****     L9963E_utils_get_gpios(pack_information->cell_temperatures_centideg);
+  48:Core/Src/bms.c ****     pack_information->current_mA = L9963E_utils_get_batt_mA();
+  49:Core/Src/bms.c **** 
+  50:Core/Src/bms.c ****     #ifdef SERIAL_DEBUG
+  51:Core/Src/bms.c ****     for(uint8_t a=0;a<L9963Es_TOTAL_CELLS_N;a++){
+  52:Core/Src/bms.c ****         sprintf(buf,"cella %2d: %x %x\r\n",a,((pack_information->cell_voltages_mV[a] & 0xFF00)>8),(
+  53:Core/Src/bms.c ****         HAL_UART_Transmit(&huart2,buf,strlen((char*)buf),HAL_MAX_DELAY);
+  54:Core/Src/bms.c ****     }
+  55:Core/Src/bms.c ****     #endif
+  56:Core/Src/bms.c **** 
+  57:Core/Src/bms.c ****     //* lettura di tutti i parametri della batteria
+  58:Core/Src/bms.c ****     battery_is_safe = battery_operability();
+  59:Core/Src/bms.c ****     compute_max_deltas();
+  60:Core/Src/bms.c **** 
+  61:Core/Src/bms.c ****     if(!battery_is_safe){
+  62:Core/Src/bms.c ****         hv_output_change_state(HV_BRUTAL_OFF);
+  63:Core/Src/bms.c ****         currentstate=HV_BRUTAL_OFF;
+  64:Core/Src/bms.c ****     }
+  65:Core/Src/bms.c **** 
+  66:Core/Src/bms.c ****     switch(currentstate){
+  67:Core/Src/bms.c ****         case HV_OFF:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 5
+
+
+  68:Core/Src/bms.c ****             //* vedere se possibile passare in HV_ON
+  69:Core/Src/bms.c ****             solar_charging_procedure(SOLAR_CHARGING_STOP);
+  70:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+  71:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+  72:Core/Src/bms.c ****             if(battery_is_safe){
+  73:Core/Src/bms.c ****                 currentstate = HV_ON;
+  74:Core/Src/bms.c ****             }
+  75:Core/Src/bms.c ****             break;
+  76:Core/Src/bms.c ****         
+  77:Core/Src/bms.c ****         case HV_PRECHARGE:
+  78:Core/Src/bms.c ****             solar_charging_procedure(SOLAR_CHARGING_STOP);
+  79:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+  80:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+  81:Core/Src/bms.c ****             currentstate = HV_ON;
+  82:Core/Src/bms.c ****             break;
+  83:Core/Src/bms.c **** 
+  84:Core/Src/bms.c ****         case HV_ON:
+  85:Core/Src/bms.c ****             //* normale utilizzo. Fare tutti i controlli
+  86:Core/Src/bms.c ****             solar_charging_procedure(SOLAR_CHARGING_START);
+  87:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_START);
+  88:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+  89:Core/Src/bms.c ****             break;
+  90:Core/Src/bms.c **** 
+  91:Core/Src/bms.c ****         case VAC_CHARGING:
+  92:Core/Src/bms.c ****             solar_charging_procedure(SOLAR_CHARGING_STOP);
+  93:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+  94:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_START);
+  95:Core/Src/bms.c ****             break;
+  96:Core/Src/bms.c **** 
+  97:Core/Src/bms.c ****         default:
+  98:Core/Src/bms.c ****             //! invalid state, something went wrong
+  99:Core/Src/bms.c ****             break;
+ 100:Core/Src/bms.c ****     }
+ 101:Core/Src/bms.c **** 
+ 102:Core/Src/bms.c ****     //* these procedure are always executed, regardless of the state
+ 103:Core/Src/bms.c ****     balancing_procedure();
+ 104:Core/Src/bms.c ****     temperature_control();
+ 105:Core/Src/bms.c **** }
+ 106:Core/Src/bms.c **** 
+ 107:Core/Src/bms.c **** //in base alla temperatura delle celle viene modificata la velocità delle ventole
+ 108:Core/Src/bms.c **** void temperature_control(){
+ 109:Core/Src/bms.c ****     uint8_t newduty;
+ 110:Core/Src/bms.c ****     int16_t temperature_for_fan_control;
+ 111:Core/Src/bms.c ****     if(pack_information->cell_delta_temperature_centideg > IGNORE_AVG_TEMPERATURE_DELTA_THRESHOLD){
+ 112:Core/Src/bms.c ****         temperature_for_fan_control = pack_information->cell_max_temperature_centideg;
+ 113:Core/Src/bms.c ****     }else{
+ 114:Core/Src/bms.c ****         temperature_for_fan_control = pack_information->cell_temperature_avg_centideg;
+ 115:Core/Src/bms.c ****     }
+ 116:Core/Src/bms.c ****     //se la differenza tra max e min è troppo alta, usare la max
+ 117:Core/Src/bms.c ****     if(temperature_for_fan_control < T_LOW){
+ 118:Core/Src/bms.c ****         newduty = FAN_OFF;
+ 119:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_MEDIUM){
+ 120:Core/Src/bms.c ****         newduty = FAN_LOW;
+ 121:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_HIGH){
+ 122:Core/Src/bms.c ****         newduty = FAN_MEDIUM;
+ 123:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_MAX){
+ 124:Core/Src/bms.c ****         newduty = FAN_HIGH;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 6
+
+
+ 125:Core/Src/bms.c ****     }else{
+ 126:Core/Src/bms.c ****         newduty = FAN_MAX;
+ 127:Core/Src/bms.c ****     }
+ 128:Core/Src/bms.c ****     
+ 129:Core/Src/bms.c ****     battery_fan_duty(newduty);
+ 130:Core/Src/bms.c **** }
+ 131:Core/Src/bms.c **** 
+ 132:Core/Src/bms.c **** //controlla la tensione delle celle e imposta il balancing (deve controllare anche la corrente?)
+ 133:Core/Src/bms.c **** void balancing_procedure(){
+ 159              		.loc 1 133 27 is_stmt 1 view -0
+ 160              		.cfi_startproc
+ 161              		@ args = 0, pretend = 0, frame = 0
+ 162              		@ frame_needed = 0, uses_anonymous_args = 0
+ 163 0000 08B5     		push	{r3, lr}
+ 164              		.cfi_def_cfa_offset 8
+ 165              		.cfi_offset 3, -8
+ 166              		.cfi_offset 14, -4
+ 134:Core/Src/bms.c ****     if(pack_information->cell_max_voltage_mV > HARD_OVERVOLT){
+ 167              		.loc 1 134 5 view .LVU37
+ 168              		.loc 1 134 24 is_stmt 0 view .LVU38
+ 169 0002 384B     		ldr	r3, .L31
+ 170 0004 1868     		ldr	r0, [r3]
+ 171 0006 B0F84620 		ldrh	r2, [r0, #70]
+ 172              		.loc 1 134 7 view .LVU39
+ 173 000a 41F26803 		movw	r3, #4200
+ 174 000e 9A42     		cmp	r2, r3
+ 175 0010 2BD8     		bhi	.L26
+ 176              	.LBB4:
+ 135:Core/Src/bms.c ****         for(uint8_t i=0;i<L9963Es_TOTAL_CELLS_N;i++){
+ 136:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 137:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_ON;
+ 138:Core/Src/bms.c ****                 pack_information->cell_balancing_number++;
+ 139:Core/Src/bms.c ****             }else{
+ 140:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_OFF;
+ 141:Core/Src/bms.c ****             }
+ 142:Core/Src/bms.c ****         }
+ 143:Core/Src/bms.c ****     }else{
+ 144:Core/Src/bms.c ****         //* if at least one cell is above DEF_HIGH_V_START_mV the balancing procedure can start
+ 145:Core/Src/bms.c ****         if(pack_information->battery_state.is_charging == 0){
+ 177              		.loc 1 145 9 is_stmt 1 view .LVU40
+ 178              		.loc 1 145 43 is_stmt 0 view .LVU41
+ 179 0012 90F8A530 		ldrb	r3, [r0, #165]	@ zero_extendqisi2
+ 180              		.loc 1 145 11 view .LVU42
+ 181 0016 002B     		cmp	r3, #0
+ 182 0018 63D0     		beq	.L9
+ 183              	.LBB5:
+ 146:Core/Src/bms.c ****             return; //* no balancing while not charging
+ 147:Core/Src/bms.c ****         }
+ 148:Core/Src/bms.c **** 
+ 149:Core/Src/bms.c ****         //* the battery is charging, check if balancing conditions are met
+ 150:Core/Src/bms.c ****         uint8_t any_above_high = 0;
+ 151:Core/Src/bms.c ****         for (uint8_t i = 0; i < L9963Es_TOTAL_CELLS_N; i++) {
+ 184              		.loc 1 151 22 view .LVU43
+ 185 001a 0023     		movs	r3, #0
+ 186              	.L17:
+ 187              	.LVL13:
+ 188              		.loc 1 151 31 is_stmt 1 discriminator 1 view .LVU44
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 7
+
+
+ 189 001c 1B2B     		cmp	r3, #27
+ 190 001e 26D8     		bhi	.L30
+ 152:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] > DEF_HIGH_V_START_mV) {
+ 191              		.loc 1 152 13 view .LVU45
+ 192              		.loc 1 152 51 is_stmt 0 view .LVU46
+ 193 0020 1A1D     		adds	r2, r3, #4
+ 194 0022 00EB4202 		add	r2, r0, r2, lsl #1
+ 195 0026 9188     		ldrh	r1, [r2, #4]
+ 196              		.loc 1 152 16 view .LVU47
+ 197 0028 41F20402 		movw	r2, #4100
+ 198 002c 9142     		cmp	r1, r2
+ 199 002e 20D8     		bhi	.L27
+ 151:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] > DEF_HIGH_V_START_mV) {
+ 200              		.loc 1 151 57 is_stmt 1 discriminator 2 view .LVU48
+ 201 0030 0133     		adds	r3, r3, #1
+ 202              	.LVL14:
+ 151:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] > DEF_HIGH_V_START_mV) {
+ 203              		.loc 1 151 57 is_stmt 0 discriminator 2 view .LVU49
+ 204 0032 DBB2     		uxtb	r3, r3
+ 205              	.LVL15:
+ 151:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] > DEF_HIGH_V_START_mV) {
+ 206              		.loc 1 151 57 discriminator 2 view .LVU50
+ 207 0034 F2E7     		b	.L17
+ 208              	.LVL16:
+ 209              	.L12:
+ 151:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] > DEF_HIGH_V_START_mV) {
+ 210              		.loc 1 151 57 discriminator 2 view .LVU51
+ 211              	.LBE5:
+ 212              	.LBE4:
+ 213              	.LBB8:
+ 140:Core/Src/bms.c ****             }
+ 214              		.loc 1 140 17 is_stmt 1 view .LVU52
+ 140:Core/Src/bms.c ****             }
+ 215              		.loc 1 140 53 is_stmt 0 view .LVU53
+ 216 0036 C218     		adds	r2, r0, r3
+ 217 0038 0021     		movs	r1, #0
+ 218 003a 82F84C10 		strb	r1, [r2, #76]
+ 219              	.L13:
+ 135:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 220              		.loc 1 135 50 is_stmt 1 discriminator 2 view .LVU54
+ 221 003e 0133     		adds	r3, r3, #1
+ 222              	.LVL17:
+ 135:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 223              		.loc 1 135 50 is_stmt 0 discriminator 2 view .LVU55
+ 224 0040 DBB2     		uxtb	r3, r3
+ 225              	.LVL18:
+ 226              	.L10:
+ 135:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 227              		.loc 1 135 26 is_stmt 1 discriminator 1 view .LVU56
+ 228 0042 1B2B     		cmp	r3, #27
+ 229 0044 45D8     		bhi	.L15
+ 136:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_ON;
+ 230              		.loc 1 136 13 view .LVU57
+ 136:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_ON;
+ 231              		.loc 1 136 50 is_stmt 0 view .LVU58
+ 232 0046 1A1D     		adds	r2, r3, #4
+ 233 0048 00EB4202 		add	r2, r0, r2, lsl #1
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 8
+
+
+ 234 004c 9188     		ldrh	r1, [r2, #4]
+ 136:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_ON;
+ 235              		.loc 1 136 15 view .LVU59
+ 236 004e 41F26802 		movw	r2, #4200
+ 237 0052 9142     		cmp	r1, r2
+ 238 0054 EFD9     		bls	.L12
+ 137:Core/Src/bms.c ****                 pack_information->cell_balancing_number++;
+ 239              		.loc 1 137 17 is_stmt 1 view .LVU60
+ 137:Core/Src/bms.c ****                 pack_information->cell_balancing_number++;
+ 240              		.loc 1 137 53 is_stmt 0 view .LVU61
+ 241 0056 C218     		adds	r2, r0, r3
+ 242 0058 0221     		movs	r1, #2
+ 243 005a 82F84C10 		strb	r1, [r2, #76]
+ 138:Core/Src/bms.c ****             }else{
+ 244              		.loc 1 138 17 is_stmt 1 view .LVU62
+ 138:Core/Src/bms.c ****             }else{
+ 245              		.loc 1 138 33 is_stmt 0 view .LVU63
+ 246 005e 90F89820 		ldrb	r2, [r0, #152]	@ zero_extendqisi2
+ 138:Core/Src/bms.c ****             }else{
+ 247              		.loc 1 138 56 view .LVU64
+ 248 0062 0132     		adds	r2, r2, #1
+ 249 0064 80F89820 		strb	r2, [r0, #152]
+ 250 0068 E9E7     		b	.L13
+ 251              	.LVL19:
+ 252              	.L26:
+ 135:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 253              		.loc 1 135 21 view .LVU65
+ 254 006a 0023     		movs	r3, #0
+ 255 006c E9E7     		b	.L10
+ 256              	.LVL20:
+ 257              	.L30:
+ 135:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 258              		.loc 1 135 21 view .LVU66
+ 259              	.LBE8:
+ 260              	.LBB9:
+ 150:Core/Src/bms.c ****         for (uint8_t i = 0; i < L9963Es_TOTAL_CELLS_N; i++) {
+ 261              		.loc 1 150 17 view .LVU67
+ 262 006e 0023     		movs	r3, #0
+ 263              	.LVL21:
+ 264              	.LBB6:
+ 150:Core/Src/bms.c ****         for (uint8_t i = 0; i < L9963Es_TOTAL_CELLS_N; i++) {
+ 265              		.loc 1 150 17 view .LVU68
+ 266 0070 00E0     		b	.L18
+ 267              	.LVL22:
+ 268              	.L27:
+ 153:Core/Src/bms.c ****                 any_above_high = 1;
+ 269              		.loc 1 153 32 view .LVU69
+ 270 0072 0123     		movs	r3, #1
+ 271              	.LVL23:
+ 272              	.L18:
+ 273              		.loc 1 153 32 view .LVU70
+ 274              	.LBE6:
+ 154:Core/Src/bms.c ****                 break;
+ 155:Core/Src/bms.c ****             }
+ 156:Core/Src/bms.c ****         }
+ 157:Core/Src/bms.c **** 
+ 158:Core/Src/bms.c ****         //* these balancing conditions needs to be true for balancing to start 
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 9
+
+
+ 159:Core/Src/bms.c ****         if (!(any_above_high==1) &&
+ 275              		.loc 1 159 9 is_stmt 1 view .LVU71
+ 276              		.loc 1 159 12 is_stmt 0 view .LVU72
+ 277 0074 1BB9     		cbnz	r3, .L20
+ 160:Core/Src/bms.c ****             !(pack_information->pack_cell_delta_mV > DEF_DELTA_START_mV)    ){
+ 278              		.loc 1 160 31 view .LVU73
+ 279 0076 B0F84A30 		ldrh	r3, [r0, #74]
+ 280              	.LVL24:
+ 159:Core/Src/bms.c ****             !(pack_information->pack_cell_delta_mV > DEF_DELTA_START_mV)    ){
+ 281              		.loc 1 159 34 discriminator 1 view .LVU74
+ 282 007a 962B     		cmp	r3, #150
+ 283 007c 31D9     		bls	.L9
+ 284              	.L20:
+ 161:Core/Src/bms.c ****             return; //* no balancing needed
+ 162:Core/Src/bms.c ****         }
+ 163:Core/Src/bms.c **** 
+ 164:Core/Src/bms.c ****         //* start balancing procedure
+ 165:Core/Src/bms.c ****         pack_information->cell_balancing_number = 0;
+ 285              		.loc 1 165 9 is_stmt 1 view .LVU75
+ 286              		.loc 1 165 49 is_stmt 0 view .LVU76
+ 287 007e 0023     		movs	r3, #0
+ 288 0080 80F89830 		strb	r3, [r0, #152]
+ 166:Core/Src/bms.c ****         for (uint8_t i = 0; i < L9963Es_TOTAL_CELLS_N; i++) {
+ 289              		.loc 1 166 9 is_stmt 1 view .LVU77
+ 290              	.LBB7:
+ 291              		.loc 1 166 14 view .LVU78
+ 292              	.LVL25:
+ 293              		.loc 1 166 9 is_stmt 0 view .LVU79
+ 294 0084 0AE0     		b	.L21
+ 295              	.LVL26:
+ 296              	.L23:
+ 167:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 168:Core/Src/bms.c ****                 //* the cell could be balanced
+ 169:Core/Src/bms.c ****                 if((int16_t)(pack_information->cell_voltages_mV[i] - (int16_t)(pack_information->ce
+ 170:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_ON; /* è consentito bilan
+ 171:Core/Src/bms.c ****                     pack_information->cell_balancing_number++;
+ 172:Core/Src/bms.c ****                 }else{
+ 173:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_OFF;
+ 297              		.loc 1 173 21 is_stmt 1 view .LVU80
+ 298              		.loc 1 173 57 is_stmt 0 view .LVU81
+ 299 0086 8444     		add	ip, ip, r0
+ 300 0088 0022     		movs	r2, #0
+ 301 008a 8CF84C20 		strb	r2, [ip, #76]
+ 302 008e 03E0     		b	.L24
+ 303              	.L22:
+ 174:Core/Src/bms.c ****                 }
+ 175:Core/Src/bms.c ****             }else{
+ 176:Core/Src/bms.c ****                 pack_information->cell_balancing[i] = CELL_BALANCING_OFF;
+ 304              		.loc 1 176 17 is_stmt 1 view .LVU82
+ 305              		.loc 1 176 53 is_stmt 0 view .LVU83
+ 306 0090 C218     		adds	r2, r0, r3
+ 307 0092 0021     		movs	r1, #0
+ 308 0094 82F84C10 		strb	r1, [r2, #76]
+ 309              	.L24:
+ 166:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 310              		.loc 1 166 57 is_stmt 1 discriminator 2 view .LVU84
+ 311 0098 0133     		adds	r3, r3, #1
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 10
+
+
+ 312              	.LVL27:
+ 166:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 313              		.loc 1 166 57 is_stmt 0 discriminator 2 view .LVU85
+ 314 009a DBB2     		uxtb	r3, r3
+ 315              	.LVL28:
+ 316              	.L21:
+ 166:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 317              		.loc 1 166 31 is_stmt 1 discriminator 1 view .LVU86
+ 318 009c 1B2B     		cmp	r3, #27
+ 319 009e 18D8     		bhi	.L15
+ 167:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 320              		.loc 1 167 13 view .LVU87
+ 167:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 321              		.loc 1 167 51 is_stmt 0 view .LVU88
+ 322 00a0 9C46     		mov	ip, r3
+ 323 00a2 1A1D     		adds	r2, r3, #4
+ 324 00a4 00EB4202 		add	r2, r0, r2, lsl #1
+ 325 00a8 9288     		ldrh	r2, [r2, #4]
+ 167:Core/Src/bms.c ****             if (pack_information->cell_voltages_mV[i] >= DEF_HIGH_V_START_mV) {
+ 326              		.loc 1 167 16 view .LVU89
+ 327 00aa 41F20301 		movw	r1, #4099
+ 328 00ae 8A42     		cmp	r2, r1
+ 329 00b0 EED9     		bls	.L22
+ 169:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_ON; /* è consentito bilan
+ 330              		.loc 1 169 17 is_stmt 1 view .LVU90
+ 169:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_ON; /* è consentito bilan
+ 331              		.loc 1 169 96 is_stmt 0 view .LVU91
+ 332 00b2 B0F84410 		ldrh	r1, [r0, #68]
+ 169:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_ON; /* è consentito bilan
+ 333              		.loc 1 169 68 view .LVU92
+ 334 00b6 521A     		subs	r2, r2, r1
+ 335 00b8 12B2     		sxth	r2, r2
+ 169:Core/Src/bms.c ****                     pack_information->cell_balancing[i] = CELL_BALANCING_ON; /* è consentito bilan
+ 336              		.loc 1 169 19 view .LVU93
+ 337 00ba 0A2A     		cmp	r2, #10
+ 338 00bc E3DD     		ble	.L23
+ 170:Core/Src/bms.c ****                     pack_information->cell_balancing_number++;
+ 339              		.loc 1 170 21 is_stmt 1 view .LVU94
+ 170:Core/Src/bms.c ****                     pack_information->cell_balancing_number++;
+ 340              		.loc 1 170 57 is_stmt 0 view .LVU95
+ 341 00be C218     		adds	r2, r0, r3
+ 342 00c0 0221     		movs	r1, #2
+ 343 00c2 82F84C10 		strb	r1, [r2, #76]
+ 171:Core/Src/bms.c ****                 }else{
+ 344              		.loc 1 171 21 is_stmt 1 view .LVU96
+ 171:Core/Src/bms.c ****                 }else{
+ 345              		.loc 1 171 37 is_stmt 0 view .LVU97
+ 346 00c6 90F89820 		ldrb	r2, [r0, #152]	@ zero_extendqisi2
+ 171:Core/Src/bms.c ****                 }else{
+ 347              		.loc 1 171 60 view .LVU98
+ 348 00ca 0132     		adds	r2, r2, #1
+ 349 00cc 80F89820 		strb	r2, [r0, #152]
+ 350 00d0 E2E7     		b	.L24
+ 351              	.LVL29:
+ 352              	.L15:
+ 171:Core/Src/bms.c ****                 }else{
+ 353              		.loc 1 171 60 view .LVU99
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 11
+
+
+ 354              	.LBE7:
+ 355              	.LBE9:
+ 177:Core/Src/bms.c ****             }
+ 178:Core/Src/bms.c ****         }
+ 179:Core/Src/bms.c ****     }
+ 180:Core/Src/bms.c ****     //* function for setting the balancing on the L9963Es
+ 181:Core/Src/bms.c ****     balancing_set(pack_information->cell_balancing, pack_information->cell_balancing_number > 0 ? 1
+ 356              		.loc 1 181 5 is_stmt 1 view .LVU100
+ 357              		.loc 1 181 69 is_stmt 0 view .LVU101
+ 358 00d2 90F89810 		ldrb	r1, [r0, #152]	@ zero_extendqisi2
+ 359              		.loc 1 181 5 view .LVU102
+ 360 00d6 0039     		subs	r1, r1, #0
+ 361 00d8 18BF     		it	ne
+ 362 00da 0121     		movne	r1, #1
+ 363 00dc 4C30     		adds	r0, r0, #76
+ 364 00de FFF7FEFF 		bl	balancing_set
+ 365              	.LVL30:
+ 366              	.L9:
+ 182:Core/Src/bms.c **** }
+ 367              		.loc 1 182 1 view .LVU103
+ 368 00e2 08BD     		pop	{r3, pc}
+ 369              	.L32:
+ 370              		.align	2
+ 371              	.L31:
+ 372 00e4 00000000 		.word	pack_information
+ 373              		.cfi_endproc
+ 374              	.LFE140:
+ 376              		.section	.text.compute_max_deltas,"ax",%progbits
+ 377              		.align	1
+ 378              		.global	compute_max_deltas
+ 379              		.syntax unified
+ 380              		.thumb
+ 381              		.thumb_func
+ 383              	compute_max_deltas:
+ 384              	.LFB141:
+ 183:Core/Src/bms.c **** 
+ 184:Core/Src/bms.c **** /* compute max, min and delta of all cell voltages */
+ 185:Core/Src/bms.c **** void compute_max_deltas(){
+ 385              		.loc 1 185 26 is_stmt 1 view -0
+ 386              		.cfi_startproc
+ 387              		@ args = 0, pretend = 0, frame = 0
+ 388              		@ frame_needed = 0, uses_anonymous_args = 0
+ 389 0000 38B5     		push	{r3, r4, r5, lr}
+ 390              		.cfi_def_cfa_offset 16
+ 391              		.cfi_offset 3, -16
+ 392              		.cfi_offset 4, -12
+ 393              		.cfi_offset 5, -8
+ 394              		.cfi_offset 14, -4
+ 186:Core/Src/bms.c ****     uint16_t min_out = max_search(pack_information->cell_voltages_mV, L9963Es_TOTAL_CELLS_N);
+ 395              		.loc 1 186 5 view .LVU105
+ 396              		.loc 1 186 51 is_stmt 0 view .LVU106
+ 397 0002 1B4C     		ldr	r4, .L35
+ 398 0004 2068     		ldr	r0, [r4]
+ 399              		.loc 1 186 24 view .LVU107
+ 400 0006 1C21     		movs	r1, #28
+ 401 0008 0C30     		adds	r0, r0, #12
+ 402 000a FFF7FEFF 		bl	max_search
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 12
+
+
+ 403              	.LVL31:
+ 404 000e 0546     		mov	r5, r0
+ 405              	.LVL32:
+ 187:Core/Src/bms.c ****     uint16_t max_out = min_search(pack_information->cell_voltages_mV, L9963Es_TOTAL_CELLS_N);
+ 406              		.loc 1 187 5 is_stmt 1 view .LVU108
+ 407              		.loc 1 187 51 is_stmt 0 view .LVU109
+ 408 0010 2068     		ldr	r0, [r4]
+ 409              		.loc 1 187 24 view .LVU110
+ 410 0012 1C21     		movs	r1, #28
+ 411 0014 0C30     		adds	r0, r0, #12
+ 412 0016 FFF7FEFF 		bl	min_search
+ 413              	.LVL33:
+ 188:Core/Src/bms.c ****     pack_information->cell_min_voltage_mV = min_out;
+ 414              		.loc 1 188 5 is_stmt 1 view .LVU111
+ 415              		.loc 1 188 21 is_stmt 0 view .LVU112
+ 416 001a 2368     		ldr	r3, [r4]
+ 417              		.loc 1 188 43 view .LVU113
+ 418 001c A3F84450 		strh	r5, [r3, #68]	@ movhi
+ 189:Core/Src/bms.c ****     pack_information->cell_max_voltage_mV = max_out;
+ 419              		.loc 1 189 5 is_stmt 1 view .LVU114
+ 420              		.loc 1 189 43 is_stmt 0 view .LVU115
+ 421 0020 A3F84600 		strh	r0, [r3, #70]	@ movhi
+ 190:Core/Src/bms.c ****     pack_information->pack_cell_delta_mV = max_out - min_out;
+ 422              		.loc 1 190 5 is_stmt 1 view .LVU116
+ 423              		.loc 1 190 52 is_stmt 0 view .LVU117
+ 424 0024 401B     		subs	r0, r0, r5
+ 425              	.LVL34:
+ 426              		.loc 1 190 42 view .LVU118
+ 427 0026 A3F84A00 		strh	r0, [r3, #74]	@ movhi
+ 191:Core/Src/bms.c ****     pack_information->cell_voltage_avg_mV = get_avg(pack_information->cell_voltages_mV, L9963Es_TOT
+ 428              		.loc 1 191 5 is_stmt 1 view .LVU119
+ 429              		.loc 1 191 45 is_stmt 0 view .LVU120
+ 430 002a 1C21     		movs	r1, #28
+ 431 002c 03F10C00 		add	r0, r3, #12
+ 432 0030 FFF7FEFF 		bl	get_avg
+ 433              	.LVL35:
+ 434              		.loc 1 191 21 discriminator 1 view .LVU121
+ 435 0034 2368     		ldr	r3, [r4]
+ 436              		.loc 1 191 43 discriminator 1 view .LVU122
+ 437 0036 A3F84800 		strh	r0, [r3, #72]	@ movhi
+ 192:Core/Src/bms.c **** 
+ 193:Core/Src/bms.c ****     int16_t min_out_signed = max_search_signed(pack_information->cell_temperatures_centideg, L9963E
+ 438              		.loc 1 193 5 is_stmt 1 view .LVU123
+ 439              		.loc 1 193 30 is_stmt 0 view .LVU124
+ 440 003a 0A21     		movs	r1, #10
+ 441 003c 03F16800 		add	r0, r3, #104
+ 442 0040 FFF7FEFF 		bl	max_search_signed
+ 443              	.LVL36:
+ 444 0044 0546     		mov	r5, r0
+ 445              	.LVL37:
+ 194:Core/Src/bms.c ****     int16_t max_out_signed = min_search_signed(pack_information->cell_temperatures_centideg, L9963E
+ 446              		.loc 1 194 5 is_stmt 1 view .LVU125
+ 447              		.loc 1 194 64 is_stmt 0 view .LVU126
+ 448 0046 2068     		ldr	r0, [r4]
+ 449              		.loc 1 194 30 view .LVU127
+ 450 0048 0A21     		movs	r1, #10
+ 451 004a 6830     		adds	r0, r0, #104
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 13
+
+
+ 452 004c FFF7FEFF 		bl	min_search_signed
+ 453              	.LVL38:
+ 195:Core/Src/bms.c ****     pack_information->cell_min_temperature_centideg = min_out_signed;
+ 454              		.loc 1 195 5 is_stmt 1 view .LVU128
+ 455              		.loc 1 195 21 is_stmt 0 view .LVU129
+ 456 0050 2468     		ldr	r4, [r4]
+ 457              		.loc 1 195 53 view .LVU130
+ 458 0052 A4F87C50 		strh	r5, [r4, #124]	@ movhi
+ 196:Core/Src/bms.c ****     pack_information->cell_max_temperature_centideg = max_out_signed;
+ 459              		.loc 1 196 5 is_stmt 1 view .LVU131
+ 460              		.loc 1 196 53 is_stmt 0 view .LVU132
+ 461 0056 A4F87E00 		strh	r0, [r4, #126]	@ movhi
+ 197:Core/Src/bms.c ****     pack_information->cell_delta_temperature_centideg = max_out_signed - min_out_signed;
+ 462              		.loc 1 197 5 is_stmt 1 view .LVU133
+ 463              		.loc 1 197 72 is_stmt 0 view .LVU134
+ 464 005a 401B     		subs	r0, r0, r5
+ 465              	.LVL39:
+ 466              		.loc 1 197 55 view .LVU135
+ 467 005c A4F88000 		strh	r0, [r4, #128]	@ movhi
+ 198:Core/Src/bms.c ****     pack_information->cell_temperature_avg_centideg = get_avg_signed(pack_information->cell_tempera
+ 468              		.loc 1 198 5 is_stmt 1 view .LVU136
+ 469              		.loc 1 198 55 is_stmt 0 view .LVU137
+ 470 0060 0A21     		movs	r1, #10
+ 471 0062 04F16800 		add	r0, r4, #104
+ 472 0066 FFF7FEFF 		bl	get_avg_signed
+ 473              	.LVL40:
+ 474              		.loc 1 198 53 discriminator 1 view .LVU138
+ 475 006a A4F88200 		strh	r0, [r4, #130]	@ movhi
+ 199:Core/Src/bms.c **** }
+ 476              		.loc 1 199 1 view .LVU139
+ 477 006e 38BD     		pop	{r3, r4, r5, pc}
+ 478              	.LVL41:
+ 479              	.L36:
+ 480              		.loc 1 199 1 view .LVU140
+ 481              		.align	2
+ 482              	.L35:
+ 483 0070 00000000 		.word	pack_information
+ 484              		.cfi_endproc
+ 485              	.LFE141:
+ 487              		.section	.text.voltage_check,"ax",%progbits
+ 488              		.align	1
+ 489              		.global	voltage_check
+ 490              		.syntax unified
+ 491              		.thumb
+ 492              		.thumb_func
+ 494              	voltage_check:
+ 495              	.LFB143:
+ 200:Core/Src/bms.c **** 
+ 201:Core/Src/bms.c **** //controlla se la batteria è sicura da utilizzare. 0 per no, 1 per si
+ 202:Core/Src/bms.c **** uint8_t battery_operability(){
+ 203:Core/Src/bms.c ****     uint8_t error_counter = 0; //se questo valore rimane a 0 allora la batteria è utilizzabile
+ 204:Core/Src/bms.c ****     //controllare questi prototipi, succede un out of index
+ 205:Core/Src/bms.c ****     error_counter += voltage_check();
+ 206:Core/Src/bms.c ****     error_counter += current_check();
+ 207:Core/Src/bms.c ****     error_counter += temperature_check();
+ 208:Core/Src/bms.c ****     return error_counter == ERROR_NOT_PRESENT ? 1 : 0;
+ 209:Core/Src/bms.c **** }
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 14
+
+
+ 210:Core/Src/bms.c **** 
+ 211:Core/Src/bms.c **** //* if 0 is returned the voltages are okay, if not the voltages are not okay
+ 212:Core/Src/bms.c **** uint8_t voltage_check(){
+ 496              		.loc 1 212 24 is_stmt 1 view -0
+ 497              		.cfi_startproc
+ 498              		@ args = 0, pretend = 0, frame = 0
+ 499              		@ frame_needed = 0, uses_anonymous_args = 0
+ 500              		@ link register save eliminated.
+ 213:Core/Src/bms.c ****     uint8_t status = 0;
+ 501              		.loc 1 213 5 view .LVU142
+ 502              	.LVL42:
+ 214:Core/Src/bms.c **** 
+ 215:Core/Src/bms.c ****     //* check if the voltage pack is okay
+ 216:Core/Src/bms.c ****     if(pack_information->pack_voltage_mV > PACK_OVERVOLTAGE){
+ 503              		.loc 1 216 5 view .LVU143
+ 504              		.loc 1 216 24 is_stmt 0 view .LVU144
+ 505 0000 454B     		ldr	r3, .L55
+ 506 0002 1B68     		ldr	r3, [r3]
+ 507 0004 1968     		ldr	r1, [r3]
+ 508              		.loc 1 216 7 view .LVU145
+ 509 0006 454A     		ldr	r2, .L55+4
+ 510 0008 9142     		cmp	r1, r2
+ 511 000a 09D9     		bls	.L38
+ 217:Core/Src/bms.c ****         status++;
+ 512              		.loc 1 217 9 is_stmt 1 view .LVU146
+ 513              	.LVL43:
+ 218:Core/Src/bms.c ****         battery_errors->pack_overvoltage = ERROR_PRESENT;
+ 514              		.loc 1 218 9 view .LVU147
+ 515              		.loc 1 218 23 is_stmt 0 view .LVU148
+ 516 000c 444B     		ldr	r3, .L55+8
+ 517 000e 1B68     		ldr	r3, [r3]
+ 518              		.loc 1 218 42 view .LVU149
+ 519 0010 0120     		movs	r0, #1
+ 520 0012 83F87000 		strb	r0, [r3, #112]
+ 521              	.LVL44:
+ 522              	.L39:
+ 217:Core/Src/bms.c ****         status++;
+ 523              		.loc 1 217 15 view .LVU150
+ 524 0016 0023     		movs	r3, #0
+ 525              	.LVL45:
+ 526              	.LBB10:
+ 219:Core/Src/bms.c ****     }else{
+ 220:Core/Src/bms.c ****         battery_errors->pack_overvoltage = ERROR_NOT_PRESENT;
+ 221:Core/Src/bms.c ****         if(pack_information->pack_voltage_mV < PACK_UNDERVOLTAGE){
+ 222:Core/Src/bms.c ****             status++;
+ 223:Core/Src/bms.c ****             battery_errors->pack_undervoltage = ERROR_PRESENT;
+ 224:Core/Src/bms.c ****         }else{
+ 225:Core/Src/bms.c ****             battery_errors->pack_undervoltage = ERROR_NOT_PRESENT;
+ 226:Core/Src/bms.c ****         }
+ 227:Core/Src/bms.c ****     }
+ 228:Core/Src/bms.c **** 
+ 229:Core/Src/bms.c ****     //* check if the cell voltages are okay
+ 230:Core/Src/bms.c ****     for(uint8_t i=0; i<L9963Es_TOTAL_CELLS_N; i++) {
+ 527              		.loc 1 230 23 is_stmt 1 discriminator 1 view .LVU151
+ 528 0018 1B2B     		cmp	r3, #27
+ 529 001a 7BD8     		bhi	.L53
+ 530              	.LBE10:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 15
+
+
+ 212:Core/Src/bms.c ****     uint8_t status = 0;
+ 531              		.loc 1 212 24 is_stmt 0 view .LVU152
+ 532 001c 10B4     		push	{r4}
+ 533              		.cfi_def_cfa_offset 4
+ 534              		.cfi_offset 4, -4
+ 535 001e 57E0     		b	.L48
+ 536              	.LVL46:
+ 537              	.L38:
+ 538              		.cfi_def_cfa_offset 0
+ 539              		.cfi_restore 4
+ 220:Core/Src/bms.c ****         if(pack_information->pack_voltage_mV < PACK_UNDERVOLTAGE){
+ 540              		.loc 1 220 9 is_stmt 1 view .LVU153
+ 220:Core/Src/bms.c ****         if(pack_information->pack_voltage_mV < PACK_UNDERVOLTAGE){
+ 541              		.loc 1 220 23 is_stmt 0 view .LVU154
+ 542 0020 3F4A     		ldr	r2, .L55+8
+ 543 0022 1268     		ldr	r2, [r2]
+ 220:Core/Src/bms.c ****         if(pack_information->pack_voltage_mV < PACK_UNDERVOLTAGE){
+ 544              		.loc 1 220 42 view .LVU155
+ 545 0024 0021     		movs	r1, #0
+ 546 0026 82F87010 		strb	r1, [r2, #112]
+ 221:Core/Src/bms.c ****             status++;
+ 547              		.loc 1 221 9 is_stmt 1 view .LVU156
+ 221:Core/Src/bms.c ****             status++;
+ 548              		.loc 1 221 28 is_stmt 0 view .LVU157
+ 549 002a 1968     		ldr	r1, [r3]
+ 221:Core/Src/bms.c ****             status++;
+ 550              		.loc 1 221 11 view .LVU158
+ 551 002c 3D4B     		ldr	r3, .L55+12
+ 552 002e 9942     		cmp	r1, r3
+ 553 0030 03D8     		bhi	.L40
+ 222:Core/Src/bms.c ****             battery_errors->pack_undervoltage = ERROR_PRESENT;
+ 554              		.loc 1 222 13 is_stmt 1 view .LVU159
+ 555              	.LVL47:
+ 223:Core/Src/bms.c ****         }else{
+ 556              		.loc 1 223 13 view .LVU160
+ 223:Core/Src/bms.c ****         }else{
+ 557              		.loc 1 223 47 is_stmt 0 view .LVU161
+ 558 0032 0120     		movs	r0, #1
+ 559 0034 82F87100 		strb	r0, [r2, #113]
+ 560 0038 EDE7     		b	.L39
+ 561              	.LVL48:
+ 562              	.L40:
+ 225:Core/Src/bms.c ****         }
+ 563              		.loc 1 225 13 is_stmt 1 view .LVU162
+ 225:Core/Src/bms.c ****         }
+ 564              		.loc 1 225 47 is_stmt 0 view .LVU163
+ 565 003a 0020     		movs	r0, #0
+ 566 003c 82F87100 		strb	r0, [r2, #113]
+ 567 0040 E9E7     		b	.L39
+ 568              	.LVL49:
+ 569              	.L42:
+ 570              		.cfi_def_cfa_offset 4
+ 571              		.cfi_offset 4, -4
+ 572              	.LBB11:
+ 231:Core/Src/bms.c ****         if(pack_information->cell_voltages_mV[i] > SOFT_OVERVOLT){
+ 232:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 233:Core/Src/bms.c ****                 status++;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 16
+
+
+ 234:Core/Src/bms.c ****                 battery_errors->cell_soft_overvoltage[i] = ERROR_NOT_PRESENT;
+ 235:Core/Src/bms.c ****                 battery_errors->cell_hard_overvoltage[i] = ERROR_PRESENT;
+ 236:Core/Src/bms.c ****             }else{
+ 237:Core/Src/bms.c ****                 battery_errors->cell_soft_overvoltage[i] = ERROR_PRESENT;
+ 573              		.loc 1 237 17 is_stmt 1 view .LVU164
+ 574              		.loc 1 237 31 is_stmt 0 view .LVU165
+ 575 0042 374A     		ldr	r2, .L55+8
+ 576              		.loc 1 237 58 view .LVU166
+ 577 0044 4FF0010C 		mov	ip, #1
+ 578 0048 1468     		ldr	r4, [r2]
+ 579 004a 04F803C0 		strb	ip, [r4, r3]
+ 238:Core/Src/bms.c ****                 battery_errors->cell_hard_overvoltage[i] = ERROR_NOT_PRESENT;
+ 580              		.loc 1 238 17 is_stmt 1 view .LVU167
+ 581              		.loc 1 238 31 is_stmt 0 view .LVU168
+ 582 004e 1268     		ldr	r2, [r2]
+ 583              		.loc 1 238 58 view .LVU169
+ 584 0050 1A44     		add	r2, r2, r3
+ 585 0052 4FF0000C 		mov	ip, #0
+ 586 0056 82F81CC0 		strb	ip, [r2, #28]
+ 587 005a 09E0     		b	.L43
+ 588              	.L41:
+ 239:Core/Src/bms.c ****             }
+ 240:Core/Src/bms.c ****         }else{
+ 241:Core/Src/bms.c ****             battery_errors->cell_soft_overvoltage[i] = ERROR_NOT_PRESENT;
+ 589              		.loc 1 241 13 is_stmt 1 view .LVU170
+ 590              		.loc 1 241 27 is_stmt 0 view .LVU171
+ 591 005c 304A     		ldr	r2, .L55+8
+ 592              		.loc 1 241 54 view .LVU172
+ 593 005e 4FF0000C 		mov	ip, #0
+ 594 0062 1468     		ldr	r4, [r2]
+ 595 0064 04F803C0 		strb	ip, [r4, r3]
+ 242:Core/Src/bms.c ****             battery_errors->cell_hard_overvoltage[i] = ERROR_NOT_PRESENT;
+ 596              		.loc 1 242 13 is_stmt 1 view .LVU173
+ 597              		.loc 1 242 27 is_stmt 0 view .LVU174
+ 598 0068 1268     		ldr	r2, [r2]
+ 599              		.loc 1 242 54 view .LVU175
+ 600 006a 1A44     		add	r2, r2, r3
+ 601 006c 82F81CC0 		strb	ip, [r2, #28]
+ 602              	.L43:
+ 243:Core/Src/bms.c ****         }
+ 244:Core/Src/bms.c **** 
+ 245:Core/Src/bms.c ****         if(pack_information->cell_voltages_mV[i] < SOFT_UNDERVOLT){
+ 603              		.loc 1 245 9 is_stmt 1 view .LVU176
+ 604              		.loc 1 245 28 is_stmt 0 view .LVU177
+ 605 0070 294A     		ldr	r2, .L55
+ 606 0072 1268     		ldr	r2, [r2]
+ 607              		.loc 1 245 46 view .LVU178
+ 608 0074 01F1040C 		add	ip, r1, #4
+ 609 0078 02EB4C02 		add	r2, r2, ip, lsl #1
+ 610 007c 9288     		ldrh	r2, [r2, #4]
+ 611              		.loc 1 245 11 view .LVU179
+ 612 007e 40F6B73C 		movw	ip, #2999
+ 613 0082 6245     		cmp	r2, ip
+ 614 0084 18D8     		bhi	.L44
+ 246:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] < HARD_UNDERVOLT){
+ 615              		.loc 1 246 13 is_stmt 1 view .LVU180
+ 616              		.loc 1 246 15 is_stmt 0 view .LVU181
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 17
+
+
+ 617 0086 B2F52F6F 		cmp	r2, #2800
+ 618 008a 0BD2     		bcs	.L45
+ 247:Core/Src/bms.c ****                 status++;
+ 619              		.loc 1 247 17 is_stmt 1 view .LVU182
+ 620              		.loc 1 247 23 is_stmt 0 view .LVU183
+ 621 008c 0130     		adds	r0, r0, #1
+ 622              	.LVL50:
+ 623              		.loc 1 247 23 view .LVU184
+ 624 008e C0B2     		uxtb	r0, r0
+ 625              	.LVL51:
+ 248:Core/Src/bms.c ****                 battery_errors->cell_soft_undervoltage[i] = ERROR_NOT_PRESENT;
+ 626              		.loc 1 248 17 is_stmt 1 view .LVU185
+ 627              		.loc 1 248 31 is_stmt 0 view .LVU186
+ 628 0090 234A     		ldr	r2, .L55+8
+ 629 0092 1268     		ldr	r2, [r2]
+ 630              		.loc 1 248 59 view .LVU187
+ 631 0094 0A44     		add	r2, r2, r1
+ 632 0096 0021     		movs	r1, #0
+ 633 0098 82F83810 		strb	r1, [r2, #56]
+ 249:Core/Src/bms.c ****                 battery_errors->cell_hard_undervoltage[i] = ERROR_PRESENT;
+ 634              		.loc 1 249 17 is_stmt 1 view .LVU188
+ 635              		.loc 1 249 59 is_stmt 0 view .LVU189
+ 636 009c 0121     		movs	r1, #1
+ 637 009e 82F85410 		strb	r1, [r2, #84]
+ 638 00a2 11E0     		b	.L46
+ 639              	.L45:
+ 250:Core/Src/bms.c ****             }else{
+ 251:Core/Src/bms.c ****                 battery_errors->cell_soft_undervoltage[i] = ERROR_PRESENT;
+ 640              		.loc 1 251 17 is_stmt 1 view .LVU190
+ 641              		.loc 1 251 31 is_stmt 0 view .LVU191
+ 642 00a4 1E4A     		ldr	r2, .L55+8
+ 643 00a6 1268     		ldr	r2, [r2]
+ 644              		.loc 1 251 59 view .LVU192
+ 645 00a8 0A44     		add	r2, r2, r1
+ 646 00aa 0121     		movs	r1, #1
+ 647 00ac 82F83810 		strb	r1, [r2, #56]
+ 252:Core/Src/bms.c ****                 battery_errors->cell_hard_undervoltage[i] = ERROR_NOT_PRESENT;
+ 648              		.loc 1 252 17 is_stmt 1 view .LVU193
+ 649              		.loc 1 252 59 is_stmt 0 view .LVU194
+ 650 00b0 0021     		movs	r1, #0
+ 651 00b2 82F85410 		strb	r1, [r2, #84]
+ 652 00b6 07E0     		b	.L46
+ 653              	.L44:
+ 253:Core/Src/bms.c ****             }
+ 254:Core/Src/bms.c ****         }else{
+ 255:Core/Src/bms.c ****             battery_errors->cell_soft_undervoltage[i] = ERROR_NOT_PRESENT;
+ 654              		.loc 1 255 13 is_stmt 1 view .LVU195
+ 655              		.loc 1 255 27 is_stmt 0 view .LVU196
+ 656 00b8 194A     		ldr	r2, .L55+8
+ 657 00ba 1268     		ldr	r2, [r2]
+ 658              		.loc 1 255 55 view .LVU197
+ 659 00bc 0A44     		add	r2, r2, r1
+ 660 00be 0021     		movs	r1, #0
+ 661 00c0 82F83810 		strb	r1, [r2, #56]
+ 256:Core/Src/bms.c ****             battery_errors->cell_hard_undervoltage[i] = ERROR_NOT_PRESENT;
+ 662              		.loc 1 256 13 is_stmt 1 view .LVU198
+ 663              		.loc 1 256 55 is_stmt 0 view .LVU199
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 18
+
+
+ 664 00c4 82F85410 		strb	r1, [r2, #84]
+ 665              	.L46:
+ 230:Core/Src/bms.c ****         if(pack_information->cell_voltages_mV[i] > SOFT_OVERVOLT){
+ 666              		.loc 1 230 48 is_stmt 1 discriminator 2 view .LVU200
+ 667 00c8 0133     		adds	r3, r3, #1
+ 668              	.LVL52:
+ 230:Core/Src/bms.c ****         if(pack_information->cell_voltages_mV[i] > SOFT_OVERVOLT){
+ 669              		.loc 1 230 48 is_stmt 0 discriminator 2 view .LVU201
+ 670 00ca DBB2     		uxtb	r3, r3
+ 671              	.LVL53:
+ 230:Core/Src/bms.c ****         if(pack_information->cell_voltages_mV[i] > SOFT_OVERVOLT){
+ 672              		.loc 1 230 23 is_stmt 1 discriminator 1 view .LVU202
+ 673 00cc 1B2B     		cmp	r3, #27
+ 674 00ce 1ED8     		bhi	.L54
+ 675              	.L48:
+ 231:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 676              		.loc 1 231 9 view .LVU203
+ 231:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 677              		.loc 1 231 28 is_stmt 0 view .LVU204
+ 678 00d0 114A     		ldr	r2, .L55
+ 679 00d2 1268     		ldr	r2, [r2]
+ 231:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 680              		.loc 1 231 46 view .LVU205
+ 681 00d4 1946     		mov	r1, r3
+ 682 00d6 03F1040C 		add	ip, r3, #4
+ 683 00da 02EB4C02 		add	r2, r2, ip, lsl #1
+ 684 00de 9288     		ldrh	r2, [r2, #4]
+ 231:Core/Src/bms.c ****             if(pack_information->cell_voltages_mV[i] > HARD_OVERVOLT){
+ 685              		.loc 1 231 11 view .LVU206
+ 686 00e0 41F2540C 		movw	ip, #4180
+ 687 00e4 6245     		cmp	r2, ip
+ 688 00e6 B9D9     		bls	.L41
+ 232:Core/Src/bms.c ****                 status++;
+ 689              		.loc 1 232 13 is_stmt 1 view .LVU207
+ 232:Core/Src/bms.c ****                 status++;
+ 690              		.loc 1 232 15 is_stmt 0 view .LVU208
+ 691 00e8 41F2680C 		movw	ip, #4200
+ 692 00ec 6245     		cmp	r2, ip
+ 693 00ee A8D9     		bls	.L42
+ 233:Core/Src/bms.c ****                 battery_errors->cell_soft_overvoltage[i] = ERROR_NOT_PRESENT;
+ 694              		.loc 1 233 17 is_stmt 1 view .LVU209
+ 233:Core/Src/bms.c ****                 battery_errors->cell_soft_overvoltage[i] = ERROR_NOT_PRESENT;
+ 695              		.loc 1 233 23 is_stmt 0 view .LVU210
+ 696 00f0 0130     		adds	r0, r0, #1
+ 697              	.LVL54:
+ 233:Core/Src/bms.c ****                 battery_errors->cell_soft_overvoltage[i] = ERROR_NOT_PRESENT;
+ 698              		.loc 1 233 23 view .LVU211
+ 699 00f2 C0B2     		uxtb	r0, r0
+ 700              	.LVL55:
+ 234:Core/Src/bms.c ****                 battery_errors->cell_hard_overvoltage[i] = ERROR_PRESENT;
+ 701              		.loc 1 234 17 is_stmt 1 view .LVU212
+ 234:Core/Src/bms.c ****                 battery_errors->cell_hard_overvoltage[i] = ERROR_PRESENT;
+ 702              		.loc 1 234 31 is_stmt 0 view .LVU213
+ 703 00f4 0A4A     		ldr	r2, .L55+8
+ 234:Core/Src/bms.c ****                 battery_errors->cell_hard_overvoltage[i] = ERROR_PRESENT;
+ 704              		.loc 1 234 58 view .LVU214
+ 705 00f6 4FF0000C 		mov	ip, #0
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 19
+
+
+ 706 00fa 1468     		ldr	r4, [r2]
+ 707 00fc 04F803C0 		strb	ip, [r4, r3]
+ 235:Core/Src/bms.c ****             }else{
+ 708              		.loc 1 235 17 is_stmt 1 view .LVU215
+ 235:Core/Src/bms.c ****             }else{
+ 709              		.loc 1 235 31 is_stmt 0 view .LVU216
+ 710 0100 1268     		ldr	r2, [r2]
+ 235:Core/Src/bms.c ****             }else{
+ 711              		.loc 1 235 58 view .LVU217
+ 712 0102 1A44     		add	r2, r2, r3
+ 713 0104 4FF0010C 		mov	ip, #1
+ 714 0108 82F81CC0 		strb	ip, [r2, #28]
+ 715 010c B0E7     		b	.L43
+ 716              	.L54:
+ 235:Core/Src/bms.c ****             }else{
+ 717              		.loc 1 235 58 view .LVU218
+ 718              	.LBE11:
+ 257:Core/Src/bms.c ****         }
+ 258:Core/Src/bms.c ****     }
+ 259:Core/Src/bms.c ****     return status;
+ 719              		.loc 1 259 5 is_stmt 1 view .LVU219
+ 260:Core/Src/bms.c **** }
+ 720              		.loc 1 260 1 is_stmt 0 view .LVU220
+ 721 010e 5DF8044B 		ldr	r4, [sp], #4
+ 722              		.cfi_restore 4
+ 723              		.cfi_def_cfa_offset 0
+ 724 0112 7047     		bx	lr
+ 725              	.L53:
+ 726              		.loc 1 260 1 view .LVU221
+ 727 0114 7047     		bx	lr
+ 728              	.L56:
+ 729 0116 00BF     		.align	2
+ 730              	.L55:
+ 731 0118 00000000 		.word	pack_information
+ 732 011c 60CB0100 		.word	117600
+ 733 0120 00000000 		.word	battery_errors
+ 734 0124 A3320100 		.word	78499
+ 735              		.cfi_endproc
+ 736              	.LFE143:
+ 738              		.section	.text.temperature_check,"ax",%progbits
+ 739              		.align	1
+ 740              		.global	temperature_check
+ 741              		.syntax unified
+ 742              		.thumb
+ 743              		.thumb_func
+ 745              	temperature_check:
+ 746              	.LFB144:
+ 261:Core/Src/bms.c **** 
+ 262:Core/Src/bms.c **** //le funzioni richiamate per set e reset non sono ancora state scritte (nemmeno i prototipi)
+ 263:Core/Src/bms.c **** uint8_t temperature_check(){
+ 747              		.loc 1 263 28 is_stmt 1 view -0
+ 748              		.cfi_startproc
+ 749              		@ args = 0, pretend = 0, frame = 0
+ 750              		@ frame_needed = 0, uses_anonymous_args = 0
+ 751              		@ link register save eliminated.
+ 264:Core/Src/bms.c ****     uint8_t status = 0;
+ 752              		.loc 1 264 5 view .LVU223
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 20
+
+
+ 753              	.LVL56:
+ 265:Core/Src/bms.c ****     for(uint8_t i=0; i<L9963Es_TOTAL_CELLS_N; i++) {
+ 754              		.loc 1 265 5 view .LVU224
+ 755              	.LBB12:
+ 756              		.loc 1 265 9 view .LVU225
+ 757              		.loc 1 265 17 is_stmt 0 view .LVU226
+ 758 0000 0023     		movs	r3, #0
+ 759              	.LBE12:
+ 264:Core/Src/bms.c ****     uint8_t status = 0;
+ 760              		.loc 1 264 13 view .LVU227
+ 761 0002 1846     		mov	r0, r3
+ 762              	.LVL57:
+ 763              	.LBB13:
+ 764              		.loc 1 265 23 is_stmt 1 discriminator 1 view .LVU228
+ 765 0004 1B2B     		cmp	r3, #27
+ 766 0006 61D8     		bhi	.L70
+ 767              	.LBE13:
+ 263:Core/Src/bms.c ****     uint8_t status = 0;
+ 768              		.loc 1 263 28 is_stmt 0 view .LVU229
+ 769 0008 10B4     		push	{r4}
+ 770              		.cfi_def_cfa_offset 4
+ 771              		.cfi_offset 4, -4
+ 772 000a 40E0     		b	.L65
+ 773              	.LVL58:
+ 774              	.L60:
+ 775              	.LBB14:
+ 266:Core/Src/bms.c ****         if(pack_information->cell_temperatures_centideg[i] > SOFT_OVERTEMP){
+ 267:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] > HARD_OVERTEMP){
+ 268:Core/Src/bms.c ****                 status++;
+ 269:Core/Src/bms.c ****                 battery_errors->cell_soft_overtemp[i] = ERROR_NOT_PRESENT;
+ 270:Core/Src/bms.c ****                 battery_errors->cell_hard_overtemp[i] = ERROR_PRESENT;
+ 271:Core/Src/bms.c ****             }else{
+ 272:Core/Src/bms.c ****                 battery_errors->cell_soft_overtemp[i] = ERROR_PRESENT;
+ 776              		.loc 1 272 17 is_stmt 1 view .LVU230
+ 777              		.loc 1 272 31 is_stmt 0 view .LVU231
+ 778 000c 304C     		ldr	r4, .L72
+ 779 000e 2468     		ldr	r4, [r4]
+ 780              		.loc 1 272 55 view .LVU232
+ 781 0010 1C44     		add	r4, r4, r3
+ 782 0012 4FF0010C 		mov	ip, #1
+ 783 0016 84F874C0 		strb	ip, [r4, #116]
+ 273:Core/Src/bms.c ****                 battery_errors->cell_hard_overtemp[i] = ERROR_NOT_PRESENT;
+ 784              		.loc 1 273 17 is_stmt 1 view .LVU233
+ 785              		.loc 1 273 55 is_stmt 0 view .LVU234
+ 786 001a 4FF0000C 		mov	ip, #0
+ 787 001e 84F87EC0 		strb	ip, [r4, #126]
+ 788 0022 08E0     		b	.L61
+ 789              	.L59:
+ 274:Core/Src/bms.c ****             }
+ 275:Core/Src/bms.c ****         }else{
+ 276:Core/Src/bms.c ****             battery_errors->cell_soft_overtemp[i] = ERROR_NOT_PRESENT;
+ 790              		.loc 1 276 13 is_stmt 1 view .LVU235
+ 791              		.loc 1 276 27 is_stmt 0 view .LVU236
+ 792 0024 2A4C     		ldr	r4, .L72
+ 793 0026 2468     		ldr	r4, [r4]
+ 794              		.loc 1 276 51 view .LVU237
+ 795 0028 04EB030C 		add	ip, r4, r3
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 21
+
+
+ 796 002c 0024     		movs	r4, #0
+ 797 002e 8CF87440 		strb	r4, [ip, #116]
+ 277:Core/Src/bms.c ****             battery_errors->cell_hard_overtemp[i] = ERROR_NOT_PRESENT;
+ 798              		.loc 1 277 13 is_stmt 1 view .LVU238
+ 799              		.loc 1 277 51 is_stmt 0 view .LVU239
+ 800 0032 8CF87E40 		strb	r4, [ip, #126]
+ 801              	.L61:
+ 802              	.LVL59:
+ 278:Core/Src/bms.c ****         }
+ 279:Core/Src/bms.c **** 
+ 280:Core/Src/bms.c ****         if(pack_information->cell_temperatures_centideg[i] < SOFT_UNDERTEMP){
+ 803              		.loc 1 280 9 is_stmt 1 view .LVU240
+ 804              		.loc 1 280 56 is_stmt 0 view .LVU241
+ 805 0036 02F13404 		add	r4, r2, #52
+ 806 003a 31F91410 		ldrsh	r1, [r1, r4, lsl #1]
+ 807              		.loc 1 280 11 view .LVU242
+ 808 003e B1F5FA7F 		cmp	r1, #500
+ 809 0042 18DA     		bge	.L62
+ 281:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] < HARD_UNDERTEMP){
+ 810              		.loc 1 281 13 is_stmt 1 view .LVU243
+ 811              		.loc 1 281 15 is_stmt 0 view .LVU244
+ 812 0044 11F1640F 		cmn	r1, #100
+ 813 0048 0BDA     		bge	.L63
+ 282:Core/Src/bms.c ****                 status++;
+ 814              		.loc 1 282 17 is_stmt 1 view .LVU245
+ 815              		.loc 1 282 23 is_stmt 0 view .LVU246
+ 816 004a 0130     		adds	r0, r0, #1
+ 817              	.LVL60:
+ 818              		.loc 1 282 23 view .LVU247
+ 819 004c C0B2     		uxtb	r0, r0
+ 820              	.LVL61:
+ 283:Core/Src/bms.c ****                 battery_errors->cell_soft_undertemp[i] = ERROR_NOT_PRESENT;
+ 821              		.loc 1 283 17 is_stmt 1 view .LVU248
+ 822              		.loc 1 283 31 is_stmt 0 view .LVU249
+ 823 004e 2049     		ldr	r1, .L72
+ 824 0050 0968     		ldr	r1, [r1]
+ 825              		.loc 1 283 56 view .LVU250
+ 826 0052 0A44     		add	r2, r2, r1
+ 827 0054 0021     		movs	r1, #0
+ 828 0056 82F88810 		strb	r1, [r2, #136]
+ 284:Core/Src/bms.c ****                 battery_errors->cell_hard_undertemp[i] = ERROR_PRESENT;
+ 829              		.loc 1 284 17 is_stmt 1 view .LVU251
+ 830              		.loc 1 284 56 is_stmt 0 view .LVU252
+ 831 005a 0121     		movs	r1, #1
+ 832 005c 82F89210 		strb	r1, [r2, #146]
+ 833 0060 11E0     		b	.L64
+ 834              	.L63:
+ 285:Core/Src/bms.c ****             }else{
+ 286:Core/Src/bms.c ****                 battery_errors->cell_soft_undertemp[i] = ERROR_PRESENT;
+ 835              		.loc 1 286 17 is_stmt 1 view .LVU253
+ 836              		.loc 1 286 31 is_stmt 0 view .LVU254
+ 837 0062 1B49     		ldr	r1, .L72
+ 838 0064 0968     		ldr	r1, [r1]
+ 839              		.loc 1 286 56 view .LVU255
+ 840 0066 0A44     		add	r2, r2, r1
+ 841 0068 0121     		movs	r1, #1
+ 842 006a 82F88810 		strb	r1, [r2, #136]
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 22
+
+
+ 287:Core/Src/bms.c ****                 battery_errors->cell_hard_undertemp[i] = ERROR_NOT_PRESENT;
+ 843              		.loc 1 287 17 is_stmt 1 view .LVU256
+ 844              		.loc 1 287 56 is_stmt 0 view .LVU257
+ 845 006e 0021     		movs	r1, #0
+ 846 0070 82F89210 		strb	r1, [r2, #146]
+ 847 0074 07E0     		b	.L64
+ 848              	.L62:
+ 288:Core/Src/bms.c ****             }
+ 289:Core/Src/bms.c ****         }else{
+ 290:Core/Src/bms.c ****             battery_errors->cell_soft_undertemp[i] = ERROR_NOT_PRESENT;
+ 849              		.loc 1 290 13 is_stmt 1 view .LVU258
+ 850              		.loc 1 290 27 is_stmt 0 view .LVU259
+ 851 0076 1649     		ldr	r1, .L72
+ 852 0078 0968     		ldr	r1, [r1]
+ 853              		.loc 1 290 52 view .LVU260
+ 854 007a 0A44     		add	r2, r2, r1
+ 855 007c 0021     		movs	r1, #0
+ 856 007e 82F88810 		strb	r1, [r2, #136]
+ 291:Core/Src/bms.c ****             battery_errors->cell_hard_undertemp[i] = ERROR_NOT_PRESENT;
+ 857              		.loc 1 291 13 is_stmt 1 view .LVU261
+ 858              		.loc 1 291 52 is_stmt 0 view .LVU262
+ 859 0082 82F89210 		strb	r1, [r2, #146]
+ 860              	.L64:
+ 265:Core/Src/bms.c ****         if(pack_information->cell_temperatures_centideg[i] > SOFT_OVERTEMP){
+ 861              		.loc 1 265 48 is_stmt 1 discriminator 2 view .LVU263
+ 862 0086 0133     		adds	r3, r3, #1
+ 863              	.LVL62:
+ 265:Core/Src/bms.c ****         if(pack_information->cell_temperatures_centideg[i] > SOFT_OVERTEMP){
+ 864              		.loc 1 265 48 is_stmt 0 discriminator 2 view .LVU264
+ 865 0088 DBB2     		uxtb	r3, r3
+ 866              	.LVL63:
+ 265:Core/Src/bms.c ****         if(pack_information->cell_temperatures_centideg[i] > SOFT_OVERTEMP){
+ 867              		.loc 1 265 23 is_stmt 1 discriminator 1 view .LVU265
+ 868 008a 1B2B     		cmp	r3, #27
+ 869 008c 1BD8     		bhi	.L71
+ 870              	.LVL64:
+ 871              	.L65:
+ 266:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] > HARD_OVERTEMP){
+ 872              		.loc 1 266 9 view .LVU266
+ 266:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] > HARD_OVERTEMP){
+ 873              		.loc 1 266 28 is_stmt 0 view .LVU267
+ 874 008e 114A     		ldr	r2, .L72+4
+ 875 0090 1168     		ldr	r1, [r2]
+ 266:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] > HARD_OVERTEMP){
+ 876              		.loc 1 266 56 view .LVU268
+ 877 0092 1A46     		mov	r2, r3
+ 878 0094 03F13404 		add	r4, r3, #52
+ 879 0098 31F914C0 		ldrsh	ip, [r1, r4, lsl #1]
+ 266:Core/Src/bms.c ****             if(pack_information->cell_temperatures_centideg[i] > HARD_OVERTEMP){
+ 880              		.loc 1 266 11 view .LVU269
+ 881 009c BCF57A6F 		cmp	ip, #4000
+ 882 00a0 C0DD     		ble	.L59
+ 267:Core/Src/bms.c ****                 status++;
+ 883              		.loc 1 267 13 is_stmt 1 view .LVU270
+ 267:Core/Src/bms.c ****                 status++;
+ 884              		.loc 1 267 15 is_stmt 0 view .LVU271
+ 885 00a2 41F27C54 		movw	r4, #5500
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 23
+
+
+ 886 00a6 A445     		cmp	ip, r4
+ 887 00a8 B0DD     		ble	.L60
+ 268:Core/Src/bms.c ****                 battery_errors->cell_soft_overtemp[i] = ERROR_NOT_PRESENT;
+ 888              		.loc 1 268 17 is_stmt 1 view .LVU272
+ 268:Core/Src/bms.c ****                 battery_errors->cell_soft_overtemp[i] = ERROR_NOT_PRESENT;
+ 889              		.loc 1 268 23 is_stmt 0 view .LVU273
+ 890 00aa 0130     		adds	r0, r0, #1
+ 891 00ac C0B2     		uxtb	r0, r0
+ 892              	.LVL65:
+ 269:Core/Src/bms.c ****                 battery_errors->cell_hard_overtemp[i] = ERROR_PRESENT;
+ 893              		.loc 1 269 17 is_stmt 1 view .LVU274
+ 269:Core/Src/bms.c ****                 battery_errors->cell_hard_overtemp[i] = ERROR_PRESENT;
+ 894              		.loc 1 269 31 is_stmt 0 view .LVU275
+ 895 00ae 084C     		ldr	r4, .L72
+ 896 00b0 2468     		ldr	r4, [r4]
+ 269:Core/Src/bms.c ****                 battery_errors->cell_hard_overtemp[i] = ERROR_PRESENT;
+ 897              		.loc 1 269 55 view .LVU276
+ 898 00b2 1C44     		add	r4, r4, r3
+ 899 00b4 4FF0000C 		mov	ip, #0
+ 900 00b8 84F874C0 		strb	ip, [r4, #116]
+ 270:Core/Src/bms.c ****             }else{
+ 901              		.loc 1 270 17 is_stmt 1 view .LVU277
+ 270:Core/Src/bms.c ****             }else{
+ 902              		.loc 1 270 55 is_stmt 0 view .LVU278
+ 903 00bc 4FF0010C 		mov	ip, #1
+ 904 00c0 84F87EC0 		strb	ip, [r4, #126]
+ 905 00c4 B7E7     		b	.L61
+ 906              	.L71:
+ 270:Core/Src/bms.c ****             }else{
+ 907              		.loc 1 270 55 view .LVU279
+ 908              	.LBE14:
+ 292:Core/Src/bms.c ****         }
+ 293:Core/Src/bms.c ****     }
+ 294:Core/Src/bms.c ****     return status;
+ 909              		.loc 1 294 5 is_stmt 1 view .LVU280
+ 295:Core/Src/bms.c **** }
+ 910              		.loc 1 295 1 is_stmt 0 view .LVU281
+ 911 00c6 5DF8044B 		ldr	r4, [sp], #4
+ 912              		.cfi_restore 4
+ 913              		.cfi_def_cfa_offset 0
+ 914 00ca 7047     		bx	lr
+ 915              	.LVL66:
+ 916              	.L70:
+ 917              		.loc 1 295 1 view .LVU282
+ 918 00cc 7047     		bx	lr
+ 919              	.L73:
+ 920 00ce 00BF     		.align	2
+ 921              	.L72:
+ 922 00d0 00000000 		.word	battery_errors
+ 923 00d4 00000000 		.word	pack_information
+ 924              		.cfi_endproc
+ 925              	.LFE144:
+ 927              		.section	.text.current_check,"ax",%progbits
+ 928              		.align	1
+ 929              		.global	current_check
+ 930              		.syntax unified
+ 931              		.thumb
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 24
+
+
+ 932              		.thumb_func
+ 934              	current_check:
+ 935              	.LFB145:
+ 296:Core/Src/bms.c **** 
+ 297:Core/Src/bms.c **** uint8_t current_check(){
+ 936              		.loc 1 297 24 is_stmt 1 view -0
+ 937              		.cfi_startproc
+ 938              		@ args = 0, pretend = 0, frame = 0
+ 939              		@ frame_needed = 0, uses_anonymous_args = 0
+ 940              		@ link register save eliminated.
+ 298:Core/Src/bms.c ****     if(pack_information->current_mA > MIN_CURRENT_FOR_CHARGING_STATE_mA){
+ 941              		.loc 1 298 5 view .LVU284
+ 942              		.loc 1 298 24 is_stmt 0 view .LVU285
+ 943 0000 224B     		ldr	r3, .L81
+ 944 0002 1968     		ldr	r1, [r3]
+ 945 0004 D1F88820 		ldr	r2, [r1, #136]
+ 946 0008 D1F88C30 		ldr	r3, [r1, #140]
+ 947              		.loc 1 298 7 view .LVU286
+ 948 000c 40F2E930 		movw	r0, #1001
+ 949 0010 8242     		cmp	r2, r0
+ 950 0012 73F10000 		sbcs	r0, r3, #0
+ 951 0016 15DB     		blt	.L75
+ 299:Core/Src/bms.c ****         pack_information->battery_state.is_charging = 1;
+ 952              		.loc 1 299 9 is_stmt 1 view .LVU287
+ 953              		.loc 1 299 53 is_stmt 0 view .LVU288
+ 954 0018 0120     		movs	r0, #1
+ 955 001a 81F8A500 		strb	r0, [r1, #165]
+ 300:Core/Src/bms.c ****         pack_information->battery_state.is_discharging = 0;
+ 956              		.loc 1 300 9 is_stmt 1 view .LVU289
+ 957              		.loc 1 300 56 is_stmt 0 view .LVU290
+ 958 001e 0020     		movs	r0, #0
+ 959 0020 81F8A600 		strb	r0, [r1, #166]
+ 960              	.L76:
+ 301:Core/Src/bms.c ****     }
+ 302:Core/Src/bms.c ****     else if((-pack_information->current_mA) > MIN_CURRENT_FOR_DISCHARGING_STATE_mA){
+ 303:Core/Src/bms.c ****         pack_information->battery_state.is_charging = 0;
+ 304:Core/Src/bms.c ****         pack_information->battery_state.is_discharging = 1;
+ 305:Core/Src/bms.c ****     }
+ 306:Core/Src/bms.c **** 
+ 307:Core/Src/bms.c ****     uint8_t status = 0;
+ 961              		.loc 1 307 5 is_stmt 1 view .LVU291
+ 962              	.LVL67:
+ 308:Core/Src/bms.c ****     if(pack_information->current_mA > 0){
+ 963              		.loc 1 308 5 view .LVU292
+ 964              		.loc 1 308 7 is_stmt 0 view .LVU293
+ 965 0024 012A     		cmp	r2, #1
+ 966 0026 73F10001 		sbcs	r1, r3, #0
+ 967 002a 1DDB     		blt	.L77
+ 309:Core/Src/bms.c ****         if((pack_information->current_mA) > MAX_CHARGE_CURRENT){
+ 968              		.loc 1 309 9 is_stmt 1 view .LVU294
+ 969              		.loc 1 309 11 is_stmt 0 view .LVU295
+ 970 002c 41F2B541 		movw	r1, #5301
+ 971 0030 8A42     		cmp	r2, r1
+ 972 0032 73F10003 		sbcs	r3, r3, #0
+ 973 0036 11DB     		blt	.L78
+ 310:Core/Src/bms.c ****             status++;
+ 974              		.loc 1 310 13 is_stmt 1 view .LVU296
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 25
+
+
+ 975              	.LVL68:
+ 311:Core/Src/bms.c ****             battery_errors->battery_overcurrent_charge = ERROR_PRESENT;
+ 976              		.loc 1 311 13 view .LVU297
+ 977              		.loc 1 311 27 is_stmt 0 view .LVU298
+ 978 0038 154B     		ldr	r3, .L81+4
+ 979 003a 1B68     		ldr	r3, [r3]
+ 980              		.loc 1 311 56 view .LVU299
+ 981 003c 0120     		movs	r0, #1
+ 982 003e 83F87200 		strb	r0, [r3, #114]
+ 983 0042 7047     		bx	lr
+ 984              	.LVL69:
+ 985              	.L75:
+ 302:Core/Src/bms.c ****         pack_information->battery_state.is_charging = 0;
+ 986              		.loc 1 302 10 is_stmt 1 view .LVU300
+ 302:Core/Src/bms.c ****         pack_information->battery_state.is_charging = 0;
+ 987              		.loc 1 302 12 is_stmt 0 view .LVU301
+ 988 0044 12F57A7F 		cmn	r2, #1000
+ 989 0048 73F1FF30 		sbcs	r0, r3, #-1
+ 990 004c EADA     		bge	.L76
+ 303:Core/Src/bms.c ****         pack_information->battery_state.is_discharging = 1;
+ 991              		.loc 1 303 9 is_stmt 1 view .LVU302
+ 303:Core/Src/bms.c ****         pack_information->battery_state.is_discharging = 1;
+ 992              		.loc 1 303 53 is_stmt 0 view .LVU303
+ 993 004e 0020     		movs	r0, #0
+ 994 0050 81F8A500 		strb	r0, [r1, #165]
+ 304:Core/Src/bms.c ****     }
+ 995              		.loc 1 304 9 is_stmt 1 view .LVU304
+ 304:Core/Src/bms.c ****     }
+ 996              		.loc 1 304 56 is_stmt 0 view .LVU305
+ 997 0054 0120     		movs	r0, #1
+ 998 0056 81F8A600 		strb	r0, [r1, #166]
+ 999 005a E3E7     		b	.L76
+ 1000              	.LVL70:
+ 1001              	.L78:
+ 312:Core/Src/bms.c ****         }else{
+ 313:Core/Src/bms.c ****             battery_errors->battery_overcurrent_charge = ERROR_NOT_PRESENT;
+ 1002              		.loc 1 313 13 is_stmt 1 view .LVU306
+ 1003              		.loc 1 313 27 is_stmt 0 view .LVU307
+ 1004 005c 0C4B     		ldr	r3, .L81+4
+ 1005 005e 1B68     		ldr	r3, [r3]
+ 1006              		.loc 1 313 56 view .LVU308
+ 1007 0060 0020     		movs	r0, #0
+ 1008 0062 83F87200 		strb	r0, [r3, #114]
+ 1009 0066 7047     		bx	lr
+ 1010              	.L77:
+ 314:Core/Src/bms.c ****         }
+ 315:Core/Src/bms.c ****     }else{
+ 316:Core/Src/bms.c ****         if(-(pack_information->current_mA) > MAX_DISCHARGE_CURRENT){
+ 1011              		.loc 1 316 9 is_stmt 1 view .LVU309
+ 1012              		.loc 1 316 11 is_stmt 0 view .LVU310
+ 1013 0068 0A49     		ldr	r1, .L81+8
+ 1014 006a 8A42     		cmp	r2, r1
+ 1015 006c 4FF0FF32 		mov	r2, #-1
+ 1016 0070 9341     		sbcs	r3, r3, r2
+ 1017 0072 05DA     		bge	.L80
+ 317:Core/Src/bms.c ****             status++;
+ 1018              		.loc 1 317 13 is_stmt 1 view .LVU311
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 26
+
+
+ 1019              	.LVL71:
+ 318:Core/Src/bms.c ****             battery_errors->battery_overcurrent_discharge = ERROR_PRESENT;
+ 1020              		.loc 1 318 13 view .LVU312
+ 1021              		.loc 1 318 27 is_stmt 0 view .LVU313
+ 1022 0074 064B     		ldr	r3, .L81+4
+ 1023 0076 1B68     		ldr	r3, [r3]
+ 1024              		.loc 1 318 59 view .LVU314
+ 1025 0078 0120     		movs	r0, #1
+ 1026 007a 83F87300 		strb	r0, [r3, #115]
+ 1027 007e 7047     		bx	lr
+ 1028              	.LVL72:
+ 1029              	.L80:
+ 319:Core/Src/bms.c ****         }else{
+ 320:Core/Src/bms.c ****             battery_errors->battery_overcurrent_discharge = ERROR_NOT_PRESENT;
+ 1030              		.loc 1 320 13 is_stmt 1 view .LVU315
+ 1031              		.loc 1 320 27 is_stmt 0 view .LVU316
+ 1032 0080 034B     		ldr	r3, .L81+4
+ 1033 0082 1B68     		ldr	r3, [r3]
+ 1034              		.loc 1 320 59 view .LVU317
+ 1035 0084 0020     		movs	r0, #0
+ 1036 0086 83F87300 		strb	r0, [r3, #115]
+ 1037              	.LVL73:
+ 321:Core/Src/bms.c ****         }
+ 322:Core/Src/bms.c ****     }
+ 323:Core/Src/bms.c **** 
+ 324:Core/Src/bms.c ****     return status;
+ 1038              		.loc 1 324 5 is_stmt 1 view .LVU318
+ 325:Core/Src/bms.c **** }
+ 1039              		.loc 1 325 1 is_stmt 0 view .LVU319
+ 1040 008a 7047     		bx	lr
+ 1041              	.L82:
+ 1042              		.align	2
+ 1043              	.L81:
+ 1044 008c 00000000 		.word	pack_information
+ 1045 0090 00000000 		.word	battery_errors
+ 1046 0094 98D6FFFF 		.word	-10600
+ 1047              		.cfi_endproc
+ 1048              	.LFE145:
+ 1050              		.section	.text.battery_operability,"ax",%progbits
+ 1051              		.align	1
+ 1052              		.global	battery_operability
+ 1053              		.syntax unified
+ 1054              		.thumb
+ 1055              		.thumb_func
+ 1057              	battery_operability:
+ 1058              	.LFB142:
+ 202:Core/Src/bms.c ****     uint8_t error_counter = 0; //se questo valore rimane a 0 allora la batteria è utilizzabile
+ 1059              		.loc 1 202 30 is_stmt 1 view -0
+ 1060              		.cfi_startproc
+ 1061              		@ args = 0, pretend = 0, frame = 0
+ 1062              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1063 0000 10B5     		push	{r4, lr}
+ 1064              		.cfi_def_cfa_offset 8
+ 1065              		.cfi_offset 4, -8
+ 1066              		.cfi_offset 14, -4
+ 203:Core/Src/bms.c ****     //controllare questi prototipi, succede un out of index
+ 1067              		.loc 1 203 5 view .LVU321
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 27
+
+
+ 1068              	.LVL74:
+ 205:Core/Src/bms.c ****     error_counter += current_check();
+ 1069              		.loc 1 205 5 view .LVU322
+ 205:Core/Src/bms.c ****     error_counter += current_check();
+ 1070              		.loc 1 205 22 is_stmt 0 view .LVU323
+ 1071 0002 FFF7FEFF 		bl	voltage_check
+ 1072              	.LVL75:
+ 1073 0006 0446     		mov	r4, r0
+ 1074              	.LVL76:
+ 206:Core/Src/bms.c ****     error_counter += temperature_check();
+ 1075              		.loc 1 206 5 is_stmt 1 view .LVU324
+ 206:Core/Src/bms.c ****     error_counter += temperature_check();
+ 1076              		.loc 1 206 22 is_stmt 0 view .LVU325
+ 1077 0008 FFF7FEFF 		bl	current_check
+ 1078              	.LVL77:
+ 206:Core/Src/bms.c ****     error_counter += temperature_check();
+ 1079              		.loc 1 206 19 discriminator 1 view .LVU326
+ 1080 000c 0444     		add	r4, r4, r0
+ 1081              	.LVL78:
+ 206:Core/Src/bms.c ****     error_counter += temperature_check();
+ 1082              		.loc 1 206 19 discriminator 1 view .LVU327
+ 1083 000e E4B2     		uxtb	r4, r4
+ 1084              	.LVL79:
+ 207:Core/Src/bms.c ****     return error_counter == ERROR_NOT_PRESENT ? 1 : 0;
+ 1085              		.loc 1 207 5 is_stmt 1 view .LVU328
+ 207:Core/Src/bms.c ****     return error_counter == ERROR_NOT_PRESENT ? 1 : 0;
+ 1086              		.loc 1 207 22 is_stmt 0 view .LVU329
+ 1087 0010 FFF7FEFF 		bl	temperature_check
+ 1088              	.LVL80:
+ 207:Core/Src/bms.c ****     return error_counter == ERROR_NOT_PRESENT ? 1 : 0;
+ 1089              		.loc 1 207 19 discriminator 1 view .LVU330
+ 1090 0014 2044     		add	r0, r0, r4
+ 1091 0016 C0B2     		uxtb	r0, r0
+ 1092              	.LVL81:
+ 208:Core/Src/bms.c **** }
+ 1093              		.loc 1 208 5 is_stmt 1 view .LVU331
+ 209:Core/Src/bms.c **** 
+ 1094              		.loc 1 209 1 is_stmt 0 view .LVU332
+ 1095 0018 B0FA80F0 		clz	r0, r0
+ 1096              	.LVL82:
+ 209:Core/Src/bms.c **** 
+ 1097              		.loc 1 209 1 view .LVU333
+ 1098 001c 4009     		lsrs	r0, r0, #5
+ 1099 001e 10BD     		pop	{r4, pc}
+ 1100              		.cfi_endproc
+ 1101              	.LFE142:
+ 1103              		.section	.text.hv_output_change_state,"ax",%progbits
+ 1104              		.align	1
+ 1105              		.global	hv_output_change_state
+ 1106              		.syntax unified
+ 1107              		.thumb
+ 1108              		.thumb_func
+ 1110              	hv_output_change_state:
+ 1111              	.LVL83:
+ 1112              	.LFB146:
+ 326:Core/Src/bms.c **** 
+ 327:Core/Src/bms.c **** void hv_output_change_state(uint8_t newstate){
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 28
+
+
+ 1113              		.loc 1 327 46 is_stmt 1 view -0
+ 1114              		.cfi_startproc
+ 1115              		@ args = 0, pretend = 0, frame = 0
+ 1116              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1117              		@ link register save eliminated.
+ 328:Core/Src/bms.c **** 
+ 329:Core/Src/bms.c **** }
+ 1118              		.loc 1 329 1 view .LVU335
+ 1119 0000 7047     		bx	lr
+ 1120              		.cfi_endproc
+ 1121              	.LFE146:
+ 1123              		.section	.text.battery_fan_duty,"ax",%progbits
+ 1124              		.align	1
+ 1125              		.global	battery_fan_duty
+ 1126              		.syntax unified
+ 1127              		.thumb
+ 1128              		.thumb_func
+ 1130              	battery_fan_duty:
+ 1131              	.LVL84:
+ 1132              	.LFB147:
+ 330:Core/Src/bms.c **** 
+ 331:Core/Src/bms.c **** //funzione per aggiustare facilmente il duty cycle delle ventole per il raffreddamento
+ 332:Core/Src/bms.c **** void battery_fan_duty(uint8_t duty){
+ 1133              		.loc 1 332 36 view -0
+ 1134              		.cfi_startproc
+ 1135              		@ args = 0, pretend = 0, frame = 0
+ 1136              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1137              		@ link register save eliminated.
+ 333:Core/Src/bms.c ****     if(duty>FAN_MAX_DUTY){
+ 1138              		.loc 1 333 5 view .LVU337
+ 1139              		.loc 1 333 7 is_stmt 0 view .LVU338
+ 1140 0000 6428     		cmp	r0, #100
+ 1141 0002 04D8     		bhi	.L90
+ 334:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1=FAN_MAX_DUTY;
+ 335:Core/Src/bms.c ****         return;
+ 336:Core/Src/bms.c ****     }
+ 337:Core/Src/bms.c ****     
+ 338:Core/Src/bms.c ****     if(duty<FAN_MIN_DUTY){
+ 1142              		.loc 1 338 5 is_stmt 1 view .LVU339
+ 1143              		.loc 1 338 7 is_stmt 0 view .LVU340
+ 1144 0004 1328     		cmp	r0, #19
+ 1145 0006 06D9     		bls	.L91
+ 339:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1 = FAN_MIN_DUTY;
+ 340:Core/Src/bms.c ****         return;  
+ 341:Core/Src/bms.c ****     }
+ 342:Core/Src/bms.c **** 
+ 343:Core/Src/bms.c ****     TIMER_FAN_PWM->CCR1=duty;
+ 1146              		.loc 1 343 5 is_stmt 1 view .LVU341
+ 1147              		.loc 1 343 24 is_stmt 0 view .LVU342
+ 1148 0008 054B     		ldr	r3, .L92
+ 1149 000a 5863     		str	r0, [r3, #52]
+ 344:Core/Src/bms.c **** }
+ 1150              		.loc 1 344 1 view .LVU343
+ 1151 000c 7047     		bx	lr
+ 1152              	.L90:
+ 334:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1=FAN_MAX_DUTY;
+ 1153              		.loc 1 334 9 is_stmt 1 view .LVU344
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 29
+
+
+ 334:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1=FAN_MAX_DUTY;
+ 1154              		.loc 1 334 28 is_stmt 0 view .LVU345
+ 1155 000e 044B     		ldr	r3, .L92
+ 1156 0010 6422     		movs	r2, #100
+ 1157 0012 5A63     		str	r2, [r3, #52]
+ 335:Core/Src/bms.c ****     }
+ 1158              		.loc 1 335 9 is_stmt 1 view .LVU346
+ 1159 0014 7047     		bx	lr
+ 1160              	.L91:
+ 339:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1 = FAN_MIN_DUTY;
+ 1161              		.loc 1 339 9 view .LVU347
+ 339:Core/Src/bms.c ****         TIMER_FAN_PWM->CCR1 = FAN_MIN_DUTY;
+ 1162              		.loc 1 339 29 is_stmt 0 view .LVU348
+ 1163 0016 024B     		ldr	r3, .L92
+ 1164 0018 1422     		movs	r2, #20
+ 1165 001a 5A63     		str	r2, [r3, #52]
+ 340:Core/Src/bms.c ****     }
+ 1166              		.loc 1 340 9 is_stmt 1 view .LVU349
+ 1167 001c 7047     		bx	lr
+ 1168              	.L93:
+ 1169 001e 00BF     		.align	2
+ 1170              	.L92:
+ 1171 0020 00180040 		.word	1073747968
+ 1172              		.cfi_endproc
+ 1173              	.LFE147:
+ 1175              		.section	.text.temperature_control,"ax",%progbits
+ 1176              		.align	1
+ 1177              		.global	temperature_control
+ 1178              		.syntax unified
+ 1179              		.thumb
+ 1180              		.thumb_func
+ 1182              	temperature_control:
+ 1183              	.LFB139:
+ 108:Core/Src/bms.c ****     uint8_t newduty;
+ 1184              		.loc 1 108 27 view -0
+ 1185              		.cfi_startproc
+ 1186              		@ args = 0, pretend = 0, frame = 0
+ 1187              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1188 0000 08B5     		push	{r3, lr}
+ 1189              		.cfi_def_cfa_offset 8
+ 1190              		.cfi_offset 3, -8
+ 1191              		.cfi_offset 14, -4
+ 109:Core/Src/bms.c ****     int16_t temperature_for_fan_control;
+ 1192              		.loc 1 109 5 view .LVU351
+ 110:Core/Src/bms.c ****     if(pack_information->cell_delta_temperature_centideg > IGNORE_AVG_TEMPERATURE_DELTA_THRESHOLD){
+ 1193              		.loc 1 110 5 view .LVU352
+ 111:Core/Src/bms.c ****         temperature_for_fan_control = pack_information->cell_max_temperature_centideg;
+ 1194              		.loc 1 111 5 view .LVU353
+ 111:Core/Src/bms.c ****         temperature_for_fan_control = pack_information->cell_max_temperature_centideg;
+ 1195              		.loc 1 111 24 is_stmt 0 view .LVU354
+ 1196 0002 144B     		ldr	r3, .L103
+ 1197 0004 1B68     		ldr	r3, [r3]
+ 1198 0006 B3F98020 		ldrsh	r2, [r3, #128]
+ 111:Core/Src/bms.c ****         temperature_for_fan_control = pack_information->cell_max_temperature_centideg;
+ 1199              		.loc 1 111 7 view .LVU355
+ 1200 000a B2F5FA7F 		cmp	r2, #500
+ 1201 000e 13DD     		ble	.L95
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 30
+
+
+ 112:Core/Src/bms.c ****     }else{
+ 1202              		.loc 1 112 9 is_stmt 1 view .LVU356
+ 112:Core/Src/bms.c ****     }else{
+ 1203              		.loc 1 112 37 is_stmt 0 view .LVU357
+ 1204 0010 B3F97E30 		ldrsh	r3, [r3, #126]
+ 1205              	.LVL85:
+ 1206              	.L96:
+ 117:Core/Src/bms.c ****         newduty = FAN_OFF;
+ 1207              		.loc 1 117 5 is_stmt 1 view .LVU358
+ 117:Core/Src/bms.c ****         newduty = FAN_OFF;
+ 1208              		.loc 1 117 7 is_stmt 0 view .LVU359
+ 1209 0014 40F6B732 		movw	r2, #2999
+ 1210 0018 9342     		cmp	r3, r2
+ 1211 001a 10DD     		ble	.L98
+ 119:Core/Src/bms.c ****         newduty = FAN_LOW;
+ 1212              		.loc 1 119 11 is_stmt 1 view .LVU360
+ 119:Core/Src/bms.c ****         newduty = FAN_LOW;
+ 1213              		.loc 1 119 13 is_stmt 0 view .LVU361
+ 1214 001c 41F29312 		movw	r2, #4499
+ 1215 0020 9342     		cmp	r3, r2
+ 1216 0022 10DD     		ble	.L99
+ 121:Core/Src/bms.c ****         newduty = FAN_MEDIUM;
+ 1217              		.loc 1 121 11 is_stmt 1 view .LVU362
+ 121:Core/Src/bms.c ****         newduty = FAN_MEDIUM;
+ 1218              		.loc 1 121 13 is_stmt 0 view .LVU363
+ 1219 0024 41F28732 		movw	r2, #4999
+ 1220 0028 9342     		cmp	r3, r2
+ 1221 002a 0EDD     		ble	.L100
+ 123:Core/Src/bms.c ****         newduty = FAN_HIGH;
+ 1222              		.loc 1 123 11 is_stmt 1 view .LVU364
+ 123:Core/Src/bms.c ****         newduty = FAN_HIGH;
+ 1223              		.loc 1 123 13 is_stmt 0 view .LVU365
+ 1224 002c 41F27B52 		movw	r2, #5499
+ 1225 0030 9342     		cmp	r3, r2
+ 1226 0032 0CDC     		bgt	.L101
+ 124:Core/Src/bms.c ****     }else{
+ 1227              		.loc 1 124 17 view .LVU366
+ 1228 0034 5020     		movs	r0, #80
+ 1229 0036 03E0     		b	.L97
+ 1230              	.LVL86:
+ 1231              	.L95:
+ 114:Core/Src/bms.c ****     }
+ 1232              		.loc 1 114 9 is_stmt 1 view .LVU367
+ 114:Core/Src/bms.c ****     }
+ 1233              		.loc 1 114 37 is_stmt 0 view .LVU368
+ 1234 0038 B3F98230 		ldrsh	r3, [r3, #130]
+ 1235 003c EAE7     		b	.L96
+ 1236              	.LVL87:
+ 1237              	.L98:
+ 118:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_MEDIUM){
+ 1238              		.loc 1 118 17 view .LVU369
+ 1239 003e 0020     		movs	r0, #0
+ 1240              	.L97:
+ 1241              	.LVL88:
+ 129:Core/Src/bms.c **** }
+ 1242              		.loc 1 129 5 is_stmt 1 view .LVU370
+ 1243 0040 FFF7FEFF 		bl	battery_fan_duty
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 31
+
+
+ 1244              	.LVL89:
+ 130:Core/Src/bms.c **** 
+ 1245              		.loc 1 130 1 is_stmt 0 view .LVU371
+ 1246 0044 08BD     		pop	{r3, pc}
+ 1247              	.LVL90:
+ 1248              	.L99:
+ 120:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_HIGH){
+ 1249              		.loc 1 120 17 view .LVU372
+ 1250 0046 1E20     		movs	r0, #30
+ 1251 0048 FAE7     		b	.L97
+ 1252              	.L100:
+ 122:Core/Src/bms.c ****     }else if(temperature_for_fan_control < T_MAX){
+ 1253              		.loc 1 122 17 view .LVU373
+ 1254 004a 3C20     		movs	r0, #60
+ 1255 004c F8E7     		b	.L97
+ 1256              	.L101:
+ 126:Core/Src/bms.c ****     }
+ 1257              		.loc 1 126 17 view .LVU374
+ 1258 004e 6420     		movs	r0, #100
+ 1259 0050 F6E7     		b	.L97
+ 1260              	.L104:
+ 1261 0052 00BF     		.align	2
+ 1262              	.L103:
+ 1263 0054 00000000 		.word	pack_information
+ 1264              		.cfi_endproc
+ 1265              	.LFE139:
+ 1267              		.section	.text.gpiowrite,"ax",%progbits
+ 1268              		.align	1
+ 1269              		.global	gpiowrite
+ 1270              		.syntax unified
+ 1271              		.thumb
+ 1272              		.thumb_func
+ 1274              	gpiowrite:
+ 1275              	.LVL91:
+ 1276              	.LFB148:
+ 345:Core/Src/bms.c **** 
+ 346:Core/Src/bms.c **** void gpiowrite(uint8_t pin, uint8_t state){
+ 1277              		.loc 1 346 43 is_stmt 1 view -0
+ 1278              		.cfi_startproc
+ 1279              		@ args = 0, pretend = 0, frame = 0
+ 1280              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1281              		@ link register save eliminated.
+ 347:Core/Src/bms.c ****     switch(pin){
+ 1282              		.loc 1 347 5 view .LVU376
+ 348:Core/Src/bms.c **** 
+ 349:Core/Src/bms.c ****         default:
+ 350:Core/Src/bms.c ****             break;
+ 1283              		.loc 1 350 13 view .LVU377
+ 351:Core/Src/bms.c ****     }
+ 352:Core/Src/bms.c **** }
+ 1284              		.loc 1 352 1 is_stmt 0 view .LVU378
+ 1285 0000 7047     		bx	lr
+ 1286              		.cfi_endproc
+ 1287              	.LFE148:
+ 1289              		.section	.text.vac_charging_procedure,"ax",%progbits
+ 1290              		.align	1
+ 1291              		.global	vac_charging_procedure
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 32
+
+
+ 1292              		.syntax unified
+ 1293              		.thumb
+ 1294              		.thumb_func
+ 1296              	vac_charging_procedure:
+ 1297              	.LVL92:
+ 1298              	.LFB149:
+ 353:Core/Src/bms.c **** 
+ 354:Core/Src/bms.c **** //*-------- communication with other HV devices ------------
+ 355:Core/Src/bms.c **** //controlla il comportamento del pacco batteria durante la ricarica da presa type2
+ 356:Core/Src/bms.c **** 
+ 357:Core/Src/bms.c **** uint32_t charger_millis;
+ 358:Core/Src/bms.c **** uint8_t charging_first_time = 0;
+ 359:Core/Src/bms.c **** void vac_charging_procedure(uint8_t command_request){
+ 1299              		.loc 1 359 53 is_stmt 1 view -0
+ 1300              		.cfi_startproc
+ 1301              		@ args = 0, pretend = 0, frame = 0
+ 1302              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1303              		@ link register save eliminated.
+ 360:Core/Src/bms.c ****     if(VAC_CHARGING_STOP){
+ 1304              		.loc 1 360 5 view .LVU380
+ 361:Core/Src/bms.c ****         charging_first_time = 1;
+ 1305              		.loc 1 361 9 view .LVU381
+ 1306              		.loc 1 361 29 is_stmt 0 view .LVU382
+ 1307 0000 0122     		movs	r2, #1
+ 1308 0002 044B     		ldr	r3, .L107
+ 1309 0004 1A70     		strb	r2, [r3]
+ 362:Core/Src/bms.c ****         hv_devices_states_requests->obc.charging_voltage = 0;
+ 1310              		.loc 1 362 9 is_stmt 1 view .LVU383
+ 1311              		.loc 1 362 35 is_stmt 0 view .LVU384
+ 1312 0006 044B     		ldr	r3, .L107+4
+ 1313 0008 1B68     		ldr	r3, [r3]
+ 1314              		.loc 1 362 58 view .LVU385
+ 1315 000a 0021     		movs	r1, #0
+ 1316 000c 5960     		str	r1, [r3, #4]
+ 363:Core/Src/bms.c ****         hv_devices_states_requests->obc.charging_current = 0;
+ 1317              		.loc 1 363 9 is_stmt 1 view .LVU386
+ 1318              		.loc 1 363 58 is_stmt 0 view .LVU387
+ 1319 000e 9960     		str	r1, [r3, #8]
+ 364:Core/Src/bms.c ****         hv_devices_states_requests->obc.charging_current_state = CHARGING_STATE_A;
+ 1320              		.loc 1 364 9 is_stmt 1 view .LVU388
+ 1321              		.loc 1 364 64 is_stmt 0 view .LVU389
+ 1322 0010 5A70     		strb	r2, [r3, #1]
+ 365:Core/Src/bms.c ****     }else if(VAC_CHARGING_START){
+ 366:Core/Src/bms.c ****         //*calculation for current avaiable via type2standard
+ 367:Core/Src/bms.c ****         //!REDACTED
+ 368:Core/Src/bms.c ****         //*charging procedure
+ 369:Core/Src/bms.c ****         if(pack_information->battery_state.is_charging_allowed == 1 && hv_devices_states_requests->
+ 370:Core/Src/bms.c ****             if(charging_first_time == 1){
+ 371:Core/Src/bms.c ****                 charging_first_time = 0;
+ 372:Core/Src/bms.c ****                 charger_millis = HAL_GetTick();
+ 373:Core/Src/bms.c ****                 hv_devices_states_requests->obc.charging_voltage = PACK_CHARGING_VOLTAGE_mV;
+ 374:Core/Src/bms.c ****                 hv_devices_states_requests->obc.charging_current = PACK_CHARGING_CURRENT_START_mA;
+ 375:Core/Src/bms.c ****                 hv_devices_states_requests->obc.charging_current_state = CHARGING_STATE_C;
+ 376:Core/Src/bms.c ****             }else{
+ 377:Core/Src/bms.c ****                 //gradually increase charging current
+ 378:Core/Src/bms.c ****                 if(timer_check(PACK_CHARGING_TIME_RISE_WAIT_ms,charger_millis)){
+ 379:Core/Src/bms.c ****                     charger_millis = HAL_GetTick();
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 33
+
+
+ 380:Core/Src/bms.c ****                     if(hv_devices_states_requests->obc.charging_current + PACK_CHARGING_CURRENT_RIS
+ 381:Core/Src/bms.c ****                         hv_devices_states_requests->obc.charging_current = PACK_CHARGING_CURRENT_ST
+ 382:Core/Src/bms.c ****                     }else{
+ 383:Core/Src/bms.c ****                         hv_devices_states_requests->obc.charging_current = PACK_CHARGING_CURRENT_mA
+ 384:Core/Src/bms.c ****                     }
+ 385:Core/Src/bms.c ****                 }
+ 386:Core/Src/bms.c ****                 if(pack_information->pack_voltage_mV == PACK_CHARGING_VOLTAGE_mV){
+ 387:Core/Src/bms.c ****                     //CV charging phase - check when charging need to be stopped
+ 388:Core/Src/bms.c ****                     if(pack_information->current_mA <= PACK_CHARGING_CURRENT_END_mA){
+ 389:Core/Src/bms.c ****                         pack_information->battery_state.is_charging_allowed = 0;
+ 390:Core/Src/bms.c ****                         charging_first_time = 1;
+ 391:Core/Src/bms.c ****                         hv_devices_states_requests->obc.charging_voltage = 0;
+ 392:Core/Src/bms.c ****                         hv_devices_states_requests->obc.charging_current = 0;
+ 393:Core/Src/bms.c ****                         hv_devices_states_requests->obc.charging_current_state = CHARGING_STATE_A;
+ 394:Core/Src/bms.c ****                     }
+ 395:Core/Src/bms.c ****                 }//else we are in CC charging phase
+ 396:Core/Src/bms.c ****             }
+ 397:Core/Src/bms.c ****         }
+ 398:Core/Src/bms.c ****     }
+ 399:Core/Src/bms.c **** }
+ 1323              		.loc 1 399 1 view .LVU390
+ 1324 0012 7047     		bx	lr
+ 1325              	.L108:
+ 1326              		.align	2
+ 1327              	.L107:
+ 1328 0014 00000000 		.word	charging_first_time
+ 1329 0018 00000000 		.word	hv_devices_states_requests
+ 1330              		.cfi_endproc
+ 1331              	.LFE149:
+ 1333              		.section	.text.bms_routine,"ax",%progbits
+ 1334              		.align	1
+ 1335              		.global	bms_routine
+ 1336              		.syntax unified
+ 1337              		.thumb
+ 1338              		.thumb_func
+ 1340              	bms_routine:
+ 1341              	.LFB138:
+  30:Core/Src/bms.c ****     #ifdef SERIAL_DEBUG
+ 1342              		.loc 1 30 19 is_stmt 1 view -0
+ 1343              		.cfi_startproc
+ 1344              		@ args = 0, pretend = 0, frame = 0
+ 1345              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1346 0000 38B5     		push	{r3, r4, r5, lr}
+ 1347              		.cfi_def_cfa_offset 16
+ 1348              		.cfi_offset 3, -16
+ 1349              		.cfi_offset 4, -12
+ 1350              		.cfi_offset 5, -8
+ 1351              		.cfi_offset 14, -4
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1352              		.loc 1 37 5 view .LVU392
+ 1353              	.LBB15:
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1354              		.loc 1 37 9 view .LVU393
+ 1355              	.LVL93:
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1356              		.loc 1 37 17 is_stmt 0 view .LVU394
+ 1357 0002 0124     		movs	r4, #1
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 34
+
+
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1358              		.loc 1 37 5 view .LVU395
+ 1359 0004 05E0     		b	.L110
+ 1360              	.LVL94:
+ 1361              	.L111:
+  38:Core/Src/bms.c ****     
+ 1362              		.loc 1 38 9 is_stmt 1 view .LVU396
+ 1363 0006 0121     		movs	r1, #1
+ 1364 0008 2046     		mov	r0, r4
+ 1365 000a FFF7FEFF 		bl	L9963E_utils_read_cells
+ 1366              	.LVL95:
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1367              		.loc 1 37 65 discriminator 3 view .LVU397
+ 1368 000e 0134     		adds	r4, r4, #1
+ 1369              	.LVL96:
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1370              		.loc 1 37 65 is_stmt 0 discriminator 3 view .LVU398
+ 1371 0010 E4B2     		uxtb	r4, r4
+ 1372              	.LVL97:
+ 1373              	.L110:
+  37:Core/Src/bms.c ****         L9963E_utils_read_cells(n_modules,1);
+ 1374              		.loc 1 37 38 is_stmt 1 discriminator 1 view .LVU399
+ 1375 0012 022C     		cmp	r4, #2
+ 1376 0014 F7D9     		bls	.L111
+ 1377              	.LBE15:
+  45:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+ 1378              		.loc 1 45 5 view .LVU400
+  45:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+ 1379              		.loc 1 45 21 is_stmt 0 view .LVU401
+ 1380 0016 234C     		ldr	r4, .L121
+ 1381              	.LVL98:
+  45:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+ 1382              		.loc 1 45 21 view .LVU402
+ 1383 0018 2568     		ldr	r5, [r4]
+  45:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+ 1384              		.loc 1 45 41 view .LVU403
+ 1385 001a FFF7FEFF 		bl	L9963E_utils_get_batt_mv
+ 1386              	.LVL99:
+  45:Core/Src/bms.c ****     L9963E_utils_get_cells(pack_information->cell_voltages_mV);
+ 1387              		.loc 1 45 39 discriminator 1 view .LVU404
+ 1388 001e 2860     		str	r0, [r5]
+  46:Core/Src/bms.c ****     L9963E_utils_get_gpios(pack_information->cell_temperatures_centideg);
+ 1389              		.loc 1 46 5 is_stmt 1 view .LVU405
+  46:Core/Src/bms.c ****     L9963E_utils_get_gpios(pack_information->cell_temperatures_centideg);
+ 1390              		.loc 1 46 44 is_stmt 0 view .LVU406
+ 1391 0020 2068     		ldr	r0, [r4]
+  46:Core/Src/bms.c ****     L9963E_utils_get_gpios(pack_information->cell_temperatures_centideg);
+ 1392              		.loc 1 46 5 view .LVU407
+ 1393 0022 0C30     		adds	r0, r0, #12
+ 1394 0024 FFF7FEFF 		bl	L9963E_utils_get_cells
+ 1395              	.LVL100:
+  47:Core/Src/bms.c ****     pack_information->current_mA = L9963E_utils_get_batt_mA();
+ 1396              		.loc 1 47 5 is_stmt 1 view .LVU408
+  47:Core/Src/bms.c ****     pack_information->current_mA = L9963E_utils_get_batt_mA();
+ 1397              		.loc 1 47 44 is_stmt 0 view .LVU409
+ 1398 0028 2068     		ldr	r0, [r4]
+  47:Core/Src/bms.c ****     pack_information->current_mA = L9963E_utils_get_batt_mA();
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 35
+
+
+ 1399              		.loc 1 47 5 view .LVU410
+ 1400 002a 6830     		adds	r0, r0, #104
+ 1401 002c FFF7FEFF 		bl	L9963E_utils_get_gpios
+ 1402              	.LVL101:
+  48:Core/Src/bms.c **** 
+ 1403              		.loc 1 48 5 is_stmt 1 view .LVU411
+  48:Core/Src/bms.c **** 
+ 1404              		.loc 1 48 36 is_stmt 0 view .LVU412
+ 1405 0030 FFF7FEFF 		bl	L9963E_utils_get_batt_mA
+ 1406              	.LVL102:
+  48:Core/Src/bms.c **** 
+ 1407              		.loc 1 48 21 discriminator 1 view .LVU413
+ 1408 0034 2368     		ldr	r3, [r4]
+  48:Core/Src/bms.c **** 
+ 1409              		.loc 1 48 36 discriminator 1 view .LVU414
+ 1410 0036 C217     		asrs	r2, r0, #31
+  48:Core/Src/bms.c **** 
+ 1411              		.loc 1 48 34 discriminator 1 view .LVU415
+ 1412 0038 C3F88800 		str	r0, [r3, #136]
+ 1413 003c C3F88C20 		str	r2, [r3, #140]
+  58:Core/Src/bms.c ****     compute_max_deltas();
+ 1414              		.loc 1 58 5 is_stmt 1 view .LVU416
+  58:Core/Src/bms.c ****     compute_max_deltas();
+ 1415              		.loc 1 58 23 is_stmt 0 view .LVU417
+ 1416 0040 FFF7FEFF 		bl	battery_operability
+ 1417              	.LVL103:
+  58:Core/Src/bms.c ****     compute_max_deltas();
+ 1418              		.loc 1 58 21 discriminator 1 view .LVU418
+ 1419 0044 184C     		ldr	r4, .L121+4
+ 1420 0046 2070     		strb	r0, [r4]
+  59:Core/Src/bms.c **** 
+ 1421              		.loc 1 59 5 is_stmt 1 view .LVU419
+ 1422 0048 FFF7FEFF 		bl	compute_max_deltas
+ 1423              	.LVL104:
+  61:Core/Src/bms.c ****         hv_output_change_state(HV_BRUTAL_OFF);
+ 1424              		.loc 1 61 5 view .LVU420
+  61:Core/Src/bms.c ****         hv_output_change_state(HV_BRUTAL_OFF);
+ 1425              		.loc 1 61 8 is_stmt 0 view .LVU421
+ 1426 004c 2378     		ldrb	r3, [r4]	@ zero_extendqisi2
+  61:Core/Src/bms.c ****         hv_output_change_state(HV_BRUTAL_OFF);
+ 1427              		.loc 1 61 7 view .LVU422
+ 1428 004e 13B9     		cbnz	r3, .L112
+  62:Core/Src/bms.c ****         currentstate=HV_BRUTAL_OFF;
+ 1429              		.loc 1 62 9 is_stmt 1 view .LVU423
+  63:Core/Src/bms.c ****     }
+ 1430              		.loc 1 63 9 view .LVU424
+  63:Core/Src/bms.c ****     }
+ 1431              		.loc 1 63 21 is_stmt 0 view .LVU425
+ 1432 0050 164B     		ldr	r3, .L121+8
+ 1433 0052 0422     		movs	r2, #4
+ 1434 0054 1A70     		strb	r2, [r3]
+ 1435              	.L112:
+  66:Core/Src/bms.c ****         case HV_OFF:
+ 1436              		.loc 1 66 5 is_stmt 1 view .LVU426
+ 1437 0056 154B     		ldr	r3, .L121+8
+ 1438 0058 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 1439 005a 052B     		cmp	r3, #5
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 36
+
+
+ 1440 005c 14D8     		bhi	.L113
+ 1441 005e DFE803F0 		tbb	[pc, r3]
+ 1442              	.L115:
+ 1443 0062 18       		.byte	(.L118-.L115)/2
+ 1444 0063 03       		.byte	(.L117-.L115)/2
+ 1445 0064 0D       		.byte	(.L116-.L115)/2
+ 1446 0065 13       		.byte	(.L113-.L115)/2
+ 1447 0066 13       		.byte	(.L113-.L115)/2
+ 1448 0067 1C       		.byte	(.L114-.L115)/2
+ 1449              		.p2align 1
+ 1450              	.L117:
+  69:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+ 1451              		.loc 1 69 13 view .LVU427
+  70:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+ 1452              		.loc 1 70 13 view .LVU428
+  71:Core/Src/bms.c ****             if(battery_is_safe){
+ 1453              		.loc 1 71 13 view .LVU429
+ 1454 0068 0120     		movs	r0, #1
+ 1455 006a FFF7FEFF 		bl	vac_charging_procedure
+ 1456              	.LVL105:
+  72:Core/Src/bms.c ****                 currentstate = HV_ON;
+ 1457              		.loc 1 72 13 view .LVU430
+  72:Core/Src/bms.c ****                 currentstate = HV_ON;
+ 1458              		.loc 1 72 16 is_stmt 0 view .LVU431
+ 1459 006e 0E4B     		ldr	r3, .L121+4
+ 1460 0070 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+  72:Core/Src/bms.c ****                 currentstate = HV_ON;
+ 1461              		.loc 1 72 15 view .LVU432
+ 1462 0072 4BB1     		cbz	r3, .L113
+  73:Core/Src/bms.c ****             }
+ 1463              		.loc 1 73 17 is_stmt 1 view .LVU433
+  73:Core/Src/bms.c ****             }
+ 1464              		.loc 1 73 30 is_stmt 0 view .LVU434
+ 1465 0074 0D4B     		ldr	r3, .L121+8
+ 1466 0076 0022     		movs	r2, #0
+ 1467 0078 1A70     		strb	r2, [r3]
+ 1468 007a 05E0     		b	.L113
+ 1469              	.L116:
+  78:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+ 1470              		.loc 1 78 13 is_stmt 1 view .LVU435
+  79:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+ 1471              		.loc 1 79 13 view .LVU436
+  80:Core/Src/bms.c ****             currentstate = HV_ON;
+ 1472              		.loc 1 80 13 view .LVU437
+ 1473 007c 0120     		movs	r0, #1
+ 1474 007e FFF7FEFF 		bl	vac_charging_procedure
+ 1475              	.LVL106:
+  81:Core/Src/bms.c ****             break;
+ 1476              		.loc 1 81 13 view .LVU438
+  81:Core/Src/bms.c ****             break;
+ 1477              		.loc 1 81 26 is_stmt 0 view .LVU439
+ 1478 0082 0A4B     		ldr	r3, .L121+8
+ 1479 0084 0022     		movs	r2, #0
+ 1480 0086 1A70     		strb	r2, [r3]
+  82:Core/Src/bms.c **** 
+ 1481              		.loc 1 82 13 is_stmt 1 view .LVU440
+ 1482              	.L113:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 37
+
+
+ 103:Core/Src/bms.c ****     temperature_control();
+ 1483              		.loc 1 103 5 view .LVU441
+ 1484 0088 FFF7FEFF 		bl	balancing_procedure
+ 1485              	.LVL107:
+ 104:Core/Src/bms.c **** }
+ 1486              		.loc 1 104 5 view .LVU442
+ 1487 008c FFF7FEFF 		bl	temperature_control
+ 1488              	.LVL108:
+ 105:Core/Src/bms.c **** 
+ 1489              		.loc 1 105 1 is_stmt 0 view .LVU443
+ 1490 0090 38BD     		pop	{r3, r4, r5, pc}
+ 1491              	.L118:
+  86:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_START);
+ 1492              		.loc 1 86 13 is_stmt 1 view .LVU444
+  87:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_STOP);
+ 1493              		.loc 1 87 13 view .LVU445
+  88:Core/Src/bms.c ****             break;
+ 1494              		.loc 1 88 13 view .LVU446
+ 1495 0092 0120     		movs	r0, #1
+ 1496 0094 FFF7FEFF 		bl	vac_charging_procedure
+ 1497              	.LVL109:
+  89:Core/Src/bms.c **** 
+ 1498              		.loc 1 89 13 view .LVU447
+ 1499 0098 F6E7     		b	.L113
+ 1500              	.L114:
+  92:Core/Src/bms.c ****             powertrain_control(POWERTRAIN_STOP);
+ 1501              		.loc 1 92 13 view .LVU448
+  93:Core/Src/bms.c ****             vac_charging_procedure(VAC_CHARGING_START);
+ 1502              		.loc 1 93 13 view .LVU449
+  94:Core/Src/bms.c ****             break;
+ 1503              		.loc 1 94 13 view .LVU450
+ 1504 009a 0020     		movs	r0, #0
+ 1505 009c FFF7FEFF 		bl	vac_charging_procedure
+ 1506              	.LVL110:
+  95:Core/Src/bms.c **** 
+ 1507              		.loc 1 95 13 view .LVU451
+ 1508 00a0 F2E7     		b	.L113
+ 1509              	.L122:
+ 1510 00a2 00BF     		.align	2
+ 1511              	.L121:
+ 1512 00a4 00000000 		.word	pack_information
+ 1513 00a8 00000000 		.word	battery_is_safe
+ 1514 00ac 00000000 		.word	currentstate
+ 1515              		.cfi_endproc
+ 1516              	.LFE138:
+ 1518              		.section	.text.solar_charging_procedure,"ax",%progbits
+ 1519              		.align	1
+ 1520              		.global	solar_charging_procedure
+ 1521              		.syntax unified
+ 1522              		.thumb
+ 1523              		.thumb_func
+ 1525              	solar_charging_procedure:
+ 1526              	.LVL111:
+ 1527              	.LFB150:
+ 400:Core/Src/bms.c **** 
+ 401:Core/Src/bms.c **** //controlla la ricarica tramite i pannelli fotovoltaici
+ 402:Core/Src/bms.c **** void solar_charging_procedure(uint8_t command_request){
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 38
+
+
+ 1528              		.loc 1 402 55 view -0
+ 1529              		.cfi_startproc
+ 1530              		@ args = 0, pretend = 0, frame = 0
+ 1531              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1532              		@ link register save eliminated.
+ 403:Core/Src/bms.c ****     //!REDACTED
+ 404:Core/Src/bms.c **** }
+ 1533              		.loc 1 404 1 view .LVU453
+ 1534 0000 7047     		bx	lr
+ 1535              		.cfi_endproc
+ 1536              	.LFE150:
+ 1538              		.section	.text.powertrain_control,"ax",%progbits
+ 1539              		.align	1
+ 1540              		.global	powertrain_control
+ 1541              		.syntax unified
+ 1542              		.thumb
+ 1543              		.thumb_func
+ 1545              	powertrain_control:
+ 1546              	.LVL112:
+ 1547              	.LFB151:
+ 405:Core/Src/bms.c **** 
+ 406:Core/Src/bms.c **** //comunica alla centralina del powertrain cosa è possibile fare
+ 407:Core/Src/bms.c **** //(potenza erogabile e quantità regen permessa)
+ 408:Core/Src/bms.c **** void powertrain_control(uint8_t command_request){
+ 1548              		.loc 1 408 49 view -0
+ 1549              		.cfi_startproc
+ 1550              		@ args = 0, pretend = 0, frame = 0
+ 1551              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1552              		@ link register save eliminated.
+ 409:Core/Src/bms.c ****     //!REDACTED
+ 410:Core/Src/bms.c **** }
+ 1553              		.loc 1 410 1 view .LVU455
+ 1554 0000 7047     		bx	lr
+ 1555              		.cfi_endproc
+ 1556              	.LFE151:
+ 1558              		.section	.text.get_pack_information,"ax",%progbits
+ 1559              		.align	1
+ 1560              		.global	get_pack_information
+ 1561              		.syntax unified
+ 1562              		.thumb
+ 1563              		.thumb_func
+ 1565              	get_pack_information:
+ 1566              	.LFB152:
+ 411:Core/Src/bms.c **** 
+ 412:Core/Src/bms.c **** pack_information_t* get_pack_information(){
+ 1567              		.loc 1 412 43 view -0
+ 1568              		.cfi_startproc
+ 1569              		@ args = 0, pretend = 0, frame = 0
+ 1570              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1571              		@ link register save eliminated.
+ 413:Core/Src/bms.c ****     return pack_information;
+ 1572              		.loc 1 413 5 view .LVU457
+ 414:Core/Src/bms.c **** }...
+ 1573              		.loc 1 414 1 is_stmt 0 view .LVU458
+ 1574 0000 014B     		ldr	r3, .L126
+ 1575 0002 1868     		ldr	r0, [r3]
+ 1576 0004 7047     		bx	lr
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 39
+
+
+ 1577              	.L127:
+ 1578 0006 00BF     		.align	2
+ 1579              	.L126:
+ 1580 0008 00000000 		.word	pack_information
+ 1581              		.cfi_endproc
+ 1582              	.LFE152:
+ 1584              		.global	charging_first_time
+ 1585              		.section	.bss.charging_first_time,"aw",%nobits
+ 1588              	charging_first_time:
+ 1589 0000 00       		.space	1
+ 1590              		.global	charger_millis
+ 1591              		.section	.bss.charger_millis,"aw",%nobits
+ 1592              		.align	2
+ 1595              	charger_millis:
+ 1596 0000 00000000 		.space	4
+ 1597              		.global	hv_devices_states_requests
+ 1598              		.section	.bss.hv_devices_states_requests,"aw",%nobits
+ 1599              		.align	2
+ 1602              	hv_devices_states_requests:
+ 1603 0000 00000000 		.space	4
+ 1604              		.global	battery_errors
+ 1605              		.section	.bss.battery_errors,"aw",%nobits
+ 1606              		.align	2
+ 1609              	battery_errors:
+ 1610 0000 00000000 		.space	4
+ 1611              		.global	pack_information
+ 1612              		.section	.bss.pack_information,"aw",%nobits
+ 1613              		.align	2
+ 1616              	pack_information:
+ 1617 0000 00000000 		.space	4
+ 1618              		.global	battery_is_safe
+ 1619              		.section	.bss.battery_is_safe,"aw",%nobits
+ 1622              	battery_is_safe:
+ 1623 0000 00       		.space	1
+ 1624              		.global	currentstate
+ 1625              		.section	.data.currentstate,"aw"
+ 1628              	currentstate:
+ 1629 0000 01       		.byte	1
+ 1630              		.text
+ 1631              	.Letext0:
+ 1632              		.file 2 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 1633              		.file 3 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 1634              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f446xx.h"
+ 1635              		.file 5 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1636              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1637              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_tim.h"
+ 1638              		.file 8 "Core/Inc/bms_datatypes.h"
+ 1639              		.file 9 "Core/Inc/hv_device_datatypes.h"
+ 1640              		.file 10 "Core/Inc/bms.h"
+ 1641              		.file 11 "Core/Inc/tim.h"
+ 1642              		.file 12 "Core/Inc/utils.h"
+ 1643              		.file 13 "Core/Inc/l9963e_utils.h"
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 40
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 bms.c
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:21     .text.bms_routines_init:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:27     .text.bms_routines_init:00000000 bms_routines_init
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:142    .text.bms_routines_init:00000064 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1616   .bss.pack_information:00000000 pack_information
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1609   .bss.battery_errors:00000000 battery_errors
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1602   .bss.hv_devices_states_requests:00000000 hv_devices_states_requests
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:151    .text.balancing_procedure:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:157    .text.balancing_procedure:00000000 balancing_procedure
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:372    .text.balancing_procedure:000000e4 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:377    .text.compute_max_deltas:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:383    .text.compute_max_deltas:00000000 compute_max_deltas
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:483    .text.compute_max_deltas:00000070 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:488    .text.voltage_check:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:494    .text.voltage_check:00000000 voltage_check
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:731    .text.voltage_check:00000118 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:739    .text.temperature_check:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:745    .text.temperature_check:00000000 temperature_check
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:922    .text.temperature_check:000000d0 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:928    .text.current_check:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:934    .text.current_check:00000000 current_check
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1044   .text.current_check:0000008c $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1051   .text.battery_operability:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1057   .text.battery_operability:00000000 battery_operability
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1104   .text.hv_output_change_state:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1110   .text.hv_output_change_state:00000000 hv_output_change_state
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1124   .text.battery_fan_duty:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1130   .text.battery_fan_duty:00000000 battery_fan_duty
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1171   .text.battery_fan_duty:00000020 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1176   .text.temperature_control:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1182   .text.temperature_control:00000000 temperature_control
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1263   .text.temperature_control:00000054 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1268   .text.gpiowrite:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1274   .text.gpiowrite:00000000 gpiowrite
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1290   .text.vac_charging_procedure:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1296   .text.vac_charging_procedure:00000000 vac_charging_procedure
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1328   .text.vac_charging_procedure:00000014 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1588   .bss.charging_first_time:00000000 charging_first_time
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1334   .text.bms_routine:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1340   .text.bms_routine:00000000 bms_routine
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1443   .text.bms_routine:00000062 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1449   .text.bms_routine:00000068 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1512   .text.bms_routine:000000a4 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1622   .bss.battery_is_safe:00000000 battery_is_safe
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1628   .data.currentstate:00000000 currentstate
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1519   .text.solar_charging_procedure:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1525   .text.solar_charging_procedure:00000000 solar_charging_procedure
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1539   .text.powertrain_control:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1545   .text.powertrain_control:00000000 powertrain_control
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1559   .text.get_pack_information:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1565   .text.get_pack_information:00000000 get_pack_information
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1580   .text.get_pack_information:00000008 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1589   .bss.charging_first_time:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1595   .bss.charger_millis:00000000 charger_millis
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1592   .bss.charger_millis:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1599   .bss.hv_devices_states_requests:00000000 $d
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s 			page 41
+
+
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1606   .bss.battery_errors:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1613   .bss.pack_information:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\ccqLiwRh.s:1623   .bss.battery_is_safe:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_TIM_PWM_Start_IT
+htim12
+balancing_set
+max_search
+min_search
+get_avg
+max_search_signed
+min_search_signed
+get_avg_signed
+L9963E_utils_read_cells
+L9963E_utils_get_batt_mv
+L9963E_utils_get_cells
+L9963E_utils_get_gpios
+L9963E_utils_get_batt_mA

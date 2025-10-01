@@ -1,0 +1,1932 @@
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"L9963E_drv.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.file 1 "Lib/L9963E_lib/src/L9963E_drv.c"
+  20              		.section	.text.L9963E_DRV_crc_calc,"ax",%progbits
+  21              		.align	1
+  22              		.global	L9963E_DRV_crc_calc
+  23              		.syntax unified
+  24              		.thumb
+  25              		.thumb_func
+  27              	L9963E_DRV_crc_calc:
+  28              	.LVL0:
+  29              	.LFB0:
+   1:Lib/L9963E_lib/src/L9963E_drv.c **** /*
+   2:Lib/L9963E_lib/src/L9963E_drv.c ****  * "THE BEER-WARE LICENSE" (Revision 69):
+   3:Lib/L9963E_lib/src/L9963E_drv.c ****  * Squadra Corse firmware team wrote this file. As long as you retain this notice
+   4:Lib/L9963E_lib/src/L9963E_drv.c ****  * you can do whatever you want with this stuff. If we meet some day, and you 
+   5:Lib/L9963E_lib/src/L9963E_drv.c ****  * think this stuff is worth it, you can buy us a beer in return.
+   6:Lib/L9963E_lib/src/L9963E_drv.c ****  * 
+   7:Lib/L9963E_lib/src/L9963E_drv.c ****  * Authors
+   8:Lib/L9963E_lib/src/L9963E_drv.c ****  * - Federico Carbone [federico.carbone.sc@gmail.com]
+   9:Lib/L9963E_lib/src/L9963E_drv.c ****  * - Filippo Rossi [filippo.rossi.sc@gmail.com]
+  10:Lib/L9963E_lib/src/L9963E_drv.c ****  */
+  11:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  12:Lib/L9963E_lib/src/L9963E_drv.c **** #include "L9963E_drv.h"
+  13:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  14:Lib/L9963E_lib/src/L9963E_drv.c **** #include <stddef.h>
+  15:Lib/L9963E_lib/src/L9963E_drv.c **** #include <string.h>
+  16:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  17:Lib/L9963E_lib/src/L9963E_drv.c **** #define WORD_LEN           40UL
+  18:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_LEN            6UL
+  19:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_POLY           (uint64_t)0x0000000000000059 /*L9963 CRC Poly:x^3+x^2+x+1*/
+  20:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_SEED           (uint64_t)0x0000000000000038
+  21:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_INIT_SEED_MASK (CRC_SEED << (WORD_LEN - CRC_LEN))
+  22:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_INIT_MASK      (CRC_POLY << (WORD_LEN - CRC_LEN - 1))
+  23:Lib/L9963E_lib/src/L9963E_drv.c **** #define FIRST_BIT_MASK     ((uint64_t)1 << (WORD_LEN - 1))  // 0x80000000
+  24:Lib/L9963E_lib/src/L9963E_drv.c **** #define CRC_LOWER_MASK     ((uint8_t)(1 << CRC_LEN) - 1)    //0b111
+  25:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  26:Lib/L9963E_lib/src/L9963E_drv.c **** uint8_t crc6_lut[64] = {0x0,  0x19, 0x32, 0x2b, 0x3d, 0x24, 0xf,  0x16, 0x23, 0x3a, 0x11, 0x8,  0x1
+  27:Lib/L9963E_lib/src/L9963E_drv.c ****                         0x1f, 0x6,  0x2d, 0x34, 0x22, 0x3b, 0x10, 0x9,  0x3c, 0x25, 0xe,  0x17, 0x1
+  28:Lib/L9963E_lib/src/L9963E_drv.c ****                         0x3e, 0x27, 0xc,  0x15, 0x3,  0x1a, 0x31, 0x28, 0x1d, 0x4,  0x2f, 0x36, 0x2
+  29:Lib/L9963E_lib/src/L9963E_drv.c ****                         0x21, 0x38, 0x13, 0xa,  0x1c, 0x5,  0x2e, 0x37, 0x2,  0x1b, 0x30, 0x29, 0x3
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 2
+
+
+  30:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  31:Lib/L9963E_lib/src/L9963E_drv.c **** uint8_t L9963E_DRV_crc_calc(uint64_t InputWord) {
+  30              		.loc 1 31 49 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 31 49 is_stmt 0 view .LVU1
+  35 0000 70B5     		push	{r4, r5, r6, lr}
+  36              		.cfi_def_cfa_offset 16
+  37              		.cfi_offset 4, -16
+  38              		.cfi_offset 5, -12
+  39              		.cfi_offset 6, -8
+  40              		.cfi_offset 14, -4
+  32:Lib/L9963E_lib/src/L9963E_drv.c ****     uint64_t TestBitMask;
+  41              		.loc 1 32 5 is_stmt 1 view .LVU2
+  33:Lib/L9963E_lib/src/L9963E_drv.c ****     uint64_t CRCMask;
+  42              		.loc 1 33 5 view .LVU3
+  34:Lib/L9963E_lib/src/L9963E_drv.c ****     uint8_t BitCount;
+  43              		.loc 1 34 5 view .LVU4
+  35:Lib/L9963E_lib/src/L9963E_drv.c ****     uint8_t crc = 0;
+  44              		.loc 1 35 5 view .LVU5
+  45              	.LVL1:
+  36:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  37:Lib/L9963E_lib/src/L9963E_drv.c ****     InputWord = (InputWord & 0xFFFFFFFFC0) ^ CRC_INIT_SEED_MASK; /* Clear the CRC bit in the data f
+  46              		.loc 1 37 5 view .LVU6
+  47              		.loc 1 37 28 is_stmt 0 view .LVU7
+  48 0002 C9B2     		uxtb	r1, r1
+  49              		.loc 1 37 15 view .LVU8
+  50 0004 20F03F04 		bic	r4, r0, #63
+  51 0008 81F0E001 		eor	r1, r1, #224
+  52              	.LVL2:
+  38:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  39:Lib/L9963E_lib/src/L9963E_drv.c ****     // first 4 bit executed as standard crc (shift and xor)
+  40:Lib/L9963E_lib/src/L9963E_drv.c ****     // in order to reach a multiple of CRC_LEN data length
+  41:Lib/L9963E_lib/src/L9963E_drv.c ****     TestBitMask = FIRST_BIT_MASK;
+  53              		.loc 1 41 5 is_stmt 1 view .LVU9
+  42:Lib/L9963E_lib/src/L9963E_drv.c ****     CRCMask     = CRC_INIT_MASK;  // 1111 <<
+  54              		.loc 1 42 5 view .LVU10
+  43:Lib/L9963E_lib/src/L9963E_drv.c ****     BitCount    = WORD_LEN % CRC_LEN;
+  55              		.loc 1 43 5 view .LVU11
+  44:Lib/L9963E_lib/src/L9963E_drv.c ****     while (0 != BitCount--) {
+  56              		.loc 1 44 5 view .LVU12
+  43:Lib/L9963E_lib/src/L9963E_drv.c ****     BitCount    = WORD_LEN % CRC_LEN;
+  57              		.loc 1 43 17 is_stmt 0 view .LVU13
+  58 000c 0420     		movs	r0, #4
+  42:Lib/L9963E_lib/src/L9963E_drv.c ****     CRCMask     = CRC_INIT_MASK;  // 1111 <<
+  59              		.loc 1 42 17 view .LVU14
+  60 000e 4FF0000C 		mov	ip, #0
+  61 0012 B226     		movs	r6, #178
+  41:Lib/L9963E_lib/src/L9963E_drv.c ****     CRCMask     = CRC_INIT_MASK;  // 1111 <<
+  62              		.loc 1 41 17 view .LVU15
+  63 0014 6346     		mov	r3, ip
+  64 0016 8025     		movs	r5, #128
+  65              		.loc 1 44 11 view .LVU16
+  66 0018 09E0     		b	.L2
+  67              	.LVL3:
+  68              	.L3:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 3
+
+
+  45:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  46:Lib/L9963E_lib/src/L9963E_drv.c ****             InputWord ^= CRCMask;
+  47:Lib/L9963E_lib/src/L9963E_drv.c ****         } /* endif */
+  48:Lib/L9963E_lib/src/L9963E_drv.c ****         CRCMask >>= 1;
+  69              		.loc 1 48 9 is_stmt 1 view .LVU17
+  70              		.loc 1 48 17 is_stmt 0 view .LVU18
+  71 001a 4FEA5C0C 		lsr	ip, ip, #1
+  72              	.LVL4:
+  73              		.loc 1 48 17 view .LVU19
+  74 001e 4CEAC67C 		orr	ip, ip, r6, lsl #31
+  75 0022 7608     		lsrs	r6, r6, #1
+  76              	.LVL5:
+  49:Lib/L9963E_lib/src/L9963E_drv.c ****         TestBitMask >>= 1;
+  77              		.loc 1 49 9 is_stmt 1 view .LVU20
+  78              		.loc 1 49 21 is_stmt 0 view .LVU21
+  79 0024 5B08     		lsrs	r3, r3, #1
+  80              	.LVL6:
+  81              		.loc 1 49 21 view .LVU22
+  82 0026 43EAC573 		orr	r3, r3, r5, lsl #31
+  83 002a 6D08     		lsrs	r5, r5, #1
+  84              	.LVL7:
+  44:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  85              		.loc 1 44 25 view .LVU23
+  86 002c 7046     		mov	r0, lr
+  87              	.LVL8:
+  88              	.L2:
+  44:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  89              		.loc 1 44 14 is_stmt 1 view .LVU24
+  44:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  90              		.loc 1 44 25 is_stmt 0 view .LVU25
+  91 002e 421E     		subs	r2, r0, #1
+  92 0030 5FFA82FE 		uxtb	lr, r2
+  93              	.LVL9:
+  44:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  94              		.loc 1 44 14 view .LVU26
+  95 0034 48B1     		cbz	r0, .L8
+  45:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  96              		.loc 1 45 9 is_stmt 1 view .LVU27
+  45:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+  97              		.loc 1 45 29 is_stmt 0 view .LVU28
+  98 0036 04EA0302 		and	r2, r4, r3
+  99 003a 01EA0500 		and	r0, r1, r5
+  45:Lib/L9963E_lib/src/L9963E_drv.c ****         if (0 != (InputWord & TestBitMask)) {
+ 100              		.loc 1 45 12 view .LVU29
+ 101 003e 0243     		orrs	r2, r2, r0
+ 102 0040 EBD0     		beq	.L3
+  46:Lib/L9963E_lib/src/L9963E_drv.c ****         } /* endif */
+ 103              		.loc 1 46 13 is_stmt 1 view .LVU30
+  46:Lib/L9963E_lib/src/L9963E_drv.c ****         } /* endif */
+ 104              		.loc 1 46 23 is_stmt 0 view .LVU31
+ 105 0042 84EA0C04 		eor	r4, r4, ip
+ 106              	.LVL10:
+  46:Lib/L9963E_lib/src/L9963E_drv.c ****         } /* endif */
+ 107              		.loc 1 46 23 view .LVU32
+ 108 0046 7140     		eors	r1, r1, r6
+ 109 0048 E7E7     		b	.L3
+ 110              	.LVL11:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 4
+
+
+ 111              	.L8:
+ 112              	.LBB2:
+  50:Lib/L9963E_lib/src/L9963E_drv.c ****     } /* endwhile */
+  51:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  52:Lib/L9963E_lib/src/L9963E_drv.c ****     // then proceed with a lut-based calculation
+  53:Lib/L9963E_lib/src/L9963E_drv.c ****     for (int8_t i = WORD_LEN - (WORD_LEN % CRC_LEN) - CRC_LEN; i > 0; i -= CRC_LEN) {
+ 113              		.loc 1 53 17 view .LVU33
+ 114 004a 1E22     		movs	r2, #30
+ 115 004c 14E0     		b	.L5
+ 116              	.LVL12:
+ 117              	.L6:
+  54:Lib/L9963E_lib/src/L9963E_drv.c ****         crc = crc6_lut[((InputWord >> i) & 0b111111) ^ crc];
+ 118              		.loc 1 54 9 is_stmt 1 view .LVU34
+ 119              		.loc 1 54 36 is_stmt 0 view .LVU35
+ 120 004e C2F1200E 		rsb	lr, r2, #32
+ 121 0052 A2F1200C 		sub	ip, r2, #32
+ 122 0056 24FA02F3 		lsr	r3, r4, r2
+ 123 005a 01FA0EFE 		lsl	lr, r1, lr
+ 124 005e 43EA0E03 		orr	r3, r3, lr
+ 125 0062 21FA0CFC 		lsr	ip, r1, ip
+ 126 0066 43EA0C03 		orr	r3, r3, ip
+ 127              		.loc 1 54 42 view .LVU36
+ 128 006a 03F03F03 		and	r3, r3, #63
+ 129              		.loc 1 54 54 view .LVU37
+ 130 006e 4340     		eors	r3, r3, r0
+ 131              		.loc 1 54 13 view .LVU38
+ 132 0070 0348     		ldr	r0, .L9
+ 133              	.LVL13:
+ 134              		.loc 1 54 13 view .LVU39
+ 135 0072 C05C     		ldrb	r0, [r0, r3]	@ zero_extendqisi2
+ 136              	.LVL14:
+  53:Lib/L9963E_lib/src/L9963E_drv.c ****         crc = crc6_lut[((InputWord >> i) & 0b111111) ^ crc];
+ 137              		.loc 1 53 73 is_stmt 1 discriminator 3 view .LVU40
+ 138 0074 063A     		subs	r2, r2, #6
+ 139              	.LVL15:
+  53:Lib/L9963E_lib/src/L9963E_drv.c ****         crc = crc6_lut[((InputWord >> i) & 0b111111) ^ crc];
+ 140              		.loc 1 53 73 is_stmt 0 discriminator 3 view .LVU41
+ 141 0076 52B2     		sxtb	r2, r2
+ 142              	.LVL16:
+ 143              	.L5:
+  53:Lib/L9963E_lib/src/L9963E_drv.c ****         crc = crc6_lut[((InputWord >> i) & 0b111111) ^ crc];
+ 144              		.loc 1 53 66 is_stmt 1 discriminator 1 view .LVU42
+ 145 0078 002A     		cmp	r2, #0
+ 146 007a E8DC     		bgt	.L6
+ 147              	.LBE2:
+  55:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  56:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  57:Lib/L9963E_lib/src/L9963E_drv.c ****     return crc;
+ 148              		.loc 1 57 5 view .LVU43
+  58:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 149              		.loc 1 58 1 is_stmt 0 view .LVU44
+ 150 007c 70BD     		pop	{r4, r5, r6, pc}
+ 151              	.LVL17:
+ 152              	.L10:
+ 153              		.loc 1 58 1 view .LVU45
+ 154 007e 00BF     		.align	2
+ 155              	.L9:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 5
+
+
+ 156 0080 00000000 		.word	crc6_lut
+ 157              		.cfi_endproc
+ 158              	.LFE0:
+ 160              		.section	.text.L9963E_DRV_init,"ax",%progbits
+ 161              		.align	1
+ 162              		.global	L9963E_DRV_init
+ 163              		.syntax unified
+ 164              		.thumb
+ 165              		.thumb_func
+ 167              	L9963E_DRV_init:
+ 168              	.LVL18:
+ 169              	.LFB1:
+  59:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  60:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_init(L9963E_DRV_HandleTypeDef *handle, L9963E_IfTypeDef interface) 
+ 170              		.loc 1 60 100 is_stmt 1 view -0
+ 171              		.cfi_startproc
+ 172              		@ args = 28, pretend = 16, frame = 0
+ 173              		@ frame_needed = 0, uses_anonymous_args = 0
+ 174              		.loc 1 60 100 is_stmt 0 view .LVU47
+ 175 0000 84B0     		sub	sp, sp, #16
+ 176              		.cfi_def_cfa_offset 16
+ 177 0002 38B5     		push	{r3, r4, r5, lr}
+ 178              		.cfi_def_cfa_offset 32
+ 179              		.cfi_offset 3, -32
+ 180              		.cfi_offset 4, -28
+ 181              		.cfi_offset 5, -24
+ 182              		.cfi_offset 14, -20
+ 183 0004 0DF1140C 		add	ip, sp, #20
+ 184 0008 8CE80E00 		stm	ip, {r1, r2, r3}
+  61:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+  62:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 185              		.loc 1 62 5 is_stmt 1 view .LVU48
+ 186              		.loc 1 62 8 is_stmt 0 view .LVU49
+ 187 000c 50B3     		cbz	r0, .L13
+ 188 000e 0446     		mov	r4, r0
+  63:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  64:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  65:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  66:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_GPIO_ReadPin == NULL) {
+ 189              		.loc 1 66 5 is_stmt 1 view .LVU50
+ 190              		.loc 1 66 8 is_stmt 0 view .LVU51
+ 191 0010 51B3     		cbz	r1, .L14
+  67:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  68:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  69:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  70:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_GPIO_WritePin == NULL) {
+ 192              		.loc 1 70 5 is_stmt 1 view .LVU52
+ 193              		.loc 1 70 18 is_stmt 0 view .LVU53
+ 194 0012 1546     		mov	r5, r2
+ 195              		.loc 1 70 8 view .LVU54
+ 196 0014 52B3     		cbz	r2, .L15
+  71:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  72:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  73:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  74:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_SPI_Receive == NULL) {
+ 197              		.loc 1 74 5 is_stmt 1 view .LVU55
+ 198              		.loc 1 74 18 is_stmt 0 view .LVU56
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 6
+
+
+ 199 0016 079B     		ldr	r3, [sp, #28]
+ 200              		.loc 1 74 8 view .LVU57
+ 201 0018 53B3     		cbz	r3, .L16
+  75:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  76:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  77:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  78:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_SPI_Transmit == NULL) {
+ 202              		.loc 1 78 5 is_stmt 1 view .LVU58
+ 203              		.loc 1 78 18 is_stmt 0 view .LVU59
+ 204 001a 089B     		ldr	r3, [sp, #32]
+ 205              		.loc 1 78 8 view .LVU60
+ 206 001c 53B3     		cbz	r3, .L17
+  79:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  80:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  81:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  82:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_GetTickMs == NULL) {
+ 207              		.loc 1 82 5 is_stmt 1 view .LVU61
+ 208              		.loc 1 82 18 is_stmt 0 view .LVU62
+ 209 001e 099B     		ldr	r3, [sp, #36]
+ 210              		.loc 1 82 8 view .LVU63
+ 211 0020 53B3     		cbz	r3, .L18
+  83:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  84:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  85:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  86:Lib/L9963E_lib/src/L9963E_drv.c ****     if (interface.L9963E_IF_DelayMs == NULL) {
+ 212              		.loc 1 86 5 is_stmt 1 view .LVU64
+ 213              		.loc 1 86 18 is_stmt 0 view .LVU65
+ 214 0022 0A9B     		ldr	r3, [sp, #40]
+ 215              		.loc 1 86 8 view .LVU66
+ 216 0024 53B3     		cbz	r3, .L19
+  87:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+  88:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+  89:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+  90:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  91:Lib/L9963E_lib/src/L9963E_drv.c ****     handle->interface = interface;
+ 217              		.loc 1 91 5 is_stmt 1 view .LVU67
+ 218              		.loc 1 91 23 is_stmt 0 view .LVU68
+ 219 0026 8446     		mov	ip, r0
+ 220 0028 0DF1140E 		add	lr, sp, #20
+ 221 002c BEE80F00 		ldmia	lr!, {r0, r1, r2, r3}
+ 222              	.LVL19:
+ 223              		.loc 1 91 23 view .LVU69
+ 224 0030 ACE80F00 		stmia	ip!, {r0, r1, r2, r3}
+ 225 0034 9EE80300 		ldm	lr, {r0, r1}
+ 226 0038 8CE80300 		stm	ip, {r0, r1}
+  92:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  93:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_CS_HIGH(handle);
+ 227              		.loc 1 93 5 is_stmt 1 view .LVU70
+ 228 003c 0121     		movs	r1, #1
+ 229 003e 0020     		movs	r0, #0
+ 230 0040 A847     		blx	r5
+ 231              	.LVL20:
+  94:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_TXEN_HIGH(handle);
+ 232              		.loc 1 94 5 view .LVU71
+ 233 0042 6368     		ldr	r3, [r4, #4]
+ 234 0044 0121     		movs	r1, #1
+ 235 0046 0846     		mov	r0, r1
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 7
+
+
+ 236 0048 9847     		blx	r3
+ 237              	.LVL21:
+  95:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_ISOFREQ_LOW(handle);
+ 238              		.loc 1 95 5 view .LVU72
+ 239 004a 6368     		ldr	r3, [r4, #4]
+ 240 004c 0021     		movs	r1, #0
+ 241 004e 0320     		movs	r0, #3
+ 242 0050 9847     		blx	r3
+ 243              	.LVL22:
+  96:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_DIS_LOW(handle);
+ 244              		.loc 1 96 5 view .LVU73
+ 245 0052 6368     		ldr	r3, [r4, #4]
+ 246 0054 0021     		movs	r1, #0
+ 247 0056 0420     		movs	r0, #4
+ 248 0058 9847     		blx	r3
+ 249              	.LVL23:
+  97:Lib/L9963E_lib/src/L9963E_drv.c **** 
+  98:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_OK;
+ 250              		.loc 1 98 5 view .LVU74
+ 251              		.loc 1 98 12 is_stmt 0 view .LVU75
+ 252 005a 0020     		movs	r0, #0
+ 253              	.LVL24:
+ 254              	.L12:
+  99:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 255              		.loc 1 99 1 view .LVU76
+ 256 005c BDE83840 		pop	{r3, r4, r5, lr}
+ 257              		.cfi_remember_state
+ 258              		.cfi_restore 14
+ 259              		.cfi_restore 5
+ 260              		.cfi_restore 4
+ 261              		.cfi_restore 3
+ 262              		.cfi_def_cfa_offset 16
+ 263 0060 04B0     		add	sp, sp, #16
+ 264              		.cfi_def_cfa_offset 0
+ 265 0062 7047     		bx	lr
+ 266              	.LVL25:
+ 267              	.L13:
+ 268              		.cfi_restore_state
+  63:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 269              		.loc 1 63 16 view .LVU77
+ 270 0064 0120     		movs	r0, #1
+ 271              	.LVL26:
+  63:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 272              		.loc 1 63 16 view .LVU78
+ 273 0066 F9E7     		b	.L12
+ 274              	.LVL27:
+ 275              	.L14:
+  67:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 276              		.loc 1 67 16 view .LVU79
+ 277 0068 0120     		movs	r0, #1
+ 278              	.LVL28:
+  67:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 279              		.loc 1 67 16 view .LVU80
+ 280 006a F7E7     		b	.L12
+ 281              	.LVL29:
+ 282              	.L15:
+  71:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 8
+
+
+ 283              		.loc 1 71 16 view .LVU81
+ 284 006c 0120     		movs	r0, #1
+ 285              	.LVL30:
+  71:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 286              		.loc 1 71 16 view .LVU82
+ 287 006e F5E7     		b	.L12
+ 288              	.LVL31:
+ 289              	.L16:
+  75:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 290              		.loc 1 75 16 view .LVU83
+ 291 0070 0120     		movs	r0, #1
+ 292              	.LVL32:
+  75:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 293              		.loc 1 75 16 view .LVU84
+ 294 0072 F3E7     		b	.L12
+ 295              	.LVL33:
+ 296              	.L17:
+  79:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 297              		.loc 1 79 16 view .LVU85
+ 298 0074 0120     		movs	r0, #1
+ 299              	.LVL34:
+  79:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 300              		.loc 1 79 16 view .LVU86
+ 301 0076 F1E7     		b	.L12
+ 302              	.LVL35:
+ 303              	.L18:
+  83:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 304              		.loc 1 83 16 view .LVU87
+ 305 0078 0120     		movs	r0, #1
+ 306              	.LVL36:
+  83:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 307              		.loc 1 83 16 view .LVU88
+ 308 007a EFE7     		b	.L12
+ 309              	.LVL37:
+ 310              	.L19:
+  87:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 311              		.loc 1 87 16 view .LVU89
+ 312 007c 0120     		movs	r0, #1
+ 313              	.LVL38:
+  87:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 314              		.loc 1 87 16 view .LVU90
+ 315 007e EDE7     		b	.L12
+ 316              		.cfi_endproc
+ 317              	.LFE1:
+ 319              		.section	.text.L9963E_DRV_wakeup,"ax",%progbits
+ 320              		.align	1
+ 321              		.global	L9963E_DRV_wakeup
+ 322              		.syntax unified
+ 323              		.thumb
+ 324              		.thumb_func
+ 326              	L9963E_DRV_wakeup:
+ 327              	.LVL39:
+ 328              	.LFB2:
+ 100:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 101:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_wakeup(L9963E_DRV_HandleTypeDef *handle) {
+ 329              		.loc 1 101 74 is_stmt 1 view -0
+ 330              		.cfi_startproc
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 9
+
+
+ 331              		@ args = 0, pretend = 0, frame = 0
+ 332              		@ frame_needed = 0, uses_anonymous_args = 0
+ 333              		.loc 1 101 74 is_stmt 0 view .LVU92
+ 334 0000 38B5     		push	{r3, r4, r5, lr}
+ 335              		.cfi_def_cfa_offset 16
+ 336              		.cfi_offset 3, -16
+ 337              		.cfi_offset 4, -12
+ 338              		.cfi_offset 5, -8
+ 339              		.cfi_offset 14, -4
+ 102:Lib/L9963E_lib/src/L9963E_drv.c ****     static const uint8_t dummy[5]  = {0x55, 0x55, 0x55, 0x55, 0x55};
+ 340              		.loc 1 102 5 is_stmt 1 view .LVU93
+ 103:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_StatusTypeDef errorcode = L9963E_OK;
+ 341              		.loc 1 103 5 view .LVU94
+ 342              	.LVL40:
+ 104:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 105:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 106:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 343              		.loc 1 106 5 view .LVU95
+ 344              		.loc 1 106 8 is_stmt 0 view .LVU96
+ 345 0002 80B1     		cbz	r0, .L23
+ 346 0004 0546     		mov	r5, r0
+ 107:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 108:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 109:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 110:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 111:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_CS_LOW(handle);
+ 347              		.loc 1 111 5 is_stmt 1 view .LVU97
+ 348 0006 4368     		ldr	r3, [r0, #4]
+ 349 0008 0021     		movs	r1, #0
+ 350 000a 0846     		mov	r0, r1
+ 351              	.LVL41:
+ 352              		.loc 1 111 5 is_stmt 0 view .LVU98
+ 353 000c 9847     		blx	r3
+ 354              	.LVL42:
+ 112:Lib/L9963E_lib/src/L9963E_drv.c ****     errorcode = L9963E_DRV_SPI_RECEIVE(handle, (uint8_t *)dummy, sizeof(dummy), 10);
+ 355              		.loc 1 112 5 is_stmt 1 view .LVU99
+ 356              		.loc 1 112 17 is_stmt 0 view .LVU100
+ 357 000e AB68     		ldr	r3, [r5, #8]
+ 358 0010 0A22     		movs	r2, #10
+ 359 0012 0521     		movs	r1, #5
+ 360 0014 0548     		ldr	r0, .L25
+ 361 0016 9847     		blx	r3
+ 362              	.LVL43:
+ 363 0018 0446     		mov	r4, r0
+ 364              	.LVL44:
+ 113:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_CS_HIGH(handle);
+ 365              		.loc 1 113 5 is_stmt 1 view .LVU101
+ 366 001a 6B68     		ldr	r3, [r5, #4]
+ 367 001c 0121     		movs	r1, #1
+ 368 001e 0020     		movs	r0, #0
+ 369 0020 9847     		blx	r3
+ 370              	.LVL45:
+ 114:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 115:Lib/L9963E_lib/src/L9963E_drv.c ****     return errorcode;
+ 371              		.loc 1 115 5 view .LVU102
+ 372              	.L22:
+ 116:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 10
+
+
+ 373              		.loc 1 116 1 is_stmt 0 view .LVU103
+ 374 0022 2046     		mov	r0, r4
+ 375 0024 38BD     		pop	{r3, r4, r5, pc}
+ 376              	.LVL46:
+ 377              	.L23:
+ 107:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 378              		.loc 1 107 16 view .LVU104
+ 379 0026 0124     		movs	r4, #1
+ 380 0028 FBE7     		b	.L22
+ 381              	.L26:
+ 382 002a 00BF     		.align	2
+ 383              	.L25:
+ 384 002c 00000000 		.word	dummy.0
+ 385              		.cfi_endproc
+ 386              	.LFE2:
+ 388              		.section	.text._L9963E_DRV_switch_endianness,"ax",%progbits
+ 389              		.align	1
+ 390              		.global	_L9963E_DRV_switch_endianness
+ 391              		.syntax unified
+ 392              		.thumb
+ 393              		.thumb_func
+ 395              	_L9963E_DRV_switch_endianness:
+ 396              	.LVL47:
+ 397              	.LFB3:
+ 117:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 118:Lib/L9963E_lib/src/L9963E_drv.c **** void _L9963E_DRV_switch_endianness(uint8_t *in, uint8_t *out) {
+ 398              		.loc 1 118 63 is_stmt 1 view -0
+ 399              		.cfi_startproc
+ 400              		@ args = 0, pretend = 0, frame = 0
+ 401              		@ frame_needed = 0, uses_anonymous_args = 0
+ 402              		@ link register save eliminated.
+ 119:Lib/L9963E_lib/src/L9963E_drv.c ****     out[0] = in[4];
+ 403              		.loc 1 119 5 view .LVU106
+ 404              		.loc 1 119 12 is_stmt 0 view .LVU107
+ 405 0000 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 406 0002 0B70     		strb	r3, [r1]
+ 120:Lib/L9963E_lib/src/L9963E_drv.c ****     out[1] = in[3];
+ 407              		.loc 1 120 5 is_stmt 1 view .LVU108
+ 408              		.loc 1 120 12 is_stmt 0 view .LVU109
+ 409 0004 C378     		ldrb	r3, [r0, #3]	@ zero_extendqisi2
+ 410 0006 4B70     		strb	r3, [r1, #1]
+ 121:Lib/L9963E_lib/src/L9963E_drv.c ****     out[2] = in[2];
+ 411              		.loc 1 121 5 is_stmt 1 view .LVU110
+ 412              		.loc 1 121 12 is_stmt 0 view .LVU111
+ 413 0008 8378     		ldrb	r3, [r0, #2]	@ zero_extendqisi2
+ 414 000a 8B70     		strb	r3, [r1, #2]
+ 122:Lib/L9963E_lib/src/L9963E_drv.c ****     out[3] = in[1];
+ 415              		.loc 1 122 5 is_stmt 1 view .LVU112
+ 416              		.loc 1 122 12 is_stmt 0 view .LVU113
+ 417 000c 4378     		ldrb	r3, [r0, #1]	@ zero_extendqisi2
+ 418 000e CB70     		strb	r3, [r1, #3]
+ 123:Lib/L9963E_lib/src/L9963E_drv.c ****     out[4] = in[0];
+ 419              		.loc 1 123 5 is_stmt 1 view .LVU114
+ 420              		.loc 1 123 16 is_stmt 0 view .LVU115
+ 421 0010 0378     		ldrb	r3, [r0]	@ zero_extendqisi2
+ 422              		.loc 1 123 12 view .LVU116
+ 423 0012 0B71     		strb	r3, [r1, #4]
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 11
+
+
+ 124:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 125:Lib/L9963E_lib/src/L9963E_drv.c ****     return;
+ 424              		.loc 1 125 5 is_stmt 1 view .LVU117
+ 126:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 425              		.loc 1 126 1 is_stmt 0 view .LVU118
+ 426 0014 7047     		bx	lr
+ 427              		.cfi_endproc
+ 428              	.LFE3:
+ 430              		.section	.text._L9963E_DRV_build_frame,"ax",%progbits
+ 431              		.align	1
+ 432              		.global	_L9963E_DRV_build_frame
+ 433              		.syntax unified
+ 434              		.thumb
+ 435              		.thumb_func
+ 437              	_L9963E_DRV_build_frame:
+ 438              	.LVL48:
+ 439              	.LFB4:
+ 127:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 128:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef _L9963E_DRV_build_frame(uint8_t *out,
+ 129:Lib/L9963E_lib/src/L9963E_drv.c ****                                              uint8_t pa,
+ 130:Lib/L9963E_lib/src/L9963E_drv.c ****                                              uint8_t rw_burst,
+ 131:Lib/L9963E_lib/src/L9963E_drv.c ****                                              uint8_t devid,
+ 132:Lib/L9963E_lib/src/L9963E_drv.c ****                                              uint8_t addr_command,
+ 133:Lib/L9963E_lib/src/L9963E_drv.c ****                                              uint32_t data) {
+ 440              		.loc 1 133 61 is_stmt 1 view -0
+ 441              		.cfi_startproc
+ 442              		@ args = 8, pretend = 0, frame = 8
+ 443              		@ frame_needed = 0, uses_anonymous_args = 0
+ 444              		.loc 1 133 61 is_stmt 0 view .LVU120
+ 445 0000 10B5     		push	{r4, lr}
+ 446              		.cfi_def_cfa_offset 8
+ 447              		.cfi_offset 4, -8
+ 448              		.cfi_offset 14, -4
+ 449 0002 82B0     		sub	sp, sp, #8
+ 450              		.cfi_def_cfa_offset 16
+ 451 0004 0446     		mov	r4, r0
+ 452 0006 9DF810C0 		ldrb	ip, [sp, #16]	@ zero_extendqisi2
+ 134:Lib/L9963E_lib/src/L9963E_drv.c ****     union L9963E_DRV_FrameUnion frame;
+ 453              		.loc 1 134 5 is_stmt 1 view .LVU121
+ 135:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.pa       = pa;
+ 454              		.loc 1 135 5 view .LVU122
+ 455              		.loc 1 135 24 is_stmt 0 view .LVU123
+ 456 000a 9DF80400 		ldrb	r0, [sp, #4]	@ zero_extendqisi2
+ 457              	.LVL49:
+ 458              		.loc 1 135 24 view .LVU124
+ 459 000e 61F3C710 		bfi	r0, r1, #7, #1
+ 460 0012 8DF80400 		strb	r0, [sp, #4]
+ 136:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.rw_burst = rw_burst;
+ 461              		.loc 1 136 5 is_stmt 1 view .LVU125
+ 462              		.loc 1 136 24 is_stmt 0 view .LVU126
+ 463 0016 C1B2     		uxtb	r1, r0
+ 464              	.LVL50:
+ 465              		.loc 1 136 24 view .LVU127
+ 466 0018 62F38611 		bfi	r1, r2, #6, #1
+ 467 001c 8DF80410 		strb	r1, [sp, #4]
+ 137:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.devid    = devid;
+ 468              		.loc 1 137 5 is_stmt 1 view .LVU128
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 12
+
+
+ 469              		.loc 1 137 24 is_stmt 0 view .LVU129
+ 470 0020 CAB2     		uxtb	r2, r1
+ 471              	.LVL51:
+ 472              		.loc 1 137 24 view .LVU130
+ 473 0022 63F34502 		bfi	r2, r3, #1, #5
+ 474 0026 8DF80420 		strb	r2, [sp, #4]
+ 138:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.addr     = addr_command;
+ 475              		.loc 1 138 5 is_stmt 1 view .LVU131
+ 476              		.loc 1 138 24 is_stmt 0 view .LVU132
+ 477 002a 0CF03F02 		and	r2, ip, #63
+ 478 002e 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 479              	.LVL52:
+ 480              		.loc 1 138 24 view .LVU133
+ 481 0032 03F00303 		and	r3, r3, #3
+ 482 0036 43EA8203 		orr	r3, r3, r2, lsl #2
+ 483 003a 8DF80330 		strb	r3, [sp, #3]
+ 484 003e CCF3801C 		ubfx	ip, ip, #6, #1
+ 485 0042 9DF80430 		ldrb	r3, [sp, #4]	@ zero_extendqisi2
+ 486 0046 23F00103 		bic	r3, r3, #1
+ 487 004a 43EA0C03 		orr	r3, r3, ip
+ 488 004e 8DF80430 		strb	r3, [sp, #4]
+ 139:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.data     = data;
+ 489              		.loc 1 139 5 is_stmt 1 view .LVU134
+ 490              		.loc 1 139 24 is_stmt 0 view .LVU135
+ 491 0052 009B     		ldr	r3, [sp]
+ 492 0054 059A     		ldr	r2, [sp, #20]
+ 493 0056 62F39713 		bfi	r3, r2, #6, #18
+ 494              	.LVL53:
+ 495              		.loc 1 139 24 view .LVU136
+ 496 005a 0093     		str	r3, [sp]
+ 140:Lib/L9963E_lib/src/L9963E_drv.c ****     frame.cmd.crc      = L9963E_DRV_crc_calc(frame.val);
+ 497              		.loc 1 140 5 is_stmt 1 view .LVU137
+ 498              		.loc 1 140 26 is_stmt 0 view .LVU138
+ 499 005c DDE90001 		ldrd	r0, [sp]
+ 500 0060 FFF7FEFF 		bl	L9963E_DRV_crc_calc
+ 501              	.LVL54:
+ 502              		.loc 1 140 24 discriminator 1 view .LVU139
+ 503 0064 9DF80030 		ldrb	r3, [sp]	@ zero_extendqisi2
+ 504 0068 60F30503 		bfi	r3, r0, #0, #6
+ 505 006c 8DF80030 		strb	r3, [sp]
+ 141:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 142:Lib/L9963E_lib/src/L9963E_drv.c ****     _L9963E_DRV_switch_endianness((uint8_t *)&frame.val, out);
+ 506              		.loc 1 142 5 is_stmt 1 view .LVU140
+ 507 0070 2146     		mov	r1, r4
+ 508 0072 6846     		mov	r0, sp
+ 509 0074 FFF7FEFF 		bl	_L9963E_DRV_switch_endianness
+ 510              	.LVL55:
+ 143:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 144:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_OK;
+ 511              		.loc 1 144 5 view .LVU141
+ 145:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 512              		.loc 1 145 1 is_stmt 0 view .LVU142
+ 513 0078 0020     		movs	r0, #0
+ 514 007a 02B0     		add	sp, sp, #8
+ 515              		.cfi_def_cfa_offset 8
+ 516              		@ sp needed
+ 517 007c 10BD     		pop	{r4, pc}
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 13
+
+
+ 518              		.loc 1 145 1 view .LVU143
+ 519              		.cfi_endproc
+ 520              	.LFE4:
+ 522              		.section	.text._L9963E_DRV_spi_transmit,"ax",%progbits
+ 523              		.align	1
+ 524              		.global	_L9963E_DRV_spi_transmit
+ 525              		.syntax unified
+ 526              		.thumb
+ 527              		.thumb_func
+ 529              	_L9963E_DRV_spi_transmit:
+ 530              	.LVL56:
+ 531              	.LFB5:
+ 146:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 147:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef _L9963E_DRV_spi_transmit(L9963E_DRV_HandleTypeDef *handle,
+ 148:Lib/L9963E_lib/src/L9963E_drv.c ****                                               uint8_t *data,
+ 149:Lib/L9963E_lib/src/L9963E_drv.c ****                                               uint8_t len,
+ 150:Lib/L9963E_lib/src/L9963E_drv.c ****                                               uint8_t timeout) {
+ 532              		.loc 1 150 64 is_stmt 1 view -0
+ 533              		.cfi_startproc
+ 534              		@ args = 0, pretend = 0, frame = 0
+ 535              		@ frame_needed = 0, uses_anonymous_args = 0
+ 536              		.loc 1 150 64 is_stmt 0 view .LVU145
+ 537 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 538              		.cfi_def_cfa_offset 24
+ 539              		.cfi_offset 3, -24
+ 540              		.cfi_offset 4, -20
+ 541              		.cfi_offset 5, -16
+ 542              		.cfi_offset 6, -12
+ 543              		.cfi_offset 7, -8
+ 544              		.cfi_offset 14, -4
+ 545 0002 0446     		mov	r4, r0
+ 546 0004 0D46     		mov	r5, r1
+ 547 0006 1646     		mov	r6, r2
+ 548 0008 1F46     		mov	r7, r3
+ 151:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_StatusTypeDef errorcode = L9963E_OK;
+ 549              		.loc 1 151 5 is_stmt 1 view .LVU146
+ 550              	.LVL57:
+ 152:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 153:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_TXEN_HIGH(handle);
+ 551              		.loc 1 153 5 view .LVU147
+ 552 000a 4368     		ldr	r3, [r0, #4]
+ 553              	.LVL58:
+ 554              		.loc 1 153 5 is_stmt 0 view .LVU148
+ 555 000c 0121     		movs	r1, #1
+ 556              	.LVL59:
+ 557              		.loc 1 153 5 view .LVU149
+ 558 000e 0846     		mov	r0, r1
+ 559              	.LVL60:
+ 560              		.loc 1 153 5 view .LVU150
+ 561 0010 9847     		blx	r3
+ 562              	.LVL61:
+ 154:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_CS_LOW(handle);
+ 563              		.loc 1 154 5 is_stmt 1 view .LVU151
+ 564 0012 6368     		ldr	r3, [r4, #4]
+ 565 0014 0021     		movs	r1, #0
+ 566 0016 0846     		mov	r0, r1
+ 567 0018 9847     		blx	r3
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 14
+
+
+ 568              	.LVL62:
+ 155:Lib/L9963E_lib/src/L9963E_drv.c ****     errorcode = L9963E_DRV_SPI_TRANSMIT(handle, data, len, timeout);
+ 569              		.loc 1 155 5 view .LVU152
+ 570              		.loc 1 155 17 is_stmt 0 view .LVU153
+ 571 001a E368     		ldr	r3, [r4, #12]
+ 572 001c 3A46     		mov	r2, r7
+ 573 001e 3146     		mov	r1, r6
+ 574 0020 2846     		mov	r0, r5
+ 575 0022 9847     		blx	r3
+ 576              	.LVL63:
+ 577 0024 0546     		mov	r5, r0
+ 578              	.LVL64:
+ 156:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_TXEN_LOW(handle);
+ 579              		.loc 1 156 5 is_stmt 1 view .LVU154
+ 580 0026 6368     		ldr	r3, [r4, #4]
+ 581 0028 0021     		movs	r1, #0
+ 582 002a 0120     		movs	r0, #1
+ 583 002c 9847     		blx	r3
+ 584              	.LVL65:
+ 157:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_CS_HIGH(handle);
+ 585              		.loc 1 157 5 view .LVU155
+ 586 002e 6368     		ldr	r3, [r4, #4]
+ 587 0030 0121     		movs	r1, #1
+ 588 0032 0020     		movs	r0, #0
+ 589 0034 9847     		blx	r3
+ 590              	.LVL66:
+ 158:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 159:Lib/L9963E_lib/src/L9963E_drv.c ****     return errorcode;
+ 591              		.loc 1 159 5 view .LVU156
+ 160:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 592              		.loc 1 160 1 is_stmt 0 view .LVU157
+ 593 0036 2846     		mov	r0, r5
+ 594 0038 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 595              		.loc 1 160 1 view .LVU158
+ 596              		.cfi_endproc
+ 597              	.LFE5:
+ 599              		.section	.text._L9963E_DRV_wait_and_receive,"ax",%progbits
+ 600              		.align	1
+ 601              		.global	_L9963E_DRV_wait_and_receive
+ 602              		.syntax unified
+ 603              		.thumb
+ 604              		.thumb_func
+ 606              	_L9963E_DRV_wait_and_receive:
+ 607              	.LVL67:
+ 608              	.LFB6:
+ 161:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 162:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef _L9963E_DRV_wait_and_receive(union L9963E_DRV_FrameUnion *frame,
+ 163:Lib/L9963E_lib/src/L9963E_drv.c ****                                                   L9963E_DRV_HandleTypeDef *handle,
+ 164:Lib/L9963E_lib/src/L9963E_drv.c ****                                                   uint8_t device,
+ 165:Lib/L9963E_lib/src/L9963E_drv.c ****                                                   uint32_t current_tick,
+ 166:Lib/L9963E_lib/src/L9963E_drv.c ****                                                   uint8_t timeout) {
+ 609              		.loc 1 166 68 is_stmt 1 view -0
+ 610              		.cfi_startproc
+ 611              		@ args = 4, pretend = 0, frame = 8
+ 612              		@ frame_needed = 0, uses_anonymous_args = 0
+ 613              		.loc 1 166 68 is_stmt 0 view .LVU160
+ 614 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 15
+
+
+ 615              		.cfi_def_cfa_offset 28
+ 616              		.cfi_offset 4, -28
+ 617              		.cfi_offset 5, -24
+ 618              		.cfi_offset 6, -20
+ 619              		.cfi_offset 7, -16
+ 620              		.cfi_offset 8, -12
+ 621              		.cfi_offset 9, -8
+ 622              		.cfi_offset 14, -4
+ 623 0004 83B0     		sub	sp, sp, #12
+ 624              		.cfi_def_cfa_offset 40
+ 625 0006 0746     		mov	r7, r0
+ 626 0008 0C46     		mov	r4, r1
+ 627 000a 9046     		mov	r8, r2
+ 628 000c 1D46     		mov	r5, r3
+ 629 000e 9DF82860 		ldrb	r6, [sp, #40]	@ zero_extendqisi2
+ 167:Lib/L9963E_lib/src/L9963E_drv.c ****     uint8_t raw[5];
+ 630              		.loc 1 167 5 is_stmt 1 view .LVU161
+ 168:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_StatusTypeDef errorcode = L9963E_OK;
+ 631              		.loc 1 168 5 view .LVU162
+ 632              	.LVL68:
+ 169:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 170:Lib/L9963E_lib/src/L9963E_drv.c ****     frame->cmd.addr  = -1;
+ 633              		.loc 1 170 5 view .LVU163
+ 634              		.loc 1 170 22 is_stmt 0 view .LVU164
+ 635 0012 C378     		ldrb	r3, [r0, #3]	@ zero_extendqisi2
+ 636              	.LVL69:
+ 637              		.loc 1 170 22 view .LVU165
+ 638 0014 63F00303 		orn	r3, r3, #3
+ 639 0018 C370     		strb	r3, [r0, #3]
+ 640              	.LVL70:
+ 641              		.loc 1 170 22 view .LVU166
+ 642 001a 0379     		ldrb	r3, [r0, #4]	@ zero_extendqisi2
+ 643 001c 43F00103 		orr	r3, r3, #1
+ 644 0020 0371     		strb	r3, [r0, #4]
+ 171:Lib/L9963E_lib/src/L9963E_drv.c ****     frame->cmd.devid = -1;
+ 645              		.loc 1 171 5 is_stmt 1 view .LVU167
+ 646              		.loc 1 171 22 is_stmt 0 view .LVU168
+ 647 0022 DBB2     		uxtb	r3, r3
+ 648 0024 43F03E03 		orr	r3, r3, #62
+ 649 0028 0371     		strb	r3, [r0, #4]
+ 172:Lib/L9963E_lib/src/L9963E_drv.c ****     frame->cmd.data  = -1;
+ 650              		.loc 1 172 5 is_stmt 1 view .LVU169
+ 651              		.loc 1 172 22 is_stmt 0 view .LVU170
+ 652 002a 0368     		ldr	r3, [r0]
+ 653 002c 244A     		ldr	r2, .L41
+ 654              	.LVL71:
+ 655              		.loc 1 172 22 view .LVU171
+ 656 002e 62F39713 		bfi	r3, r2, #6, #18
+ 657 0032 0360     		str	r3, [r0]
+ 173:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 174:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_DRV_TXEN_LOW(handle);
+ 658              		.loc 1 174 5 is_stmt 1 view .LVU172
+ 659 0034 4B68     		ldr	r3, [r1, #4]
+ 660 0036 0021     		movs	r1, #0
+ 661              	.LVL72:
+ 662              		.loc 1 174 5 is_stmt 0 view .LVU173
+ 663 0038 0120     		movs	r0, #1
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 16
+
+
+ 664              	.LVL73:
+ 665              		.loc 1 174 5 view .LVU174
+ 666 003a 9847     		blx	r3
+ 667              	.LVL74:
+ 175:Lib/L9963E_lib/src/L9963E_drv.c ****     while (frame->cmd.devid != device) {
+ 668              		.loc 1 175 5 is_stmt 1 view .LVU175
+ 669              	.L33:
+ 670              		.loc 1 175 29 view .LVU176
+ 671              		.loc 1 175 22 is_stmt 0 view .LVU177
+ 672 003c 3B79     		ldrb	r3, [r7, #4]	@ zero_extendqisi2
+ 673 003e C3F34403 		ubfx	r3, r3, #1, #5
+ 674              		.loc 1 175 29 view .LVU178
+ 675 0042 4345     		cmp	r3, r8
+ 676 0044 38D0     		beq	.L39
+ 677              	.L34:
+ 176:Lib/L9963E_lib/src/L9963E_drv.c ****         while (L9963E_DRV_BNE_READ(handle) == L9963E_IF_GPIO_PIN_RESET) {
+ 678              		.loc 1 176 44 is_stmt 1 view .LVU179
+ 679              		.loc 1 176 16 is_stmt 0 view .LVU180
+ 680 0046 2368     		ldr	r3, [r4]
+ 681 0048 0220     		movs	r0, #2
+ 682 004a 9847     		blx	r3
+ 683              	.LVL75:
+ 684              		.loc 1 176 44 discriminator 1 view .LVU181
+ 685 004c 70B9     		cbnz	r0, .L40
+ 177:Lib/L9963E_lib/src/L9963E_drv.c ****             if (L9963E_DRV_GETTICK(handle) - current_tick >= timeout) {
+ 686              		.loc 1 177 13 is_stmt 1 view .LVU182
+ 687              		.loc 1 177 17 is_stmt 0 view .LVU183
+ 688 004e 2369     		ldr	r3, [r4, #16]
+ 689 0050 9847     		blx	r3
+ 690              	.LVL76:
+ 691              		.loc 1 177 44 discriminator 1 view .LVU184
+ 692 0052 401B     		subs	r0, r0, r5
+ 693              		.loc 1 177 16 discriminator 1 view .LVU185
+ 694 0054 B042     		cmp	r0, r6
+ 695 0056 F6D3     		bcc	.L34
+ 178:Lib/L9963E_lib/src/L9963E_drv.c ****                 L9963E_DRV_TXEN_HIGH(handle);
+ 696              		.loc 1 178 17 is_stmt 1 view .LVU186
+ 697 0058 6368     		ldr	r3, [r4, #4]
+ 698 005a 0121     		movs	r1, #1
+ 699 005c 0846     		mov	r0, r1
+ 700 005e 9847     		blx	r3
+ 701              	.LVL77:
+ 179:Lib/L9963E_lib/src/L9963E_drv.c ****                 return L9963E_TIMEOUT;
+ 702              		.loc 1 179 17 view .LVU187
+ 703              		.loc 1 179 24 is_stmt 0 view .LVU188
+ 704 0060 4FF00209 		mov	r9, #2
+ 705              	.L35:
+ 180:Lib/L9963E_lib/src/L9963E_drv.c ****             }
+ 181:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 182:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 183:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_CS_LOW(handle);
+ 184:Lib/L9963E_lib/src/L9963E_drv.c ****         errorcode = L9963E_DRV_SPI_RECEIVE(handle, raw, 5, 10);
+ 185:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_CS_HIGH(handle);
+ 186:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_TXEN_HIGH(handle);
+ 187:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 188:Lib/L9963E_lib/src/L9963E_drv.c ****         if (errorcode != L9963E_OK) {
+ 189:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 17
+
+
+ 190:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 191:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 192:Lib/L9963E_lib/src/L9963E_drv.c ****         _L9963E_DRV_switch_endianness(raw, (uint8_t *)&frame->val);
+ 193:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****         if (frame->cmd.crc != L9963E_DRV_crc_calc(frame->val)) {
+ 195:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 196:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 197:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 198:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 199:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_OK;
+ 200:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 706              		.loc 1 200 1 view .LVU189
+ 707 0064 4846     		mov	r0, r9
+ 708 0066 03B0     		add	sp, sp, #12
+ 709              		.cfi_remember_state
+ 710              		.cfi_def_cfa_offset 28
+ 711              		@ sp needed
+ 712 0068 BDE8F083 		pop	{r4, r5, r6, r7, r8, r9, pc}
+ 713              	.LVL78:
+ 714              	.L40:
+ 715              		.cfi_restore_state
+ 183:Lib/L9963E_lib/src/L9963E_drv.c ****         errorcode = L9963E_DRV_SPI_RECEIVE(handle, raw, 5, 10);
+ 716              		.loc 1 183 9 is_stmt 1 view .LVU190
+ 717 006c 6368     		ldr	r3, [r4, #4]
+ 718 006e 0021     		movs	r1, #0
+ 719 0070 0846     		mov	r0, r1
+ 720 0072 9847     		blx	r3
+ 721              	.LVL79:
+ 184:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_CS_HIGH(handle);
+ 722              		.loc 1 184 9 view .LVU191
+ 184:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_CS_HIGH(handle);
+ 723              		.loc 1 184 21 is_stmt 0 view .LVU192
+ 724 0074 A368     		ldr	r3, [r4, #8]
+ 725 0076 0A22     		movs	r2, #10
+ 726 0078 0521     		movs	r1, #5
+ 727 007a 6846     		mov	r0, sp
+ 728 007c 9847     		blx	r3
+ 729              	.LVL80:
+ 730 007e 8146     		mov	r9, r0
+ 731              	.LVL81:
+ 185:Lib/L9963E_lib/src/L9963E_drv.c ****         L9963E_DRV_TXEN_HIGH(handle);
+ 732              		.loc 1 185 9 is_stmt 1 view .LVU193
+ 733 0080 6368     		ldr	r3, [r4, #4]
+ 734 0082 0121     		movs	r1, #1
+ 735 0084 0020     		movs	r0, #0
+ 736 0086 9847     		blx	r3
+ 737              	.LVL82:
+ 186:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 738              		.loc 1 186 9 view .LVU194
+ 739 0088 6368     		ldr	r3, [r4, #4]
+ 740 008a 0121     		movs	r1, #1
+ 741 008c 0846     		mov	r0, r1
+ 742 008e 9847     		blx	r3
+ 743              	.LVL83:
+ 188:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ 744              		.loc 1 188 9 view .LVU195
+ 188:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 18
+
+
+ 745              		.loc 1 188 12 is_stmt 0 view .LVU196
+ 746 0090 B9F1000F 		cmp	r9, #0
+ 747 0094 E6D1     		bne	.L35
+ 192:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 748              		.loc 1 192 9 is_stmt 1 view .LVU197
+ 749 0096 3946     		mov	r1, r7
+ 750 0098 6846     		mov	r0, sp
+ 751 009a FFF7FEFF 		bl	_L9963E_DRV_switch_endianness
+ 752              	.LVL84:
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 753              		.loc 1 194 9 view .LVU198
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 754              		.loc 1 194 23 is_stmt 0 view .LVU199
+ 755 009e 97F80090 		ldrb	r9, [r7]	@ zero_extendqisi2
+ 756              	.LVL85:
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 757              		.loc 1 194 23 view .LVU200
+ 758 00a2 09F03F09 		and	r9, r9, #63
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 759              		.loc 1 194 31 view .LVU201
+ 760 00a6 D7E90001 		ldrd	r0, [r7]
+ 761 00aa FFF7FEFF 		bl	L9963E_DRV_crc_calc
+ 762              	.LVL86:
+ 194:Lib/L9963E_lib/src/L9963E_drv.c ****             return L9963E_CRC_ERROR;
+ 763              		.loc 1 194 12 discriminator 1 view .LVU202
+ 764 00ae 8145     		cmp	r9, r0
+ 765 00b0 C4D0     		beq	.L33
+ 195:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 766              		.loc 1 195 20 view .LVU203
+ 767 00b2 4FF00309 		mov	r9, #3
+ 768 00b6 D5E7     		b	.L35
+ 769              	.LVL87:
+ 770              	.L39:
+ 199:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 771              		.loc 1 199 12 view .LVU204
+ 772 00b8 4FF00009 		mov	r9, #0
+ 773 00bc D2E7     		b	.L35
+ 774              	.L42:
+ 775 00be 00BF     		.align	2
+ 776              	.L41:
+ 777 00c0 FFFF0300 		.word	262143
+ 778              		.cfi_endproc
+ 779              	.LFE6:
+ 781              		.section	.text.L9963E_DRV_burst_cmd,"ax",%progbits
+ 782              		.align	1
+ 783              		.global	L9963E_DRV_burst_cmd
+ 784              		.syntax unified
+ 785              		.thumb
+ 786              		.thumb_func
+ 788              	L9963E_DRV_burst_cmd:
+ 789              	.LVL88:
+ 790              	.LFB7:
+ 201:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 202:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_burst_cmd(L9963E_DRV_HandleTypeDef *handle,
+ 203:Lib/L9963E_lib/src/L9963E_drv.c ****                                           uint8_t device,
+ 204:Lib/L9963E_lib/src/L9963E_drv.c ****                                           L9963E_BurstCmdTypeDef command,
+ 205:Lib/L9963E_lib/src/L9963E_drv.c ****                                           L9963E_BurstUnionTypeDef *data,
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 19
+
+
+ 206:Lib/L9963E_lib/src/L9963E_drv.c ****                                           uint8_t expected_frames_n,
+ 207:Lib/L9963E_lib/src/L9963E_drv.c ****                                           uint8_t timeout) {
+ 791              		.loc 1 207 60 is_stmt 1 view -0
+ 792              		.cfi_startproc
+ 793              		@ args = 8, pretend = 0, frame = 24
+ 794              		@ frame_needed = 0, uses_anonymous_args = 0
+ 795              		.loc 1 207 60 is_stmt 0 view .LVU206
+ 796 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 797              		.cfi_def_cfa_offset 36
+ 798              		.cfi_offset 4, -36
+ 799              		.cfi_offset 5, -32
+ 800              		.cfi_offset 6, -28
+ 801              		.cfi_offset 7, -24
+ 802              		.cfi_offset 8, -20
+ 803              		.cfi_offset 9, -16
+ 804              		.cfi_offset 10, -12
+ 805              		.cfi_offset 11, -8
+ 806              		.cfi_offset 14, -4
+ 807 0004 89B0     		sub	sp, sp, #36
+ 808              		.cfi_def_cfa_offset 72
+ 809 0006 9DF84890 		ldrb	r9, [sp, #72]	@ zero_extendqisi2
+ 810 000a 9DF84CB0 		ldrb	fp, [sp, #76]	@ zero_extendqisi2
+ 208:Lib/L9963E_lib/src/L9963E_drv.c ****     union L9963E_DRV_FrameUnion frame;
+ 811              		.loc 1 208 5 is_stmt 1 view .LVU207
+ 209:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_StatusTypeDef errorcode = L9963E_OK;
+ 812              		.loc 1 209 5 view .LVU208
+ 813              	.LVL89:
+ 210:Lib/L9963E_lib/src/L9963E_drv.c ****     uint32_t current_tick;
+ 814              		.loc 1 210 5 view .LVU209
+ 211:Lib/L9963E_lib/src/L9963E_drv.c ****     uint8_t raw[5];
+ 815              		.loc 1 211 5 view .LVU210
+ 212:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 213:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 214:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 816              		.loc 1 214 5 view .LVU211
+ 817              		.loc 1 214 8 is_stmt 0 view .LVU212
+ 818 000e 0028     		cmp	r0, #0
+ 819 0010 4ED0     		beq	.L48
+ 820 0012 0E46     		mov	r6, r1
+ 821 0014 1746     		mov	r7, r2
+ 822 0016 1D46     		mov	r5, r3
+ 823 0018 8046     		mov	r8, r0
+ 215:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 216:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 217:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 218:Lib/L9963E_lib/src/L9963E_drv.c ****     if (data == NULL) {
+ 824              		.loc 1 218 5 is_stmt 1 view .LVU213
+ 825              		.loc 1 218 8 is_stmt 0 view .LVU214
+ 826 001a 002B     		cmp	r3, #0
+ 827 001c 4BD0     		beq	.L49
+ 219:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 220:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 221:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 222:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 223:Lib/L9963E_lib/src/L9963E_drv.c ****     _L9963E_DRV_build_frame(raw, 1, 0, device, command, 0);
+ 828              		.loc 1 223 5 is_stmt 1 view .LVU215
+ 829 001e 04AC     		add	r4, sp, #16
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 20
+
+
+ 830 0020 0022     		movs	r2, #0
+ 831              	.LVL90:
+ 832              		.loc 1 223 5 is_stmt 0 view .LVU216
+ 833 0022 0192     		str	r2, [sp, #4]
+ 834 0024 0097     		str	r7, [sp]
+ 835 0026 0B46     		mov	r3, r1
+ 836              	.LVL91:
+ 837              		.loc 1 223 5 view .LVU217
+ 838 0028 0121     		movs	r1, #1
+ 839              	.LVL92:
+ 840              		.loc 1 223 5 view .LVU218
+ 841 002a 2046     		mov	r0, r4
+ 842              	.LVL93:
+ 843              		.loc 1 223 5 view .LVU219
+ 844 002c FFF7FEFF 		bl	_L9963E_DRV_build_frame
+ 845              	.LVL94:
+ 224:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 225:Lib/L9963E_lib/src/L9963E_drv.c ****     errorcode = _L9963E_DRV_spi_transmit(handle, raw, 5, 10);
+ 846              		.loc 1 225 5 is_stmt 1 view .LVU220
+ 847              		.loc 1 225 17 is_stmt 0 view .LVU221
+ 848 0030 0A23     		movs	r3, #10
+ 849 0032 0522     		movs	r2, #5
+ 850 0034 2146     		mov	r1, r4
+ 851 0036 4046     		mov	r0, r8
+ 852 0038 FFF7FEFF 		bl	_L9963E_DRV_spi_transmit
+ 853              	.LVL95:
+ 226:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 227:Lib/L9963E_lib/src/L9963E_drv.c ****     if (errorcode != L9963E_OK) {
+ 854              		.loc 1 227 5 is_stmt 1 view .LVU222
+ 855              		.loc 1 227 8 is_stmt 0 view .LVU223
+ 856 003c 0446     		mov	r4, r0
+ 857 003e 0390     		str	r0, [sp, #12]
+ 858 0040 0028     		cmp	r0, #0
+ 859 0042 3AD1     		bne	.L44
+ 228:Lib/L9963E_lib/src/L9963E_drv.c ****         return errorcode;
+ 229:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 230:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 231:Lib/L9963E_lib/src/L9963E_drv.c ****     current_tick = L9963E_DRV_GETTICK(handle);
+ 860              		.loc 1 231 5 is_stmt 1 view .LVU224
+ 861              		.loc 1 231 20 is_stmt 0 view .LVU225
+ 862 0044 D8F81030 		ldr	r3, [r8, #16]
+ 863 0048 9847     		blx	r3
+ 864              	.LVL96:
+ 865              		.loc 1 231 20 view .LVU226
+ 866 004a 8246     		mov	r10, r0
+ 867              	.LVL97:
+ 232:Lib/L9963E_lib/src/L9963E_drv.c ****     for (uint8_t i = 0; i < expected_frames_n; ++i) {
+ 868              		.loc 1 232 5 is_stmt 1 view .LVU227
+ 869              	.LBB3:
+ 870              		.loc 1 232 10 view .LVU228
+ 871              		.loc 1 232 10 is_stmt 0 view .LVU229
+ 872 004c 5B46     		mov	r3, fp
+ 873 004e AB46     		mov	fp, r5
+ 874 0050 1D46     		mov	r5, r3
+ 875              	.LVL98:
+ 876              		.loc 1 232 5 view .LVU230
+ 877 0052 0BE0     		b	.L45
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 21
+
+
+ 878              	.LVL99:
+ 879              	.L46:
+ 233:Lib/L9963E_lib/src/L9963E_drv.c ****         errorcode = _L9963E_DRV_wait_and_receive(&frame, handle, device, current_tick, timeout);
+ 234:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 235:Lib/L9963E_lib/src/L9963E_drv.c ****         if (errorcode != L9963E_OK) {
+ 236:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ 237:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 238:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 239:Lib/L9963E_lib/src/L9963E_drv.c ****         if (frame.cmd.addr == command)
+ 240:Lib/L9963E_lib/src/L9963E_drv.c ****             frame.cmd.addr = 1;
+ 241:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 242:Lib/L9963E_lib/src/L9963E_drv.c ****         data->generics[(frame.cmd.addr & 0b11111) - 1] = frame.cmd.data;
+ 880              		.loc 1 242 9 is_stmt 1 view .LVU231
+ 881              		.loc 1 242 34 is_stmt 0 view .LVU232
+ 882 0054 9DF81B30 		ldrb	r3, [sp, #27]	@ zero_extendqisi2
+ 883              		.loc 1 242 40 view .LVU233
+ 884 0058 C3F38403 		ubfx	r3, r3, #2, #5
+ 885              		.loc 1 242 51 view .LVU234
+ 886 005c 013B     		subs	r3, r3, #1
+ 887              		.loc 1 242 67 view .LVU235
+ 888 005e 069A     		ldr	r2, [sp, #24]
+ 889 0060 C2F39112 		ubfx	r2, r2, #6, #18
+ 890              		.loc 1 242 56 view .LVU236
+ 891 0064 4BF82320 		str	r2, [fp, r3, lsl #2]
+ 232:Lib/L9963E_lib/src/L9963E_drv.c ****     for (uint8_t i = 0; i < expected_frames_n; ++i) {
+ 892              		.loc 1 232 48 is_stmt 1 discriminator 2 view .LVU237
+ 893 0068 0134     		adds	r4, r4, #1
+ 894              	.LVL100:
+ 232:Lib/L9963E_lib/src/L9963E_drv.c ****     for (uint8_t i = 0; i < expected_frames_n; ++i) {
+ 895              		.loc 1 232 48 is_stmt 0 discriminator 2 view .LVU238
+ 896 006a E4B2     		uxtb	r4, r4
+ 897              	.LVL101:
+ 898              	.L45:
+ 232:Lib/L9963E_lib/src/L9963E_drv.c ****     for (uint8_t i = 0; i < expected_frames_n; ++i) {
+ 899              		.loc 1 232 27 is_stmt 1 discriminator 1 view .LVU239
+ 900 006c 4C45     		cmp	r4, r9
+ 901 006e 24D2     		bcs	.L44
+ 233:Lib/L9963E_lib/src/L9963E_drv.c ****         errorcode = _L9963E_DRV_wait_and_receive(&frame, handle, device, current_tick, timeout);
+ 902              		.loc 1 233 9 view .LVU240
+ 233:Lib/L9963E_lib/src/L9963E_drv.c ****         errorcode = _L9963E_DRV_wait_and_receive(&frame, handle, device, current_tick, timeout);
+ 903              		.loc 1 233 21 is_stmt 0 view .LVU241
+ 904 0070 0095     		str	r5, [sp]
+ 905 0072 5346     		mov	r3, r10
+ 906 0074 3246     		mov	r2, r6
+ 907 0076 4146     		mov	r1, r8
+ 908 0078 06A8     		add	r0, sp, #24
+ 909 007a FFF7FEFF 		bl	_L9963E_DRV_wait_and_receive
+ 910              	.LVL102:
+ 235:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ 911              		.loc 1 235 9 is_stmt 1 view .LVU242
+ 235:Lib/L9963E_lib/src/L9963E_drv.c ****             return errorcode;
+ 912              		.loc 1 235 12 is_stmt 0 view .LVU243
+ 913 007e 00BB     		cbnz	r0, .L50
+ 239:Lib/L9963E_lib/src/L9963E_drv.c ****             frame.cmd.addr = 1;
+ 914              		.loc 1 239 9 is_stmt 1 view .LVU244
+ 239:Lib/L9963E_lib/src/L9963E_drv.c ****             frame.cmd.addr = 1;
+ 915              		.loc 1 239 22 is_stmt 0 view .LVU245
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 22
+
+
+ 916 0080 9DF81B20 		ldrb	r2, [sp, #27]	@ zero_extendqisi2
+ 917 0084 9DF81C30 		ldrb	r3, [sp, #28]	@ zero_extendqisi2
+ 918 0088 03F00103 		and	r3, r3, #1
+ 919 008c 9B01     		lsls	r3, r3, #6
+ 920 008e 43EA9203 		orr	r3, r3, r2, lsr #2
+ 239:Lib/L9963E_lib/src/L9963E_drv.c ****             frame.cmd.addr = 1;
+ 921              		.loc 1 239 12 view .LVU246
+ 922 0092 BB42     		cmp	r3, r7
+ 923 0094 DED1     		bne	.L46
+ 240:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 924              		.loc 1 240 13 is_stmt 1 view .LVU247
+ 240:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 925              		.loc 1 240 28 is_stmt 0 view .LVU248
+ 926 0096 02F00303 		and	r3, r2, #3
+ 927 009a 43F00403 		orr	r3, r3, #4
+ 928 009e 8DF81B30 		strb	r3, [sp, #27]
+ 929 00a2 9DF81C30 		ldrb	r3, [sp, #28]	@ zero_extendqisi2
+ 930 00a6 23F00103 		bic	r3, r3, #1
+ 931 00aa 8DF81C30 		strb	r3, [sp, #28]
+ 932 00ae D1E7     		b	.L46
+ 933              	.LVL103:
+ 934              	.L48:
+ 240:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 935              		.loc 1 240 28 view .LVU249
+ 936              	.LBE3:
+ 215:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 937              		.loc 1 215 16 view .LVU250
+ 938 00b0 0123     		movs	r3, #1
+ 939              	.LVL104:
+ 215:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 940              		.loc 1 215 16 view .LVU251
+ 941 00b2 0393     		str	r3, [sp, #12]
+ 942 00b4 01E0     		b	.L44
+ 943              	.LVL105:
+ 944              	.L49:
+ 219:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 945              		.loc 1 219 16 view .LVU252
+ 946 00b6 0123     		movs	r3, #1
+ 947              	.LVL106:
+ 219:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 948              		.loc 1 219 16 view .LVU253
+ 949 00b8 0393     		str	r3, [sp, #12]
+ 950              	.LVL107:
+ 951              	.L44:
+ 243:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 244:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 245:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_OK;
+ 246:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 952              		.loc 1 246 1 view .LVU254
+ 953 00ba 0398     		ldr	r0, [sp, #12]
+ 954 00bc 09B0     		add	sp, sp, #36
+ 955              		.cfi_remember_state
+ 956              		.cfi_def_cfa_offset 36
+ 957              		@ sp needed
+ 958 00be BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 959              	.LVL108:
+ 960              	.L50:
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 23
+
+
+ 961              		.cfi_restore_state
+ 962              	.LBB4:
+ 236:Lib/L9963E_lib/src/L9963E_drv.c ****         }
+ 963              		.loc 1 236 20 view .LVU255
+ 964 00c2 0390     		str	r0, [sp, #12]
+ 965 00c4 F9E7     		b	.L44
+ 966              	.LBE4:
+ 967              		.cfi_endproc
+ 968              	.LFE7:
+ 970              		.section	.text._L9963E_DRV_reg_cmd,"ax",%progbits
+ 971              		.align	1
+ 972              		.global	_L9963E_DRV_reg_cmd
+ 973              		.syntax unified
+ 974              		.thumb
+ 975              		.thumb_func
+ 977              	_L9963E_DRV_reg_cmd:
+ 978              	.LVL109:
+ 979              	.LFB8:
+ 247:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 248:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef _L9963E_DRV_reg_cmd(L9963E_DRV_HandleTypeDef *handle,
+ 249:Lib/L9963E_lib/src/L9963E_drv.c ****                                          uint8_t is_write,
+ 250:Lib/L9963E_lib/src/L9963E_drv.c ****                                          uint8_t device,
+ 251:Lib/L9963E_lib/src/L9963E_drv.c ****                                          L9963E_RegistersAddrTypeDef address,
+ 252:Lib/L9963E_lib/src/L9963E_drv.c ****                                          L9963E_RegisterUnionTypeDef *data,
+ 253:Lib/L9963E_lib/src/L9963E_drv.c ****                                          uint8_t timeout) {
+ 980              		.loc 1 253 59 is_stmt 1 view -0
+ 981              		.cfi_startproc
+ 982              		@ args = 8, pretend = 0, frame = 16
+ 983              		@ frame_needed = 0, uses_anonymous_args = 0
+ 984              		.loc 1 253 59 is_stmt 0 view .LVU257
+ 985 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 986              		.cfi_def_cfa_offset 24
+ 987              		.cfi_offset 4, -24
+ 988              		.cfi_offset 5, -20
+ 989              		.cfi_offset 6, -16
+ 990              		.cfi_offset 7, -12
+ 991              		.cfi_offset 8, -8
+ 992              		.cfi_offset 14, -4
+ 993 0004 86B0     		sub	sp, sp, #24
+ 994              		.cfi_def_cfa_offset 48
+ 995 0006 0C9F     		ldr	r7, [sp, #48]
+ 254:Lib/L9963E_lib/src/L9963E_drv.c ****     union L9963E_DRV_FrameUnion frame;
+ 996              		.loc 1 254 5 is_stmt 1 view .LVU258
+ 255:Lib/L9963E_lib/src/L9963E_drv.c ****     L9963E_StatusTypeDef errorcode = L9963E_OK;
+ 997              		.loc 1 255 5 view .LVU259
+ 998              	.LVL110:
+ 256:Lib/L9963E_lib/src/L9963E_drv.c ****     uint8_t raw[5];
+ 999              		.loc 1 256 5 view .LVU260
+ 257:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 258:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 259:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 1000              		.loc 1 259 5 view .LVU261
+ 1001              		.loc 1 259 8 is_stmt 0 view .LVU262
+ 1002 0008 0028     		cmp	r0, #0
+ 1003 000a 39D0     		beq	.L56
+ 1004 000c 0D46     		mov	r5, r1
+ 1005 000e 1446     		mov	r4, r2
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 24
+
+
+ 1006 0010 0646     		mov	r6, r0
+ 260:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 261:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 262:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 263:Lib/L9963E_lib/src/L9963E_drv.c ****     if (data == NULL) {
+ 1007              		.loc 1 263 5 is_stmt 1 view .LVU263
+ 1008              		.loc 1 263 8 is_stmt 0 view .LVU264
+ 1009 0012 002F     		cmp	r7, #0
+ 1010 0014 36D0     		beq	.L57
+ 264:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 265:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 266:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 267:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 268:Lib/L9963E_lib/src/L9963E_drv.c ****     _L9963E_DRV_build_frame(raw, 1, is_write ? 1 : 0, device, address, is_write ? data->generic : 0
+ 1011              		.loc 1 268 5 is_stmt 1 view .LVU265
+ 1012 0016 0029     		cmp	r1, #0
+ 1013 0018 14BF     		ite	ne
+ 1014 001a 0122     		movne	r2, #1
+ 1015              	.LVL111:
+ 1016              		.loc 1 268 5 is_stmt 0 view .LVU266
+ 1017 001c 0022     		moveq	r2, #0
+ 1018 001e 2DD0     		beq	.L58
+ 1019              		.loc 1 268 5 discriminator 1 view .LVU267
+ 1020 0020 3968     		ldr	r1, [r7]
+ 1021              	.LVL112:
+ 1022              	.L54:
+ 1023              		.loc 1 268 5 discriminator 4 view .LVU268
+ 1024 0022 0DF10808 		add	r8, sp, #8
+ 1025 0026 0191     		str	r1, [sp, #4]
+ 1026 0028 0093     		str	r3, [sp]
+ 1027 002a 2346     		mov	r3, r4
+ 1028              	.LVL113:
+ 1029              		.loc 1 268 5 discriminator 4 view .LVU269
+ 1030 002c 0121     		movs	r1, #1
+ 1031 002e 4046     		mov	r0, r8
+ 1032              	.LVL114:
+ 1033              		.loc 1 268 5 discriminator 4 view .LVU270
+ 1034 0030 FFF7FEFF 		bl	_L9963E_DRV_build_frame
+ 1035              	.LVL115:
+ 269:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 270:Lib/L9963E_lib/src/L9963E_drv.c ****     errorcode = _L9963E_DRV_spi_transmit(handle, raw, 5, 10);
+ 1036              		.loc 1 270 5 is_stmt 1 view .LVU271
+ 1037              		.loc 1 270 17 is_stmt 0 view .LVU272
+ 1038 0034 0A23     		movs	r3, #10
+ 1039 0036 0522     		movs	r2, #5
+ 1040 0038 4146     		mov	r1, r8
+ 1041 003a 3046     		mov	r0, r6
+ 1042 003c FFF7FEFF 		bl	_L9963E_DRV_spi_transmit
+ 1043              	.LVL116:
+ 271:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 272:Lib/L9963E_lib/src/L9963E_drv.c ****     if (errorcode != L9963E_OK) {
+ 1044              		.loc 1 272 5 is_stmt 1 view .LVU273
+ 1045              		.loc 1 272 8 is_stmt 0 view .LVU274
+ 1046 0040 0346     		mov	r3, r0
+ 1047 0042 B8B9     		cbnz	r0, .L53
+ 273:Lib/L9963E_lib/src/L9963E_drv.c ****         return errorcode;
+ 274:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 25
+
+
+ 275:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 276:Lib/L9963E_lib/src/L9963E_drv.c ****     errorcode = _L9963E_DRV_wait_and_receive(&frame, handle, device, L9963E_DRV_GETTICK(handle), ti
+ 1048              		.loc 1 276 5 is_stmt 1 view .LVU275
+ 1049              		.loc 1 276 70 is_stmt 0 view .LVU276
+ 1050 0044 3369     		ldr	r3, [r6, #16]
+ 1051              		.loc 1 276 17 view .LVU277
+ 1052 0046 9847     		blx	r3
+ 1053              	.LVL117:
+ 1054              		.loc 1 276 17 view .LVU278
+ 1055 0048 0346     		mov	r3, r0
+ 1056              		.loc 1 276 17 discriminator 1 view .LVU279
+ 1057 004a 9DF83420 		ldrb	r2, [sp, #52]	@ zero_extendqisi2
+ 1058 004e 0092     		str	r2, [sp]
+ 1059 0050 2246     		mov	r2, r4
+ 1060 0052 3146     		mov	r1, r6
+ 1061 0054 04A8     		add	r0, sp, #16
+ 1062 0056 FFF7FEFF 		bl	_L9963E_DRV_wait_and_receive
+ 1063              	.LVL118:
+ 277:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 278:Lib/L9963E_lib/src/L9963E_drv.c ****     if (errorcode != L9963E_OK) {
+ 1064              		.loc 1 278 5 is_stmt 1 view .LVU280
+ 1065              		.loc 1 278 8 is_stmt 0 view .LVU281
+ 1066 005a 0346     		mov	r3, r0
+ 1067 005c 50B9     		cbnz	r0, .L53
+ 279:Lib/L9963E_lib/src/L9963E_drv.c ****         return errorcode;
+ 280:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 281:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 282:Lib/L9963E_lib/src/L9963E_drv.c ****     if (is_write && frame.cmd.data != data->generic) {
+ 1068              		.loc 1 282 5 is_stmt 1 view .LVU282
+ 1069              		.loc 1 282 8 is_stmt 0 view .LVU283
+ 1070 005e 2DB1     		cbz	r5, .L55
+ 1071              		.loc 1 282 30 discriminator 1 view .LVU284
+ 1072 0060 049A     		ldr	r2, [sp, #16]
+ 1073 0062 C2F39112 		ubfx	r2, r2, #6, #18
+ 1074              		.loc 1 282 43 discriminator 1 view .LVU285
+ 1075 0066 3968     		ldr	r1, [r7]
+ 1076              		.loc 1 282 18 discriminator 1 view .LVU286
+ 1077 0068 8A42     		cmp	r2, r1
+ 1078 006a 0DD1     		bne	.L59
+ 1079              	.L55:
+ 283:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_READBACK_ERROR;
+ 284:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 285:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 286:Lib/L9963E_lib/src/L9963E_drv.c ****     data->generic = frame.cmd.data;
+ 1080              		.loc 1 286 5 is_stmt 1 view .LVU287
+ 1081              		.loc 1 286 30 is_stmt 0 view .LVU288
+ 1082 006c 049A     		ldr	r2, [sp, #16]
+ 1083 006e C2F39112 		ubfx	r2, r2, #6, #18
+ 1084              		.loc 1 286 19 view .LVU289
+ 1085 0072 3A60     		str	r2, [r7]
+ 287:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 288:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_OK;
+ 1086              		.loc 1 288 5 is_stmt 1 view .LVU290
+ 1087              	.LVL119:
+ 1088              	.L53:
+ 289:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1089              		.loc 1 289 1 is_stmt 0 view .LVU291
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 26
+
+
+ 1090 0074 1846     		mov	r0, r3
+ 1091 0076 06B0     		add	sp, sp, #24
+ 1092              		.cfi_remember_state
+ 1093              		.cfi_def_cfa_offset 24
+ 1094              		@ sp needed
+ 1095 0078 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1096              	.LVL120:
+ 1097              	.L58:
+ 1098              		.cfi_restore_state
+ 268:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 1099              		.loc 1 268 5 discriminator 2 view .LVU292
+ 1100 007c 0021     		movs	r1, #0
+ 1101              	.LVL121:
+ 268:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 1102              		.loc 1 268 5 discriminator 2 view .LVU293
+ 1103 007e D0E7     		b	.L54
+ 1104              	.LVL122:
+ 1105              	.L56:
+ 260:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 1106              		.loc 1 260 16 view .LVU294
+ 1107 0080 0123     		movs	r3, #1
+ 1108              	.LVL123:
+ 260:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 1109              		.loc 1 260 16 view .LVU295
+ 1110 0082 F7E7     		b	.L53
+ 1111              	.LVL124:
+ 1112              	.L57:
+ 264:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 1113              		.loc 1 264 16 view .LVU296
+ 1114 0084 0123     		movs	r3, #1
+ 1115              	.LVL125:
+ 264:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 1116              		.loc 1 264 16 view .LVU297
+ 1117 0086 F5E7     		b	.L53
+ 1118              	.LVL126:
+ 1119              	.L59:
+ 283:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 1120              		.loc 1 283 16 view .LVU298
+ 1121 0088 0423     		movs	r3, #4
+ 1122 008a F3E7     		b	.L53
+ 1123              		.cfi_endproc
+ 1124              	.LFE8:
+ 1126              		.section	.text.L9963E_DRV_reg_read,"ax",%progbits
+ 1127              		.align	1
+ 1128              		.global	L9963E_DRV_reg_read
+ 1129              		.syntax unified
+ 1130              		.thumb
+ 1131              		.thumb_func
+ 1133              	L9963E_DRV_reg_read:
+ 1134              	.LVL127:
+ 1135              	.LFB9:
+ 290:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 291:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_reg_read(L9963E_DRV_HandleTypeDef *handle,
+ 292:Lib/L9963E_lib/src/L9963E_drv.c ****                                          uint8_t device,
+ 293:Lib/L9963E_lib/src/L9963E_drv.c ****                                          L9963E_RegistersAddrTypeDef address,
+ 294:Lib/L9963E_lib/src/L9963E_drv.c ****                                          L9963E_RegisterUnionTypeDef *data,
+ 295:Lib/L9963E_lib/src/L9963E_drv.c ****                                          uint8_t timeout) {
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 27
+
+
+ 1136              		.loc 1 295 59 is_stmt 1 view -0
+ 1137              		.cfi_startproc
+ 1138              		@ args = 4, pretend = 0, frame = 0
+ 1139              		@ frame_needed = 0, uses_anonymous_args = 0
+ 296:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 297:Lib/L9963E_lib/src/L9963E_drv.c ****     if (device == 0) {
+ 1140              		.loc 1 297 5 view .LVU300
+ 1141              		.loc 1 297 8 is_stmt 0 view .LVU301
+ 1142 0000 09B9     		cbnz	r1, .L68
+ 298:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 1143              		.loc 1 298 16 view .LVU302
+ 1144 0002 0120     		movs	r0, #1
+ 1145              	.LVL128:
+ 299:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 300:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 301:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 302:Lib/L9963E_lib/src/L9963E_drv.c ****     return _L9963E_DRV_reg_cmd(handle, 0, device, address, data, timeout);
+ 303:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1146              		.loc 1 303 1 view .LVU303
+ 1147 0004 7047     		bx	lr
+ 1148              	.LVL129:
+ 1149              	.L68:
+ 295:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 1150              		.loc 1 295 59 view .LVU304
+ 1151 0006 00B5     		push	{lr}
+ 1152              		.cfi_def_cfa_offset 4
+ 1153              		.cfi_offset 14, -4
+ 1154 0008 83B0     		sub	sp, sp, #12
+ 1155              		.cfi_def_cfa_offset 16
+ 1156 000a 8C46     		mov	ip, r1
+ 302:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1157              		.loc 1 302 5 is_stmt 1 view .LVU305
+ 302:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1158              		.loc 1 302 12 is_stmt 0 view .LVU306
+ 1159 000c 9DF81010 		ldrb	r1, [sp, #16]	@ zero_extendqisi2
+ 1160              	.LVL130:
+ 302:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1161              		.loc 1 302 12 view .LVU307
+ 1162 0010 0191     		str	r1, [sp, #4]
+ 1163 0012 0093     		str	r3, [sp]
+ 1164 0014 1346     		mov	r3, r2
+ 1165              	.LVL131:
+ 302:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1166              		.loc 1 302 12 view .LVU308
+ 1167 0016 6246     		mov	r2, ip
+ 1168              	.LVL132:
+ 302:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1169              		.loc 1 302 12 view .LVU309
+ 1170 0018 0021     		movs	r1, #0
+ 1171 001a FFF7FEFF 		bl	_L9963E_DRV_reg_cmd
+ 1172              	.LVL133:
+ 1173              		.loc 1 303 1 view .LVU310
+ 1174 001e 03B0     		add	sp, sp, #12
+ 1175              		.cfi_def_cfa_offset 4
+ 1176              		@ sp needed
+ 1177 0020 5DF804FB 		ldr	pc, [sp], #4
+ 1178              		.loc 1 303 1 view .LVU311
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 28
+
+
+ 1179              		.cfi_endproc
+ 1180              	.LFE9:
+ 1182              		.section	.text.L9963E_DRV_reg_write,"ax",%progbits
+ 1183              		.align	1
+ 1184              		.global	L9963E_DRV_reg_write
+ 1185              		.syntax unified
+ 1186              		.thumb
+ 1187              		.thumb_func
+ 1189              	L9963E_DRV_reg_write:
+ 1190              	.LVL134:
+ 1191              	.LFB10:
+ 304:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 305:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_reg_write(L9963E_DRV_HandleTypeDef *handle,
+ 306:Lib/L9963E_lib/src/L9963E_drv.c ****                                           uint8_t device,
+ 307:Lib/L9963E_lib/src/L9963E_drv.c ****                                           L9963E_RegistersAddrTypeDef address,
+ 308:Lib/L9963E_lib/src/L9963E_drv.c ****                                           L9963E_RegisterUnionTypeDef *data,
+ 309:Lib/L9963E_lib/src/L9963E_drv.c ****                                           uint8_t timeout) {
+ 1192              		.loc 1 309 60 is_stmt 1 view -0
+ 1193              		.cfi_startproc
+ 1194              		@ args = 4, pretend = 0, frame = 0
+ 1195              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1196              		.loc 1 309 60 is_stmt 0 view .LVU313
+ 1197 0000 10B5     		push	{r4, lr}
+ 1198              		.cfi_def_cfa_offset 8
+ 1199              		.cfi_offset 4, -8
+ 1200              		.cfi_offset 14, -4
+ 1201 0002 82B0     		sub	sp, sp, #8
+ 1202              		.cfi_def_cfa_offset 16
+ 310:Lib/L9963E_lib/src/L9963E_drv.c ****     return _L9963E_DRV_reg_cmd(handle, 1, device, address, data, timeout);
+ 1203              		.loc 1 310 5 is_stmt 1 view .LVU314
+ 1204              		.loc 1 310 12 is_stmt 0 view .LVU315
+ 1205 0004 9DF81040 		ldrb	r4, [sp, #16]	@ zero_extendqisi2
+ 1206 0008 0194     		str	r4, [sp, #4]
+ 1207 000a 0093     		str	r3, [sp]
+ 1208 000c 1346     		mov	r3, r2
+ 1209              	.LVL135:
+ 1210              		.loc 1 310 12 view .LVU316
+ 1211 000e 0A46     		mov	r2, r1
+ 1212              	.LVL136:
+ 1213              		.loc 1 310 12 view .LVU317
+ 1214 0010 0121     		movs	r1, #1
+ 1215              	.LVL137:
+ 1216              		.loc 1 310 12 view .LVU318
+ 1217 0012 FFF7FEFF 		bl	_L9963E_DRV_reg_cmd
+ 1218              	.LVL138:
+ 311:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1219              		.loc 1 311 1 view .LVU319
+ 1220 0016 02B0     		add	sp, sp, #8
+ 1221              		.cfi_def_cfa_offset 8
+ 1222              		@ sp needed
+ 1223 0018 10BD     		pop	{r4, pc}
+ 1224              		.loc 1 311 1 view .LVU320
+ 1225              		.cfi_endproc
+ 1226              	.LFE10:
+ 1228              		.section	.text.L9963E_DRV_trans_sleep,"ax",%progbits
+ 1229              		.align	1
+ 1230              		.global	L9963E_DRV_trans_sleep
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 29
+
+
+ 1231              		.syntax unified
+ 1232              		.thumb
+ 1233              		.thumb_func
+ 1235              	L9963E_DRV_trans_sleep:
+ 1236              	.LVL139:
+ 1237              	.LFB11:
+ 312:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 313:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_trans_sleep(L9963E_DRV_HandleTypeDef *handle) {
+ 1238              		.loc 1 313 79 is_stmt 1 view -0
+ 1239              		.cfi_startproc
+ 1240              		@ args = 0, pretend = 0, frame = 0
+ 1241              		@ frame_needed = 0, uses_anonymous_args = 0
+ 314:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 315:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 1242              		.loc 1 315 5 view .LVU322
+ 1243              		.loc 1 315 8 is_stmt 0 view .LVU323
+ 1244 0000 28B1     		cbz	r0, .L73
+ 313:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 1245              		.loc 1 313 79 view .LVU324
+ 1246 0002 08B5     		push	{r3, lr}
+ 1247              		.cfi_def_cfa_offset 8
+ 1248              		.cfi_offset 3, -8
+ 1249              		.cfi_offset 14, -4
+ 316:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 317:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 318:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 319:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 320:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_DRV_DIS_LOW(handle);
+ 1250              		.loc 1 320 5 is_stmt 1 view .LVU325
+ 1251              		.loc 1 320 12 is_stmt 0 view .LVU326
+ 1252 0004 4368     		ldr	r3, [r0, #4]
+ 1253 0006 0021     		movs	r1, #0
+ 1254 0008 0420     		movs	r0, #4
+ 1255              	.LVL140:
+ 1256              		.loc 1 320 12 view .LVU327
+ 1257 000a 9847     		blx	r3
+ 1258              	.LVL141:
+ 321:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1259              		.loc 1 321 1 view .LVU328
+ 1260 000c 08BD     		pop	{r3, pc}
+ 1261              	.LVL142:
+ 1262              	.L73:
+ 1263              		.cfi_def_cfa_offset 0
+ 1264              		.cfi_restore 3
+ 1265              		.cfi_restore 14
+ 316:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 1266              		.loc 1 316 16 view .LVU329
+ 1267 000e 0120     		movs	r0, #1
+ 1268              	.LVL143:
+ 1269              		.loc 1 321 1 view .LVU330
+ 1270 0010 7047     		bx	lr
+ 1271              		.cfi_endproc
+ 1272              	.LFE11:
+ 1274              		.section	.text.L9963E_DRV_trans_wakeup,"ax",%progbits
+ 1275              		.align	1
+ 1276              		.global	L9963E_DRV_trans_wakeup
+ 1277              		.syntax unified
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 30
+
+
+ 1278              		.thumb
+ 1279              		.thumb_func
+ 1281              	L9963E_DRV_trans_wakeup:
+ 1282              	.LVL144:
+ 1283              	.LFB12:
+ 322:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 323:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_StatusTypeDef L9963E_DRV_trans_wakeup(L9963E_DRV_HandleTypeDef *handle) {
+ 1284              		.loc 1 323 80 is_stmt 1 view -0
+ 1285              		.cfi_startproc
+ 1286              		@ args = 0, pretend = 0, frame = 0
+ 1287              		@ frame_needed = 0, uses_anonymous_args = 0
+ 324:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 325:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 1288              		.loc 1 325 5 view .LVU332
+ 1289              		.loc 1 325 8 is_stmt 0 view .LVU333
+ 1290 0000 28B1     		cbz	r0, .L80
+ 323:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 1291              		.loc 1 323 80 view .LVU334
+ 1292 0002 08B5     		push	{r3, lr}
+ 1293              		.cfi_def_cfa_offset 8
+ 1294              		.cfi_offset 3, -8
+ 1295              		.cfi_offset 14, -4
+ 326:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 327:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 328:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 329:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 330:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_DRV_DIS_HIGH(handle);
+ 1296              		.loc 1 330 5 is_stmt 1 view .LVU335
+ 1297              		.loc 1 330 12 is_stmt 0 view .LVU336
+ 1298 0004 4368     		ldr	r3, [r0, #4]
+ 1299 0006 0121     		movs	r1, #1
+ 1300 0008 0420     		movs	r0, #4
+ 1301              	.LVL145:
+ 1302              		.loc 1 330 12 view .LVU337
+ 1303 000a 9847     		blx	r3
+ 1304              	.LVL146:
+ 331:Lib/L9963E_lib/src/L9963E_drv.c **** }
+ 1305              		.loc 1 331 1 view .LVU338
+ 1306 000c 08BD     		pop	{r3, pc}
+ 1307              	.LVL147:
+ 1308              	.L80:
+ 1309              		.cfi_def_cfa_offset 0
+ 1310              		.cfi_restore 3
+ 1311              		.cfi_restore 14
+ 326:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 1312              		.loc 1 326 16 view .LVU339
+ 1313 000e 0120     		movs	r0, #1
+ 1314              	.LVL148:
+ 1315              		.loc 1 331 1 view .LVU340
+ 1316 0010 7047     		bx	lr
+ 1317              		.cfi_endproc
+ 1318              	.LFE12:
+ 1320              		.section	.text.L9963E_DRV_trans_is_sleeping,"ax",%progbits
+ 1321              		.align	1
+ 1322              		.global	L9963E_DRV_trans_is_sleeping
+ 1323              		.syntax unified
+ 1324              		.thumb
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 31
+
+
+ 1325              		.thumb_func
+ 1327              	L9963E_DRV_trans_is_sleeping:
+ 1328              	.LVL149:
+ 1329              	.LFB13:
+ 332:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 333:Lib/L9963E_lib/src/L9963E_drv.c **** L9963E_IF_PinState L9963E_DRV_trans_is_sleeping(L9963E_DRV_HandleTypeDef *handle) {
+ 1330              		.loc 1 333 83 is_stmt 1 view -0
+ 1331              		.cfi_startproc
+ 1332              		@ args = 0, pretend = 0, frame = 0
+ 1333              		@ frame_needed = 0, uses_anonymous_args = 0
+ 334:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 335:Lib/L9963E_lib/src/L9963E_drv.c ****     if (handle == NULL) {
+ 1334              		.loc 1 335 5 view .LVU342
+ 1335              		.loc 1 335 8 is_stmt 0 view .LVU343
+ 1336 0000 20B1     		cbz	r0, .L87
+ 333:Lib/L9963E_lib/src/L9963E_drv.c **** #if L9963E_DEBUG
+ 1337              		.loc 1 333 83 view .LVU344
+ 1338 0002 08B5     		push	{r3, lr}
+ 1339              		.cfi_def_cfa_offset 8
+ 1340              		.cfi_offset 3, -8
+ 1341              		.cfi_offset 14, -4
+ 336:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 337:Lib/L9963E_lib/src/L9963E_drv.c ****     }
+ 338:Lib/L9963E_lib/src/L9963E_drv.c **** #endif
+ 339:Lib/L9963E_lib/src/L9963E_drv.c **** 
+ 340:Lib/L9963E_lib/src/L9963E_drv.c ****     return L9963E_DRV_DIS_READ(handle);
+ 1342              		.loc 1 340 5 is_stmt 1 view .LVU345
+ 1343              		.loc 1 340 12 is_stmt 0 view .LVU346
+ 1344 0004 0368     		ldr	r3, [r0]
+ 1345 0006 0420     		movs	r0, #4
+ 1346              	.LVL150:
+ 1347              		.loc 1 340 12 view .LVU347
+ 1348 0008 9847     		blx	r3
+ 1349              	.LVL151:
+ 341:Lib/L9963E_lib/src/L9963E_drv.c **** }...
+ 1350              		.loc 1 341 1 view .LVU348
+ 1351 000a 08BD     		pop	{r3, pc}
+ 1352              	.LVL152:
+ 1353              	.L87:
+ 1354              		.cfi_def_cfa_offset 0
+ 1355              		.cfi_restore 3
+ 1356              		.cfi_restore 14
+ 336:Lib/L9963E_lib/src/L9963E_drv.c ****         return L9963E_ERROR;
+ 1357              		.loc 1 336 16 view .LVU349
+ 1358 000c 0120     		movs	r0, #1
+ 1359              	.LVL153:
+ 1360              		.loc 1 341 1 view .LVU350
+ 1361 000e 7047     		bx	lr
+ 1362              		.cfi_endproc
+ 1363              	.LFE13:
+ 1365              		.section	.rodata.dummy.0,"a"
+ 1366              		.align	2
+ 1369              	dummy.0:
+ 1370 0000 55555555 		.ascii	"UUUUU"
+ 1370      55
+ 1371              		.global	crc6_lut
+ 1372              		.section	.data.crc6_lut,"aw"
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 32
+
+
+ 1373              		.align	2
+ 1376              	crc6_lut:
+ 1377 0000 0019322B 		.ascii	"\000\0312+=$\017\026#:\021\010\036\007,5\037\006-4\""
+ 1377      3D240F16 
+ 1377      233A1108 
+ 1377      1E072C35 
+ 1377      1F062D34 
+ 1378 0015 3B10093C 		.ascii	";\020\011<%\016\027\001\0303*>'\014\025\003\0321(\035"
+ 1378      250E1701 
+ 1378      18332A3E 
+ 1378      270C1503 
+ 1378      1A31281D 
+ 1379 0029 042F3620 		.ascii	"\004/6 9\022\013!8\023\012\034\005.7\002\0330)?&\015"
+ 1379      39120B21 
+ 1379      38130A1C 
+ 1379      052E3702 
+ 1379      1B30293F 
+ 1380 003f 14       		.ascii	"\024"
+ 1381              		.text
+ 1382              	.Letext0:
+ 1383              		.file 2 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 1384              		.file 3 "C:/Users/Alessandro/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-d
+ 1385              		.file 4 "Lib/L9963E_lib/inc/L9963E_burst.h"
+ 1386              		.file 5 "Lib/L9963E_lib/inc/L9963E_status.h"
+ 1387              		.file 6 "Lib/L9963E_lib/inc/L9963E_interface.h"
+ 1388              		.file 7 "Lib/L9963E_lib/inc/L9963E_registers.h"
+ 1389              		.file 8 "Lib/L9963E_lib/inc/L9963E_drv.h"
+ARM GAS  C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s 			page 33
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 L9963E_drv.c
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:21     .text.L9963E_DRV_crc_calc:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:27     .text.L9963E_DRV_crc_calc:00000000 L9963E_DRV_crc_calc
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:156    .text.L9963E_DRV_crc_calc:00000080 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1376   .data.crc6_lut:00000000 crc6_lut
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:161    .text.L9963E_DRV_init:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:167    .text.L9963E_DRV_init:00000000 L9963E_DRV_init
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:320    .text.L9963E_DRV_wakeup:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:326    .text.L9963E_DRV_wakeup:00000000 L9963E_DRV_wakeup
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:384    .text.L9963E_DRV_wakeup:0000002c $d
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1369   .rodata.dummy.0:00000000 dummy.0
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:389    .text._L9963E_DRV_switch_endianness:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:395    .text._L9963E_DRV_switch_endianness:00000000 _L9963E_DRV_switch_endianness
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:431    .text._L9963E_DRV_build_frame:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:437    .text._L9963E_DRV_build_frame:00000000 _L9963E_DRV_build_frame
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:523    .text._L9963E_DRV_spi_transmit:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:529    .text._L9963E_DRV_spi_transmit:00000000 _L9963E_DRV_spi_transmit
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:600    .text._L9963E_DRV_wait_and_receive:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:606    .text._L9963E_DRV_wait_and_receive:00000000 _L9963E_DRV_wait_and_receive
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:777    .text._L9963E_DRV_wait_and_receive:000000c0 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:782    .text.L9963E_DRV_burst_cmd:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:788    .text.L9963E_DRV_burst_cmd:00000000 L9963E_DRV_burst_cmd
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:971    .text._L9963E_DRV_reg_cmd:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:977    .text._L9963E_DRV_reg_cmd:00000000 _L9963E_DRV_reg_cmd
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1127   .text.L9963E_DRV_reg_read:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1133   .text.L9963E_DRV_reg_read:00000000 L9963E_DRV_reg_read
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1183   .text.L9963E_DRV_reg_write:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1189   .text.L9963E_DRV_reg_write:00000000 L9963E_DRV_reg_write
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1229   .text.L9963E_DRV_trans_sleep:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1235   .text.L9963E_DRV_trans_sleep:00000000 L9963E_DRV_trans_sleep
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1275   .text.L9963E_DRV_trans_wakeup:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1281   .text.L9963E_DRV_trans_wakeup:00000000 L9963E_DRV_trans_wakeup
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1321   .text.L9963E_DRV_trans_is_sleeping:00000000 $t
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1327   .text.L9963E_DRV_trans_is_sleeping:00000000 L9963E_DRV_trans_is_sleeping
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1366   .rodata.dummy.0:00000000 $d
+C:\Users\ALESSA~1\AppData\Local\Temp\cc2ey6Rg.s:1373   .data.crc6_lut:00000000 $d
+
+NO UNDEFINED SYMBOLS

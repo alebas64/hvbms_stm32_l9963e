@@ -1,0 +1,22 @@
+---
+name: source-code-compile
+
+on:
+    push:
+        branches: ["main"]
+    pull_request:
+        branches: ["main"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+      - name: Build STM32CubeIDE project
+        uses: xanderhendriks/action-build-stm32cubeide@v15.0
+        with:
+          project-path: '.'                            # Path to your .project file
+          project-target: 'stm_hvbms'
